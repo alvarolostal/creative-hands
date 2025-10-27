@@ -4,6 +4,7 @@ import { Search, Filter, Loader, Package } from 'lucide-react';
 import axios from 'axios';
 import ProductCard from '../components/ProductCard';
 import { useAuth } from '../context/AuthContext';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 const Products = () => {
   const { isAdmin } = useAuth();
@@ -11,6 +12,8 @@ const Products = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
+  const location = useLocation();
+  const navigate = useNavigate();
   
   const categories = [
     'Todas',
@@ -24,6 +27,17 @@ const Products = () => {
   useEffect(() => {
     fetchProducts();
   }, [selectedCategory]);
+
+  // Initialize selectedCategory from query param (e.g. /products?category=Joyería%20artesanal)
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const cat = params.get('category');
+    if (cat) {
+      // If the query says 'Todas', treat as no filter
+      setSelectedCategory(cat === 'Todas' ? '' : cat);
+    }
+    // only run on mount / when search changes
+  }, [location.search]);
 
   const fetchProducts = async () => {
     try {
@@ -102,7 +116,16 @@ const Products = () => {
                 key={category}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                onClick={() => setSelectedCategory(category === 'Todas' ? '' : category)}
+                onClick={() => {
+                  const val = category === 'Todas' ? '' : category;
+                  setSelectedCategory(val);
+                  // update URL so the selection is shareable
+                  if (val) {
+                    navigate(`/products?category=${encodeURIComponent(val)}`);
+                  } else {
+                    navigate('/products');
+                  }
+                }}
                 className={`px-4 py-2 rounded-full font-medium transition-all ${
                   (selectedCategory === category) || (selectedCategory === '' && category === 'Todas')
                     ? 'bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-lg'

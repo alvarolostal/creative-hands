@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Sparkles, Heart, Palette } from 'lucide-react';
+// kept minimal imports for the Home page (no server calls here)
 
 const Home = () => {
   return (
@@ -77,60 +78,120 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Features Section */}
+      {/* Featured Products Section (rediseñado): tarjetas que aparecen lateralmente al hacer scroll */}
       <section className="py-24 bg-white dark:bg-dark-500">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8 }} className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">¿Por qué elegirnos?</h2>
-            <p className="text-base md:text-lg text-gray-600 dark:text-gray-400">Cada pieza cuenta una historia única</p>
+          <motion.div initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }} className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">Destacados</h2>
+            <p className="text-base md:text-lg text-gray-600 dark:text-gray-400">Lo mejor de nuestro taller — calidad artesanal y diseño único.</p>
           </motion.div>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
-              { icon: Heart, title: 'Hecho con amor', description: 'Cada producto es elaborado con dedicación y pasión por el arte.', color: 'from-red-500 to-pink-500' },
-              { icon: Sparkles, title: 'Piezas únicas', description: 'No encontrarás dos piezas exactamente iguales. Todo es único.', color: 'from-yellow-500 to-orange-500' },
-              { icon: Palette, title: 'Arte auténtico', description: 'Apoyamos a artesanos locales y su talento creativo.', color: 'from-primary-500 to-primary-600' }
-            ].map((feature, index) => (
-              <motion.div key={index} initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: index * 0.15, duration: 0.8 }} whileHover={{ y: -10 }} className="glass p-8 rounded-3xl hover:shadow-2xl transition-all">
-                <div className={`w-16 h-16 bg-gradient-to-br ${feature.color} rounded-2xl flex items-center justify-center mb-6 shadow-lg`}>
-                  <feature.icon className="w-8 h-8 text-white" />
+              {
+                slug: 'Joyería artesanal',
+                title: 'Joyería artesanal',
+                text: 'Collares, anillos y piezas únicas trabajadas a mano.',
+                img: 'https://images.unsplash.com/photo-1697925493572-a8da651b0c12?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=2670'
+              },
+              {
+                slug: 'Cerámica y arcilla',
+                title: 'Cerámica y arcilla',
+                text: 'Vajillas y piezas de cerámica con acabados artesanales.',
+                img: 'https://images.unsplash.com/photo-1631125915902-d8abe9225ff2?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=774'
+              },
+              {
+                slug: 'Arte hecho a mano',
+                title: 'Arte hecho a mano',
+                text: 'Láminas, ilustraciones y obra original de artistas locales.',
+                img: 'https://plus.unsplash.com/premium_photo-1677609898243-63280b6c89a1?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=766'
+              }
+            ].map((c, i) => (
+              <motion.div
+                key={c.slug}
+                initial={{ opacity: 0, y: 12 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.3 }}
+                transition={{ duration: 0.5, delay: i * 0.06 }}
+                className="glass p-4 rounded-2xl shadow-lg hover:shadow-2xl transition-transform transform hover:-translate-y-1"
+              >
+                <div className="flex items-start gap-4">
+                  <div className="w-20 h-20 rounded-xl overflow-hidden flex-shrink-0">
+                    <img src={c.img} alt={c.title} className="w-full h-full object-cover" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{c.title}</h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">{c.text}</p>
+                    <div className="mt-4">
+                      <Link to={`/products?category=${encodeURIComponent(c.slug)}`} className="inline-flex items-center px-3 py-2 rounded-full bg-primary-500 text-white text-sm font-medium hover:opacity-95 transition-opacity">
+                        Ver {c.title}
+                        <ArrowRight className="w-4 h-4 ml-2" />
+                      </Link>
+                    </div>
+                  </div>
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{feature.title}</h3>
-                <p className="text-gray-600 dark:text-gray-400">{feature.description}</p>
               </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-24 bg-gradient-to-br from-primary-500 to-primary-600 relative overflow-hidden">
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(circle, white 1px, transparent 1px)', backgroundSize: '50px 50px' }}></div>
+      {/* Footer (fino) */}
+      <footer className="mt-12">
+        <div className="w-full bg-gradient-to-r from-primary-500 to-primary-600 text-white py-3 text-center text-sm">
+          © 2025 Álvaro Lostal. Hecho con <span className="text-red-400">❤️</span> para Creative Hands.
         </div>
+      </footer>
+      
+      {/* Helper: featured products component definition (local to page) */}
+    </div>
+  );
+};
 
-        <div className="relative z-10 max-w-4xl mx-auto text-center px-4">
-          <motion.div initial={{ opacity: 0, scale: 0.9 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ duration: 0.8 }}>
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">¿Listo para descubrir algo especial?</h2>
-            <p className="text-lg text-white/90 mb-8">Únete a nuestra comunidad y encuentra la pieza perfecta para ti</p>
+const FeaturedProducts = () => {
+  const { isAdmin } = useAuth();
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-            <div className="flex items-center justify-center gap-4">
-              <Link to="/products">
-                <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="px-8 py-4 bg-gradient-to-r from-primary-500 to-primary-600 text-white rounded-full font-semibold shadow-xl hover:shadow-2xl hover:shadow-primary-500/50 transition-all flex items-center space-x-2">
-                  <span>Explorar Productos</span>
-                  <ArrowRight className="w-5 h-5" />
-                </motion.button>
-              </Link>
+  useEffect(() => {
+    let mounted = true;
+    const fetch = async () => {
+      try {
+        const { data } = await axios.get('/api/products');
+        if (!mounted) return;
+        setProducts((data.products || []).slice(0, 6));
+      } catch (e) {
+        console.error('Error fetching featured products', e);
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    };
+    fetch();
+    return () => { mounted = false; };
+  }, []);
 
-              <Link to="/register">
-                <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="px-8 py-4 glass rounded-full font-semibold text-gray-900 dark:text-white hover:shadow-xl transition-all">
-                  Comenzar ahora
-                </motion.button>
-              </Link>
-            </div>
-          </motion.div>
-        </div>
-      </section>
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-40">
+        <div className="w-12 h-12 border-4 border-primary-500 border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-8">
+      {products.map((product, i) => (
+        <motion.div
+          key={product._id || i}
+          initial={{ opacity: 0, x: i % 2 === 0 ? -120 : 120 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true, amount: 0.25 }}
+          transition={{ duration: 0.6, ease: 'easeOut' }}
+          className="max-w-4xl mx-auto"
+        >
+          <ProductCard product={product} isAdmin={isAdmin} />
+        </motion.div>
+      ))}
     </div>
   );
 };

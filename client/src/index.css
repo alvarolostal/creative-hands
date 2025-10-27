@@ -77,6 +77,22 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
+/* Dark-mode overrides for custom utilities
+   Tailwind's `dark:` variant doesn't toggle custom CSS class definitions
+   like `.glass` at runtime. We provide explicit selectors so that when
+   the root `<html>` contains the `dark` class (applied by ThemeContext),
+   the `.glass` and other custom classes receive dark styles. */
+.dark .glass {
+  background: rgba(38, 38, 36, 0.7);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.dark .gradient-bg {
+  background: linear-gradient(135deg, rgba(38, 38, 36, 0.95) 0%, rgba(30, 30, 28, 0.95) 100%);
+}
+
 /* Smooth transitions */
 .smooth-transition {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);

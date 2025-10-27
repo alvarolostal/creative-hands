@@ -7,8 +7,8 @@ const Home = () => {
   const MotionLink = motion(Link);
   return (
     <div className="min-h-screen flex flex-col">
-      {/* Hero Section */}
-      <section className="relative h-screen flex items-center justify-center overflow-hidden">
+    {/* Hero Section */}
+    <section className="relative h-screen flex items-center justify-center overflow-hidden">
         {/* Animated Background */}
         <div className="absolute inset-0 bg-gradient-to-br from-light-500 via-primary-50 to-light-500 dark:from-dark-500 dark:via-dark-400 dark:to-dark-600">
           <div className="absolute inset-0 opacity-25 pointer-events-none">

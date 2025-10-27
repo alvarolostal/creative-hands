@@ -1,5 +1,5 @@
-/* Fuentes Apple-style */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+/* Fuentes Google: Poppins como fuente moderna y estética para el cuerpo */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
 /* Copernicus New Condensed Trial - local fallback
    Colocar el archivo de fuente en: public/fonts/CopernicusNewCondensedTrial.woff2
@@ -32,7 +32,7 @@
 }
 
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', 'Roboto', sans-serif;
+  font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', 'Roboto', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }

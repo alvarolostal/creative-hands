@@ -4,23 +4,25 @@ import { ArrowRight, Sparkles, Heart, Palette } from 'lucide-react';
 // kept minimal imports for the Home page (no server calls here)
 
 const Home = () => {
+  const MotionLink = motion(Link);
   return (
     <div className="min-h-screen flex flex-col">
       {/* Hero Section */}
       <section className="relative h-screen flex items-center justify-center overflow-hidden">
         {/* Animated Background */}
         <div className="absolute inset-0 bg-gradient-to-br from-light-500 via-primary-50 to-light-500 dark:from-dark-500 dark:via-dark-400 dark:to-dark-600">
-          <div className="absolute inset-0 opacity-30">
-            {[...Array(20)].map((_, i) => (
+          <div className="absolute inset-0 opacity-25 pointer-events-none">
+            {[...Array(8)].map((_, i) => (
               <motion.div
                 key={i}
                 className="absolute w-2 h-2 bg-primary-400 rounded-full"
                 style={{
-                  left: `${Math.random() * 100}%`,
-                  top: `${Math.random() * 100}%`,
+                  left: `${(i * 13) % 100}%`,
+                  top: `${(i * 23) % 100}%`,
+                  willChange: 'transform, opacity'
                 }}
-                animate={{ y: [0, -30, 0], opacity: [0.2, 0.8, 0.2] }}
-                transition={{ duration: 3 + Math.random() * 2, repeat: Infinity, delay: Math.random() * 2 }}
+                animate={{ y: [0, -18, 0], opacity: [0.25, 0.7, 0.25] }}
+                transition={{ duration: 4 + (i % 3), repeat: Infinity, delay: i * 0.3 }}
               />
             ))}
           </div>
@@ -58,10 +60,9 @@ const Home = () => {
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.7, duration: 0.8 }} className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-8">
               <Link to="/products">
                 <motion.button
-                  whileHover={{ scale: 1.035, y: -4 }}
-                  whileTap={{ scale: 0.97 }}
-                  transition={{ type: 'spring', stiffness: 240, damping: 22 }}
-                  className="px-8 py-4 rounded-full font-medium text-lg shadow-md transition-transform bg-primary-500 dark:bg-primary-600 text-white"
+                  whileHover={{ y: -4 }}
+                  transition={{ type: 'spring', stiffness: 220, damping: 26 }}
+                  className="px-8 py-4 rounded-full font-medium text-lg shadow-md hover:shadow-xl transition-transform bg-primary-500 dark:bg-primary-600 text-white"
                 >
                   <span>Explorar Productos</span>
                 </motion.button>
@@ -69,10 +70,9 @@ const Home = () => {
 
               <Link to="/register">
                 <motion.button
-                  whileHover={{ scale: 1.03, y: -3 }}
-                  whileTap={{ scale: 0.97 }}
-                  transition={{ type: 'spring', stiffness: 220, damping: 22 }}
-                  className="px-8 py-4 glass rounded-full font-medium text-lg text-gray-900 dark:text-white shadow-md transition-transform"
+                  whileHover={{ y: -3 }}
+                  transition={{ type: 'spring', stiffness: 200, damping: 26 }}
+                  className="px-8 py-4 glass rounded-full font-medium text-lg text-gray-900 dark:text-white shadow-md hover:shadow-lg transition-transform"
                 >
                   Comenzar ahora
                 </motion.button>
@@ -119,7 +119,8 @@ const Home = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, amount: 0.3 }}
                 transition={{ duration: 0.5, delay: i * 0.06 }}
-                className="glass p-4 rounded-2xl shadow-lg hover:shadow-2xl transition-transform transform hover:-translate-y-1"
+                whileHover={{ y: -6 }}
+                className="glass p-4 rounded-2xl shadow-lg hover:shadow-2xl transition-transform"
               >
                 <div className="flex items-start gap-4">
                   <div className="w-20 h-20 rounded-xl overflow-hidden flex-shrink-0">
@@ -129,10 +130,15 @@ const Home = () => {
                     <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{c.title}</h3>
                     <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">{c.text}</p>
                     <div className="mt-4">
-                      <Link to={`/products?category=${encodeURIComponent(c.slug)}`} className="inline-flex items-center px-3 py-2 rounded-full bg-primary-500 text-white text-sm font-medium hover:opacity-95 transition-opacity">
+                      <MotionLink
+                        to={`/products?category=${encodeURIComponent(c.slug)}`}
+                        whileHover={{ y: -3 }}
+                        transition={{ type: 'spring', stiffness: 200, damping: 26 }}
+                        className="inline-flex items-center px-3 py-2 rounded-full bg-primary-500 text-white text-sm font-medium hover:shadow-md hover:opacity-95 transition-all"
+                      >
                         Ver {c.title}
                         <ArrowRight className="w-4 h-4 ml-2" />
-                      </Link>
+                      </MotionLink>
                     </div>
                   </div>
                 </div>

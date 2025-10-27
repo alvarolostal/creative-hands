@@ -56,7 +56,11 @@ const Home = () => {
             {/* CTA Buttons */}
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.7, duration: 0.8 }} className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-8">
               <Link to="/products">
-                <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="px-8 py-4 glass text-primary-600 rounded-full font-bold text-lg shadow-2xl hover:shadow-white/20 transition-all">
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="px-8 py-4 rounded-full font-bold text-lg shadow-md transition-all bg-primary-500 dark:bg-primary-600 text-white hover:shadow-xl hover:shadow-primary-600/30"
+                >
                   <span>Explorar Productos</span>
                 </motion.button>
               </Link>
@@ -69,12 +73,7 @@ const Home = () => {
             </motion.div>
           </motion.div>
 
-          {/* Scroll Indicator */}
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.5 }} className="absolute bottom-10 left-1/2 transform -translate-x-1/2">
-            <motion.div animate={{ y: [0, 10, 0] }} transition={{ duration: 2, repeat: Infinity }} className="w-6 h-10 border-2 border-gray-400 dark:border-gray-600 rounded-full flex justify-center pt-2">
-              <div className="w-1.5 h-3 bg-gray-400 dark:bg-gray-600 rounded-full"></div>
-            </motion.div>
-          </motion.div>
+            {/* Scroll indicator removed per design request */}
         </div>
       </section>
 

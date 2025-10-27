@@ -46,6 +46,27 @@ body {
     letter-spacing: 0.02em;
   }
 
+  /* Navbar brand underline animation */
+  .brand-title {
+    position: relative;
+    display: inline-block;
+  }
+
+  .brand-title::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -0.2px;
+    height: 1.5px;
+    width: 0;
+    background: currentColor;
+    transition: width 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  .brand-title:hover::after {
+    width: 100%;
+  }
+
   /* Glassmorphism component: base + dark override (se usan selectores .dark para compatibilidad con darkMode: 'class') */
   .glass {
     background: rgba(255, 255, 255, 0.7);
@@ -79,6 +100,23 @@ body {
 
   .dark .skeleton {
     @apply from-gray-700 via-gray-600 to-gray-700;
+  }
+
+  /* Navbar-specific glass without a visible white border to avoid
+     flicker when toggling scrolled state. Keeps backdrop blur but removes
+     the semi-opaque white border that caused the white line on scroll. */
+  .glass-nav {
+    background: rgba(255, 255, 255, 0.65);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: none;
+  }
+
+  .dark .glass-nav {
+    background: rgba(20, 20, 18, 0.6);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: none;
   }
 }
 

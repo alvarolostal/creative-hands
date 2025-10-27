@@ -58,16 +58,22 @@ const Home = () => {
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.7, duration: 0.8 }} className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-8">
               <Link to="/products">
                 <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="px-8 py-4 rounded-full font-bold text-lg shadow-md transition-all bg-primary-500 dark:bg-primary-600 text-white hover:shadow-xl hover:shadow-primary-600/30"
+                  whileHover={{ scale: 1.035, y: -4 }}
+                  whileTap={{ scale: 0.97 }}
+                  transition={{ type: 'spring', stiffness: 240, damping: 22 }}
+                  className="px-8 py-4 rounded-full font-medium text-lg shadow-md transition-transform bg-primary-500 dark:bg-primary-600 text-white"
                 >
                   <span>Explorar Productos</span>
                 </motion.button>
               </Link>
 
               <Link to="/register">
-                <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="px-8 py-4 glass rounded-full font-semibold text-gray-900 dark:text-white hover:shadow-xl transition-all">
+                <motion.button
+                  whileHover={{ scale: 1.03, y: -3 }}
+                  whileTap={{ scale: 0.97 }}
+                  transition={{ type: 'spring', stiffness: 220, damping: 22 }}
+                  className="px-8 py-4 glass rounded-full font-medium text-lg text-gray-900 dark:text-white shadow-md transition-transform"
+                >
                   Comenzar ahora
                 </motion.button>
               </Link>
@@ -137,9 +143,15 @@ const Home = () => {
       </section>
 
       {/* Footer (fino) */}
-      <footer className="mt-12">
-        <div className="w-full bg-gradient-to-r from-primary-500 to-primary-600 text-white py-3 text-center text-sm">
-          © 2025 Álvaro Lostal. Hecho con <span className="text-red-400">❤️</span> para Creative Hands.
+      <footer className="mt-12 mb-12" role="contentinfo">
+        <div className="flex justify-center">
+          <div className="inline-flex items-center gap-3 px-6 py-3 md:px-8 md:py-3 rounded-xl bg-white/8 dark:bg-gray-800/60 backdrop-blur-md text-sm md:text-base text-gray-700 dark:text-gray-100 shadow-md border border-white/6 dark:border-white/10">
+            <span className="font-medium">© 2025 Álvaro Lostal</span>
+            <span className="opacity-50">·</span>
+            <span aria-hidden="true" className="text-red-400">♥</span>
+            <span className="opacity-50">·</span>
+            <span className="font-medium">Creative Hands</span>
+          </div>
         </div>
       </footer>
       

@@ -14,7 +14,7 @@ const ProductCard = ({ product, onEdit, onDelete, isAdmin }) => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       whileHover={{ y: -8 }}
-      className="glass dark:glass-dark rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all group"
+    className="glass rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all group"
     >
       {/* Image */}
       <div className="relative h-64 bg-gradient-to-br from-primary-100 to-primary-200 dark:from-gray-800 dark:to-gray-700 overflow-hidden">

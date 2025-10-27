@@ -122,7 +122,7 @@ const AdminChat = () => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 h-[calc(100vh-300px)]">
       {/* Conversations List */}
-      <div className="glass dark:glass-dark rounded-2xl p-6 overflow-y-auto">
+  <div className="glass rounded-2xl p-6 overflow-y-auto">
         <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
           Conversaciones
         </h3>
@@ -183,7 +183,7 @@ const AdminChat = () => {
       </div>
 
       {/* Chat Window */}
-      <div className="md:col-span-2 glass dark:glass-dark rounded-2xl flex flex-col overflow-hidden">
+  <div className="md:col-span-2 glass rounded-2xl flex flex-col overflow-hidden">
         {selectedConversation ? (
           <>
             {/* Chat Header */}

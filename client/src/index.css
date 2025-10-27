@@ -38,10 +38,48 @@ body {
 }
 
 /* Clase utilitaria para el título de marca */
-.copernicus {
-  font-family: 'Copernicus New Condensed Trial', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  /* opcional: ajustar espaciado entre letras si se desea */
-  letter-spacing: 0.02em;
+@layer components {
+  /* Clase utilitaria para el título de marca */
+  .copernicus {
+    font-family: 'Copernicus New Condensed Trial', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    /* opcional: ajustar espaciado entre letras si se desea */
+    letter-spacing: 0.02em;
+  }
+
+  /* Glassmorphism component: base + dark override (se usan selectores .dark para compatibilidad con darkMode: 'class') */
+  .glass {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+  }
+
+  .dark .glass {
+    background: rgba(38, 38, 36, 0.7);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  /* Gradient background component */
+  .gradient-bg {
+    background: linear-gradient(135deg, rgba(203, 104, 67, 0.1) 0%, rgba(213, 124, 85, 0.1) 100%);
+  }
+
+  .dark .gradient-bg {
+    background: linear-gradient(135deg, rgba(38, 38, 36, 0.95) 0%, rgba(30, 30, 28, 0.95) 100%);
+  }
+
+  /* Skeleton + animations (dark variant via selector) */
+  .skeleton {
+    @apply bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200;
+    background-size: 200% 100%;
+    animation: skeleton-loading 1.5s ease-in-out infinite;
+  }
+
+  .dark .skeleton {
+    @apply from-gray-700 via-gray-600 to-gray-700;
+  }
 }
 
 /* Scrollbar personalizado */
@@ -62,38 +100,9 @@ body {
   @apply bg-gray-400 dark:bg-gray-600;
 }
 
-/* Glassmorphism utility classes */
-.glass {
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.18);
+.smooth-transition {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
-
-.glass-dark {
-  background: rgba(38, 38, 36, 0.7);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-/* Dark-mode overrides for custom utilities
-   Tailwind's `dark:` variant doesn't toggle custom CSS class definitions
-   like `.glass` at runtime. We provide explicit selectors so that when
-   the root `<html>` contains the `dark` class (applied by ThemeContext),
-   the `.glass` and other custom classes receive dark styles. */
-.dark .glass {
-  background: rgba(38, 38, 36, 0.7);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.dark .gradient-bg {
-  background: linear-gradient(135deg, rgba(38, 38, 36, 0.95) 0%, rgba(30, 30, 28, 0.95) 100%);
-}
-
-/* Smooth transitions */
 .smooth-transition {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -169,6 +178,15 @@ button:active {
   animation-delay: -0.16s;
 }
 
+@keyframes skeleton-loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
 /* Card hover effect */
 .card-hover {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -182,29 +200,4 @@ button:active {
 /* Gradient backgrounds */
 .gradient-bg {
   background: linear-gradient(135deg, rgba(203, 104, 67, 0.1) 0%, rgba(213, 124, 85, 0.1) 100%);
-}
-
-.gradient-bg-dark {
-  background: linear-gradient(135deg, rgba(38, 38, 36, 0.95) 0%, rgba(30, 30, 28, 0.95) 100%);
-}
-
-/* Text selection */
-::selection {
-  @apply bg-primary-500 bg-opacity-30 text-primary-900;
-}
-
-/* Image loading skeleton */
-.skeleton {
-  @apply bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 dark:from-gray-700 dark:via-gray-600 dark:to-gray-700;
-  background-size: 200% 100%;
-  animation: skeleton-loading 1.5s ease-in-out infinite;
-}
-
-@keyframes skeleton-loading {
-  0% {
-    background-position: 200% 0;
-  }
-  100% {
-    background-position: -200% 0;
-  }
 }

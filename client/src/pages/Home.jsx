@@ -56,13 +56,13 @@ const Home = () => {
             {/* CTA Buttons */}
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.7, duration: 0.8 }} className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-8">
               <Link to="/products">
-                <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="px-8 py-4 bg-white text-primary-600 rounded-full font-bold text-lg shadow-2xl hover:shadow-white/20 transition-all">
+                <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="px-8 py-4 glass text-primary-600 rounded-full font-bold text-lg shadow-2xl hover:shadow-white/20 transition-all">
                   <span>Explorar Productos</span>
                 </motion.button>
               </Link>
 
               <Link to="/register">
-                <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="px-8 py-4 glass dark:glass-dark rounded-full font-semibold text-gray-900 dark:text-white hover:shadow-xl transition-all">
+                <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="px-8 py-4 glass rounded-full font-semibold text-gray-900 dark:text-white hover:shadow-xl transition-all">
                   Comenzar ahora
                 </motion.button>
               </Link>
@@ -92,7 +92,7 @@ const Home = () => {
               { icon: Sparkles, title: 'Piezas únicas', description: 'No encontrarás dos piezas exactamente iguales. Todo es único.', color: 'from-yellow-500 to-orange-500' },
               { icon: Palette, title: 'Arte auténtico', description: 'Apoyamos a artesanos locales y su talento creativo.', color: 'from-primary-500 to-primary-600' }
             ].map((feature, index) => (
-              <motion.div key={index} initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: index * 0.15, duration: 0.8 }} whileHover={{ y: -10 }} className="glass dark:glass-dark p-8 rounded-3xl hover:shadow-2xl transition-all">
+              <motion.div key={index} initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: index * 0.15, duration: 0.8 }} whileHover={{ y: -10 }} className="glass p-8 rounded-3xl hover:shadow-2xl transition-all">
                 <div className={`w-16 h-16 bg-gradient-to-br ${feature.color} rounded-2xl flex items-center justify-center mb-6 shadow-lg`}>
                   <feature.icon className="w-8 h-8 text-white" />
                 </div>
@@ -124,7 +124,7 @@ const Home = () => {
               </Link>
 
               <Link to="/register">
-                <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="px-8 py-4 glass dark:glass-dark rounded-full font-semibold text-gray-900 dark:text-white hover:shadow-xl transition-all">
+                <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="px-8 py-4 glass rounded-full font-semibold text-gray-900 dark:text-white hover:shadow-xl transition-all">
                   Comenzar ahora
                 </motion.button>
               </Link>

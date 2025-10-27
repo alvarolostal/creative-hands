@@ -172,7 +172,7 @@ const Admin = () => {
             className={`flex items-center space-x-2 px-6 py-3 rounded-xl font-semibold transition-all ${
               activeTab === 'products'
                 ? 'bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-lg'
-                : 'glass dark:glass-dark text-gray-700 dark:text-gray-300 hover:shadow-md'
+                : 'glass text-gray-700 dark:text-gray-300 hover:shadow-md'
             }`}
           >
             <Package className="w-5 h-5" />
@@ -183,7 +183,7 @@ const Admin = () => {
             className={`flex items-center space-x-2 px-6 py-3 rounded-xl font-semibold transition-all ${
               activeTab === 'chat'
                 ? 'bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-lg'
-                : 'glass dark:glass-dark text-gray-700 dark:text-gray-300 hover:shadow-md'
+                : 'glass text-gray-700 dark:text-gray-300 hover:shadow-md'
             }`}
           >
             <MessageSquare className="w-5 h-5" />
@@ -261,7 +261,7 @@ const Admin = () => {
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 0.9, opacity: 0 }}
                 onClick={(e) => e.stopPropagation()}
-                className="glass dark:glass-dark rounded-3xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+                className="glass rounded-3xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto"
               >
                 <div className="flex justify-between items-center mb-6">
                   <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -402,7 +402,7 @@ const Admin = () => {
                       whileTap={{ scale: 0.98 }}
                       type="button"
                       onClick={handleCloseModal}
-                      className="px-6 py-3 glass dark:glass-dark rounded-xl font-semibold text-gray-700 dark:text-gray-300 hover:shadow-md transition-all"
+                      className="px-6 py-3 glass rounded-xl font-semibold text-gray-700 dark:text-gray-300 hover:shadow-md transition-all"
                     >
                       Cancelar
                     </motion.button>

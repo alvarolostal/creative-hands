@@ -47,7 +47,7 @@ const Login = () => {
         transition={{ duration: 0.5 }}
         className="max-w-md w-full"
       >
-        <div className="glass dark:glass-dark rounded-3xl shadow-2xl p-8">
+  <div className="glass rounded-3xl shadow-2xl p-8">
           {/* Header */}
           <div className="text-center mb-8">
             <motion.div

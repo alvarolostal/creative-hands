@@ -44,7 +44,7 @@ const Navbar = () => {
       animate={{ y: 0 }}
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         scrolled
-          ? 'glass dark:glass-dark shadow-lg'
+          ? 'glass shadow-lg'
           : 'bg-transparent'
       }`}
     >
@@ -104,7 +104,7 @@ const Navbar = () => {
                 <motion.button
                   whileTap={{ scale: 0.95 }}
                   onClick={() => setUserMenuOpen(!userMenuOpen)}
-                  className="flex items-center space-x-2 px-4 py-2 rounded-full glass dark:glass-dark hover:shadow-lg transition-all"
+                  className="flex items-center space-x-2 px-4 py-2 rounded-full glass hover:shadow-lg transition-all"
                 >
                   <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center">
                     <span className="text-white text-sm font-semibold">
@@ -122,7 +122,7 @@ const Navbar = () => {
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: 10 }}
-                      className="absolute right-0 mt-2 w-48 glass dark:glass-dark rounded-xl shadow-xl overflow-hidden"
+                      className="absolute right-0 mt-2 w-48 glass rounded-xl shadow-xl overflow-hidden"
                     >
                       <div className="py-1">
                         <div className="px-4 py-2 border-b border-gray-200 dark:border-gray-700">
@@ -184,7 +184,7 @@ const Navbar = () => {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="md:hidden glass dark:glass-dark border-t border-gray-200 dark:border-gray-700"
+            className="md:hidden glass border-t border-gray-200 dark:border-gray-700"
           >
             <div className="px-4 py-4 space-y-3">
               <Link

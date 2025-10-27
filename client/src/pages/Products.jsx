@@ -91,7 +91,7 @@ const Products = () => {
               placeholder="Buscar productos..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-12 pr-4 py-3 glass dark:glass-dark rounded-full text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 transition-all"
+              className="w-full pl-12 pr-4 py-3 glass rounded-full text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 transition-all"
             />
           </div>
 
@@ -106,7 +106,7 @@ const Products = () => {
                 className={`px-4 py-2 rounded-full font-medium transition-all ${
                   (selectedCategory === category) || (selectedCategory === '' && category === 'Todas')
                     ? 'bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-lg'
-                    : 'glass dark:glass-dark text-gray-700 dark:text-gray-300 hover:shadow-md'
+                    : 'glass text-gray-700 dark:text-gray-300 hover:shadow-md'
                 }`}
               >
                 {category}

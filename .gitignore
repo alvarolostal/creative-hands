@@ -1,0 +1,50 @@
+# Node dependencies
+node_modules/
+client/node_modules/
+server/node_modules/
+
+# Production / build
+dist/
+build/
+client/dist/
+
+# Vite / caching
+.vite/
+.cache/
+/.parcel-cache/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*.log
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor directories and files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Test coverage and reports
+coverage/
+.nyc_output/
+
+# Misc
+.eslintcache
+/.cache/
+__pycache__/
+*.tgz
+
+# Optional: lockfiles are usually committed. Uncomment if you do not want them
+# package-lock.json
+# yarn.lock

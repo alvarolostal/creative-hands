@@ -89,9 +89,29 @@ export const AuthProvider = ({ children }) => {
   const login = async (credentials) => {
     try {
       const { data } = await axios.post("/api/auth/login", credentials);
+      // Guardar token y establecer header de axios inmediatamente para evitar
+      // race conditions donde componentes montados hagan peticiones protegidas
+      // antes de que el useEffect tenga oportunidad de ejecutar.
+      axios.defaults.headers.common["Authorization"] = `Bearer ${data.token}`;
+      localStorage.setItem("token", data.token);
       setToken(data.token);
-      setUser(data.user);
-      return { success: true };
+
+      try {
+        const { data: me } = await axios.get("/api/auth/me");
+        setUser(me.user);
+        return { success: true };
+      } catch (err) {
+        // Si /me falla, limpiar estado y devolver error
+        delete axios.defaults.headers.common["Authorization"];
+        localStorage.removeItem("token");
+        setToken(null);
+        setUser(null);
+        return {
+          success: false,
+          message:
+            err.response?.data?.message || "Error al verificar usuario después del login",
+        };
+      }
     } catch (error) {
       return {
         success: false,

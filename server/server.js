@@ -83,6 +83,7 @@ io.use(async (socket, next) => {
       return next(new Error("Authentication error"));
     }
 
+    // Intentamos verificar el token
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const user = await User.findById(decoded.id);
 

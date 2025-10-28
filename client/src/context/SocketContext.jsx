@@ -15,10 +15,13 @@ export const useSocket = () => {
 export const SocketProvider = ({ children }) => {
   const [socket, setSocket] = useState(null);
   const [connected, setConnected] = useState(false);
-  const { token, isAuthenticated } = useAuth();
+  const { token, isAuthenticated, loading } = useAuth();
 
   useEffect(() => {
-    if (isAuthenticated && token) {
+    // Esperar a que AuthContext haya terminado la verificación inicial (loading=false)
+    // para evitar conectar un socket con un token que luego el servidor invalide y
+    // provoque una desconexión inmediata.
+    if (!loading && isAuthenticated && token) {
       const newSocket = io("http://localhost:5000", {
         auth: { token },
       });
@@ -44,13 +47,14 @@ export const SocketProvider = ({ children }) => {
         newSocket.close();
       };
     } else {
+      // Si aún está cargando o no hay token, asegurar que no haya sockets abiertos
       if (socket) {
         socket.close();
         setSocket(null);
         setConnected(false);
       }
     }
-  }, [isAuthenticated, token]);
+  }, [isAuthenticated, token, loading]);
 
   const value = {
     socket,

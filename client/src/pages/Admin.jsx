@@ -1,48 +1,56 @@
-import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Plus, 
-  MessageSquare, 
-  Package, 
-  X, 
-  Save, 
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  Plus,
+  MessageSquare,
+  Package,
+  X,
+  Save,
   Loader,
-  Upload
-} from 'lucide-react';
-import axios from 'axios';
-import { useAuth } from '../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
-import ProductCard from '../components/ProductCard';
-import AdminChat from '../components/AdminChat';
+  Upload,
+} from "lucide-react";
+import axios from "axios";
+import { useAuth } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
+import ProductCard from "../components/ProductCard";
+import AdminChat from "../components/AdminChat";
 
 const Admin = () => {
   const { isAdmin } = useAuth();
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState('products');
+  const [activeTab, setActiveTab] = useState("products");
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showProductModal, setShowProductModal] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
   const [formData, setFormData] = useState({
-    name: '',
-    description: '',
-    price: '',
-    categoryId: '',
-    stock: '',
-    materials: '',
+    name: "",
+    description: "",
+    price: "",
+    categoryId: "",
+    stock: "",
+    materials: "",
   });
   const [saving, setSaving] = useState(false);
   const [categoriesList, setCategoriesList] = useState([]);
   const [showCategoryModal, setShowCategoryModal] = useState(false);
-  const [newCategory, setNewCategory] = useState({ name: '', slug: '', description: '' });
+  const [newCategory, setNewCategory] = useState({
+    name: "",
+    slug: "",
+    description: "",
+  });
   const [editingCategoryId, setEditingCategoryId] = useState(null);
-  const [editingCategoryData, setEditingCategoryData] = useState({ name: '', slug: '', description: '' });
+  const [editingCategoryData, setEditingCategoryData] = useState({
+    name: "",
+    slug: "",
+    description: "",
+  });
   const [showEditCategoryModal, setShowEditCategoryModal] = useState(false);
   const [editingFromList, setEditingFromList] = useState(false);
 
   useEffect(() => {
     if (!isAdmin) {
-      navigate('/products');
+      navigate("/products");
       return;
     }
     fetchProducts();
@@ -52,10 +60,10 @@ const Admin = () => {
   const fetchProducts = async () => {
     try {
       setLoading(true);
-      const { data } = await axios.get('/api/products');
+      const { data } = await axios.get("/api/products");
       setProducts(data.products);
     } catch (error) {
-      console.error('Error al cargar productos:', error);
+      console.error("Error al cargar productos:", error);
     } finally {
       setLoading(false);
     }
@@ -68,19 +76,21 @@ const Admin = () => {
         name: product.name,
         description: product.description,
         price: product.price,
-        categoryId: product.categoryId ? (product.categoryId._id || product.categoryId) : '',
+        categoryId: product.categoryId
+          ? product.categoryId._id || product.categoryId
+          : "",
         stock: product.stock,
-        materials: product.materials?.join(', ') || '',
+        materials: product.materials?.join(", ") || "",
       });
     } else {
       setEditingProduct(null);
       setFormData({
-        name: '',
-        description: '',
-        price: '',
-        categoryId: '',
-        stock: '',
-        materials: '',
+        name: "",
+        description: "",
+        price: "",
+        categoryId: "",
+        stock: "",
+        materials: "",
       });
     }
     setShowProductModal(true);
@@ -93,18 +103,18 @@ const Admin = () => {
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    if (name === 'categoryId') {
+    if (name === "categoryId") {
       // when selecting a category by id, keep the selected id only
       setFormData({
         ...formData,
-        categoryId: value
+        categoryId: value,
       });
       return;
     }
 
     setFormData({
       ...formData,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: type === "checkbox" ? checked : value,
     });
   };
 
@@ -117,40 +127,48 @@ const Admin = () => {
         ...formData,
         price: parseFloat(formData.price),
         stock: parseInt(formData.stock),
-        materials: formData.materials.split(',').map(m => m.trim()).filter(Boolean)
+        materials: formData.materials
+          .split(",")
+          .map((m) => m.trim())
+          .filter(Boolean),
       };
 
       if (editingProduct) {
-        const { data } = await axios.put(`/api/products/${editingProduct._id}`, productData);
-        setProducts(products.map(p => p._id === editingProduct._id ? data.product : p));
+        const { data } = await axios.put(
+          `/api/products/${editingProduct._id}`,
+          productData
+        );
+        setProducts(
+          products.map((p) => (p._id === editingProduct._id ? data.product : p))
+        );
       } else {
-        const { data } = await axios.post('/api/products', productData);
+        const { data } = await axios.post("/api/products", productData);
         setProducts([data.product, ...products]);
       }
 
       handleCloseModal();
     } catch (error) {
-      console.error('Error al guardar producto:', error);
-      alert('Error al guardar el producto');
+      console.error("Error al guardar producto:", error);
+      alert("Error al guardar el producto");
     } finally {
       setSaving(false);
     }
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm('¿Estás seguro de eliminar este producto?')) return;
-    
+    if (!window.confirm("¿Estás seguro de eliminar este producto?")) return;
+
     try {
       await axios.delete(`/api/products/${id}`);
-      setProducts(products.filter(p => p._id !== id));
+      setProducts(products.filter((p) => p._id !== id));
     } catch (error) {
-      console.error('Error al eliminar producto:', error);
-      alert('Error al eliminar el producto');
+      console.error("Error al eliminar producto:", error);
+      alert("Error al eliminar el producto");
     }
   };
 
   const handleOpenCategoryModal = () => {
-    setNewCategory({ name: '', slug: '', description: '' });
+    setNewCategory({ name: "", slug: "", description: "" });
     setShowCategoryModal(true);
   };
 
@@ -158,30 +176,39 @@ const Admin = () => {
     e.preventDefault();
     try {
       const payload = { ...newCategory };
-      const { data } = await axios.post('/api/categories', payload);
+      const { data } = await axios.post("/api/categories", payload);
       // refresh categories
       fetchCategories();
       setShowCategoryModal(false);
     } catch (error) {
-      console.error('Error al crear categoría:', error);
-      alert(error.response?.data?.message || 'Error al crear categoría');
+      console.error("Error al crear categoría:", error);
+      alert(error.response?.data?.message || "Error al crear categoría");
     }
   };
 
   const handleDeleteCategory = async (id) => {
-    if (!window.confirm('¿Eliminar esta categoría? Los productos pueden quedarse con category legacy.')) return;
+    if (
+      !window.confirm(
+        "¿Eliminar esta categoría? Los productos pueden quedarse con category legacy."
+      )
+    )
+      return;
     try {
       await axios.delete(`/api/categories/${id}`);
       fetchCategories();
     } catch (error) {
-      console.error('Error al eliminar categoría:', error);
-      alert(error.response?.data?.message || 'Error al eliminar categoría');
+      console.error("Error al eliminar categoría:", error);
+      alert(error.response?.data?.message || "Error al eliminar categoría");
     }
   };
 
   const startEditCategory = (cat) => {
     setEditingCategoryId(cat._id);
-    setEditingCategoryData({ name: cat.name || '', slug: cat.slug || '', description: cat.description || '' });
+    setEditingCategoryData({
+      name: cat.name || "",
+      slug: cat.slug || "",
+      description: cat.description || "",
+    });
     // If the list modal is open, close it first so the edit modal doesn't appear behind due
     // to stacking contexts/animations. Re-open the list when editing finishes if needed.
     if (showCategoryModal) {
@@ -196,7 +223,7 @@ const Admin = () => {
 
   const cancelEditCategory = () => {
     setEditingCategoryId(null);
-    setEditingCategoryData({ name: '', slug: '', description: '' });
+    setEditingCategoryData({ name: "", slug: "", description: "" });
     setShowEditCategoryModal(false);
     if (editingFromList) {
       // restore the categories modal that the user came from
@@ -208,27 +235,33 @@ const Admin = () => {
   const saveEditCategory = async (e) => {
     e.preventDefault();
     try {
-      await axios.put(`/api/categories/${editingCategoryId}`, editingCategoryData);
+      await axios.put(
+        `/api/categories/${editingCategoryId}`,
+        editingCategoryData
+      );
       fetchCategories();
       cancelEditCategory();
     } catch (error) {
-      console.error('Error al actualizar categoría:', error);
-      alert(error.response?.data?.message || 'Error al actualizar categoría');
+      console.error("Error al actualizar categoría:", error);
+      alert(error.response?.data?.message || "Error al actualizar categoría");
     }
   };
 
   const fetchCategories = async () => {
     try {
-      const { data } = await axios.get('/api/categories');
+      const { data } = await axios.get("/api/categories");
       setCategoriesList(data.categories || []);
     } catch (error) {
-      console.error('Error cargando categorías en admin, usando lista por defecto:', error);
+      console.error(
+        "Error cargando categorías en admin, usando lista por defecto:",
+        error
+      );
       setCategoriesList([
-        { _id: '', name: 'Joyería artesanal', slug: 'joyeria-artesanal' },
-        { _id: '', name: 'Velas y aromáticos', slug: 'velas-y-aromaticos' },
-        { _id: '', name: 'Textiles y ropa', slug: 'textiles-y-ropa' },
-        { _id: '', name: 'Cerámica y arcilla', slug: 'ceramica-y-arcilla' },
-        { _id: '', name: 'Arte hecho a mano', slug: 'arte-hecho-a-mano' }
+        { _id: "", name: "Joyería artesanal", slug: "joyeria-artesanal" },
+        { _id: "", name: "Velas y aromáticos", slug: "velas-y-aromaticos" },
+        { _id: "", name: "Textiles y ropa", slug: "textiles-y-ropa" },
+        { _id: "", name: "Cerámica y arcilla", slug: "ceramica-y-arcilla" },
+        { _id: "", name: "Arte hecho a mano", slug: "arte-hecho-a-mano" },
       ]);
     }
   };
@@ -258,22 +291,22 @@ const Admin = () => {
           className="flex space-x-4 mb-8"
         >
           <button
-            onClick={() => setActiveTab('products')}
+            onClick={() => setActiveTab("products")}
             className={`flex items-center space-x-2 px-6 py-3 rounded-xl font-semibold transition-colors duration-200 ${
-              activeTab === 'products'
-                ? 'bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-lg'
-                : 'glass text-gray-700 dark:text-gray-300 hover:shadow-md'
+              activeTab === "products"
+                ? "bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-lg"
+                : "glass text-gray-700 dark:text-gray-300 hover:shadow-md"
             }`}
           >
             <Package className="w-5 h-5" />
             <span>Productos</span>
           </button>
           <button
-            onClick={() => setActiveTab('chat')}
+            onClick={() => setActiveTab("chat")}
             className={`flex items-center space-x-2 px-6 py-3 rounded-xl font-semibold transition-colors duration-200 ${
-              activeTab === 'chat'
-                ? 'bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-lg'
-                : 'glass text-gray-700 dark:text-gray-300 hover:shadow-md'
+              activeTab === "chat"
+                ? "bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-lg"
+                : "glass text-gray-700 dark:text-gray-300 hover:shadow-md"
             }`}
           >
             <MessageSquare className="w-5 h-5" />
@@ -283,7 +316,7 @@ const Admin = () => {
 
         {/* Content */}
         <AnimatePresence mode="wait">
-          {activeTab === 'products' && (
+          {activeTab === "products" && (
             <motion.div
               key="products"
               initial={{ opacity: 0, x: -20 }}
@@ -297,7 +330,7 @@ const Admin = () => {
                   whileTap={{ scale: 0.95 }}
                   onClick={() => handleOpenModal()}
                   className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-primary-500 to-primary-600 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-shadow duration-200"
-                  style={{ willChange: 'transform' }}
+                  style={{ willChange: "transform" }}
                 >
                   <Plus className="w-5 h-5" />
                   <span>Nuevo Producto</span>
@@ -334,7 +367,7 @@ const Admin = () => {
             </motion.div>
           )}
 
-          {activeTab === 'chat' && (
+          {activeTab === "chat" && (
             <motion.div
               key="chat"
               initial={{ opacity: 0, x: -20 }}
@@ -360,35 +393,86 @@ const Admin = () => {
                 initial={{ scale: 0.95, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 0.95, opacity: 0 }}
-                onClick={e => e.stopPropagation()}
+                onClick={(e) => e.stopPropagation()}
                 className="glass rounded-3xl p-6 max-w-md w-full"
               >
                 <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Editar categoría</h3>
-                  <button onClick={() => cancelEditCategory()} className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700">
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                    Editar categoría
+                  </h3>
+                  <button
+                    onClick={() => cancelEditCategory()}
+                    className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
+                  >
                     <X className="w-5 h-5 text-gray-700 dark:text-gray-300" />
                   </button>
                 </div>
 
                 <form onSubmit={saveEditCategory} className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Nombre</label>
-                    <input value={editingCategoryData.name} onChange={e => setEditingCategoryData({...editingCategoryData, name: e.target.value})} required className="w-full px-4 py-2 rounded-xl border bg-white dark:bg-gray-800 text-gray-900 dark:text-white" />
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                      Nombre
+                    </label>
+                    <input
+                      value={editingCategoryData.name}
+                      onChange={(e) =>
+                        setEditingCategoryData({
+                          ...editingCategoryData,
+                          name: e.target.value,
+                        })
+                      }
+                      required
+                      className="w-full px-4 py-2 rounded-xl border bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                    />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Slug</label>
-                    <input value={editingCategoryData.slug} onChange={e => setEditingCategoryData({...editingCategoryData, slug: e.target.value})} placeholder="auto" className="w-full px-4 py-2 rounded-xl border bg-white dark:bg-gray-800 text-gray-900 dark:text-white" />
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                      Slug
+                    </label>
+                    <input
+                      value={editingCategoryData.slug}
+                      onChange={(e) =>
+                        setEditingCategoryData({
+                          ...editingCategoryData,
+                          slug: e.target.value,
+                        })
+                      }
+                      placeholder="auto"
+                      className="w-full px-4 py-2 rounded-xl border bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                    />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Descripción</label>
-                    <textarea value={editingCategoryData.description} onChange={e => setEditingCategoryData({...editingCategoryData, description: e.target.value})} className="w-full px-4 py-2 rounded-xl border bg-white dark:bg-gray-800 text-gray-900 dark:text-white" />
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                      Descripción
+                    </label>
+                    <textarea
+                      value={editingCategoryData.description}
+                      onChange={(e) =>
+                        setEditingCategoryData({
+                          ...editingCategoryData,
+                          description: e.target.value,
+                        })
+                      }
+                      className="w-full px-4 py-2 rounded-xl border bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                    />
                   </div>
 
                   <div className="flex justify-end gap-2">
-                    <button type="button" onClick={() => cancelEditCategory()} className="px-4 py-2 rounded-xl glass text-gray-700 dark:text-gray-300">Cancelar</button>
-                    <button type="submit" className="px-4 py-2 rounded-xl bg-primary-500 text-white">Guardar</button>
+                    <button
+                      type="button"
+                      onClick={() => cancelEditCategory()}
+                      className="px-4 py-2 rounded-xl glass text-gray-700 dark:text-gray-300"
+                    >
+                      Cancelar
+                    </button>
+                    <button
+                      type="submit"
+                      className="px-4 py-2 rounded-xl bg-primary-500 text-white"
+                    >
+                      Guardar
+                    </button>
                   </div>
                 </form>
               </motion.div>
@@ -415,7 +499,7 @@ const Admin = () => {
               >
                 <div className="flex justify-between items-center mb-6">
                   <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-                    {editingProduct ? 'Editar Producto' : 'Nuevo Producto'}
+                    {editingProduct ? "Editar Producto" : "Nuevo Producto"}
                   </h2>
                   <button
                     onClick={handleCloseModal}
@@ -493,13 +577,18 @@ const Admin = () => {
                     </label>
                     <select
                       name="categoryId"
-                      value={formData.categoryId || ''}
+                      value={formData.categoryId || ""}
                       onChange={handleChange}
                       className="w-full px-4 py-3 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-primary-500 text-gray-900 dark:text-white"
                     >
                       <option value="">-- Seleccionar categoría --</option>
-                      {categoriesList.map(cat => (
-                        <option key={cat._id || cat.slug || cat.name} value={cat._id || cat.slug || cat.name}>{cat.name}</option>
+                      {categoriesList.map((cat) => (
+                        <option
+                          key={cat._id || cat.slug || cat.name}
+                          value={cat._id || cat.slug || cat.name}
+                        >
+                          {cat.name}
+                        </option>
                       ))}
                     </select>
                   </div>
@@ -529,14 +618,14 @@ const Admin = () => {
                       type="submit"
                       disabled={saving}
                       className="flex-1 py-3 bg-gradient-to-r from-primary-500 to-primary-600 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-shadow duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
-                      style={{ willChange: 'transform' }}
+                      style={{ willChange: "transform" }}
                     >
                       {saving ? (
                         <Loader className="w-5 h-5 animate-spin" />
                       ) : (
                         <>
                           <Save className="w-5 h-5" />
-                          <span>{editingProduct ? 'Actualizar' : 'Crear'}</span>
+                          <span>{editingProduct ? "Actualizar" : "Crear"}</span>
                         </>
                       )}
                     </motion.button>
@@ -570,30 +659,58 @@ const Admin = () => {
                 initial={{ scale: 0.95, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 0.95, opacity: 0 }}
-                onClick={e => e.stopPropagation()}
+                onClick={(e) => e.stopPropagation()}
                 className="glass rounded-3xl p-6 max-w-lg w-full"
               >
                 <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Crear categoría</h3>
-                  <button onClick={() => setShowCategoryModal(false)} className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700">
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                    Crear categoría
+                  </h3>
+                  <button
+                    onClick={() => setShowCategoryModal(false)}
+                    className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
+                  >
                     <X className="w-5 h-5 text-gray-700 dark:text-gray-300" />
                   </button>
                 </div>
 
                 <div className="space-y-4">
-                    <div>
-                      <h4 className="font-semibold mb-2 text-gray-900 dark:text-white">Categorías existentes</h4>
+                  <div>
+                    <h4 className="font-semibold mb-2 text-gray-900 dark:text-white">
+                      Categorías existentes
+                    </h4>
                     <div className="space-y-2 max-h-48 overflow-y-auto">
-                      {categoriesList.map(cat => (
-                        <div key={cat._id || cat.slug || cat.name} className="p-3 rounded-lg bg-white/60 dark:bg-gray-800/60 flex items-center justify-between gap-4 overflow-hidden">
+                      {categoriesList.map((cat) => (
+                        <div
+                          key={cat._id || cat.slug || cat.name}
+                          className="p-3 rounded-lg bg-white/60 dark:bg-gray-800/60 flex items-center justify-between gap-4 overflow-hidden"
+                        >
                           <div className="flex-1 min-w-0">
-                            <div className="font-medium text-gray-900 dark:text-white truncate">{cat.name}</div>
-                            <div className="text-xs text-gray-500 dark:text-gray-400 truncate">{cat.slug}</div>
-                            {cat.description ? <div className="text-xs text-gray-600 dark:text-gray-300 mt-1 truncate">{cat.description}</div> : null}
+                            <div className="font-medium text-gray-900 dark:text-white truncate">
+                              {cat.name}
+                            </div>
+                            <div className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                              {cat.slug}
+                            </div>
+                            {cat.description ? (
+                              <div className="text-xs text-gray-600 dark:text-gray-300 mt-1 truncate">
+                                {cat.description}
+                              </div>
+                            ) : null}
                           </div>
                           <div className="flex-shrink-0 flex items-center gap-2">
-                            <button onClick={() => startEditCategory(cat)} className="px-3 py-1 glass rounded-md text-gray-700 dark:text-gray-300">Editar</button>
-                            <button onClick={() => handleDeleteCategory(cat._id)} className="px-3 py-1 bg-red-500 text-white rounded-md">Eliminar</button>
+                            <button
+                              onClick={() => startEditCategory(cat)}
+                              className="px-3 py-1 glass rounded-md text-gray-700 dark:text-gray-300"
+                            >
+                              Editar
+                            </button>
+                            <button
+                              onClick={() => handleDeleteCategory(cat._id)}
+                              className="px-3 py-1 bg-red-500 text-white rounded-md"
+                            >
+                              Eliminar
+                            </button>
                           </div>
                         </div>
                       ))}
@@ -602,34 +719,66 @@ const Admin = () => {
 
                   <form onSubmit={handleCreateCategory} className="space-y-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Nombre</label>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Nombre
+                      </label>
                       <input
                         value={newCategory.name}
-                        onChange={e => setNewCategory({...newCategory, name: e.target.value})}
+                        onChange={(e) =>
+                          setNewCategory({
+                            ...newCategory,
+                            name: e.target.value,
+                          })
+                        }
                         required
                         className="w-full px-4 py-2 rounded-xl border bg-white dark:bg-gray-800 text-gray-900 dark:text-white border-gray-300 dark:border-gray-700 focus:ring-2 focus:ring-primary-500"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Slug (opcional)</label>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Slug (opcional)
+                      </label>
                       <input
                         value={newCategory.slug}
-                        onChange={e => setNewCategory({...newCategory, slug: e.target.value})}
+                        onChange={(e) =>
+                          setNewCategory({
+                            ...newCategory,
+                            slug: e.target.value,
+                          })
+                        }
                         placeholder="auto"
                         className="w-full px-4 py-2 rounded-xl border bg-white dark:bg-gray-800 text-gray-900 dark:text-white border-gray-300 dark:border-gray-700 focus:ring-2 focus:ring-primary-500"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Descripción (opcional)</label>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Descripción (opcional)
+                      </label>
                       <textarea
                         value={newCategory.description}
-                        onChange={e => setNewCategory({...newCategory, description: e.target.value})}
+                        onChange={(e) =>
+                          setNewCategory({
+                            ...newCategory,
+                            description: e.target.value,
+                          })
+                        }
                         className="w-full px-4 py-2 rounded-xl border bg-white dark:bg-gray-800 text-gray-900 dark:text-white border-gray-300 dark:border-gray-700 focus:ring-2 focus:ring-primary-500"
                       />
                     </div>
                     <div className="flex justify-end space-x-2">
-                      <button type="button" onClick={() => setShowCategoryModal(false)} className="px-4 py-2 rounded-xl glass text-gray-700 dark:text-gray-300">Cerrar</button>
-                      <button type="submit" className="px-4 py-2 rounded-xl bg-primary-500 text-white">Crear</button>
+                      <button
+                        type="button"
+                        onClick={() => setShowCategoryModal(false)}
+                        className="px-4 py-2 rounded-xl glass text-gray-700 dark:text-gray-300"
+                      >
+                        Cerrar
+                      </button>
+                      <button
+                        type="submit"
+                        className="px-4 py-2 rounded-xl bg-primary-500 text-white"
+                      >
+                        Crear
+                      </button>
                     </div>
                   </form>
                 </div>

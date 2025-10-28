@@ -1,38 +1,38 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const Product = require('../models/Product');
-const { protect, adminOnly } = require('../middleware/auth');
-const Category = require('../models/Category');
+const Product = require("../models/Product");
+const { protect, adminOnly } = require("../middleware/auth");
+const Category = require("../models/Category");
 
 // @route   GET /api/products
 // @desc    Obtener todos los productos
 // @access  Public
-router.get('/', async (req, res) => {
+router.get("/", async (req, res) => {
   try {
-    const { search, sort = '-createdAt' } = req.query;
-    
+    const { search, sort = "-createdAt" } = req.query;
+
     const query = {};
-    
+
     // Búsqueda por texto
     if (search) {
       query.$text = { $search: search };
     }
-    
+
     const products = await Product.find(query)
       .sort(sort)
-      .populate('createdBy', 'name')
-      .populate('categoryId', 'name slug');
-    
+      .populate("createdBy", "name")
+      .populate("categoryId", "name slug");
+
     res.json({
       success: true,
       count: products.length,
-      products
+      products,
     });
   } catch (error) {
-    console.error('Error al obtener productos:', error);
+    console.error("Error al obtener productos:", error);
     res.status(500).json({
       success: false,
-      message: 'Error al obtener productos'
+      message: "Error al obtener productos",
     });
   }
 });
@@ -44,7 +44,7 @@ router.get('/', async (req, res) => {
 // @route   GET /api/products/category/:slug
 // @desc    Obtener productos por slug de categoría
 // @access  Public
-router.get('/category/:slug', async (req, res) => {
+router.get("/category/:slug", async (req, res) => {
   try {
     const { slug } = req.params;
     const category = await Category.findOne({ slug });
@@ -52,37 +52,44 @@ router.get('/category/:slug', async (req, res) => {
     // Buscar por categoryId (ya no usamos el campo legacy `category`)
     const query = { categoryId: category._id };
 
-  const products = await Product.find(query).populate('createdBy', 'name').populate('categoryId', 'name slug');
+    const products = await Product.find(query)
+      .populate("createdBy", "name")
+      .populate("categoryId", "name slug");
 
     res.json({ success: true, count: products.length, products });
   } catch (error) {
-    console.error('Error al obtener productos por categoría:', error);
-    res.status(500).json({ success: false, message: 'Error al obtener productos por categoría' });
+    console.error("Error al obtener productos por categoría:", error);
+    res
+      .status(500)
+      .json({
+        success: false,
+        message: "Error al obtener productos por categoría",
+      });
   }
 });
 
-router.get('/:id', async (req, res) => {
+router.get("/:id", async (req, res) => {
   try {
     const product = await Product.findById(req.params.id)
-      .populate('createdBy', 'name email')
-      .populate('categoryId', 'name slug');
-    
+      .populate("createdBy", "name email")
+      .populate("categoryId", "name slug");
+
     if (!product) {
       return res.status(404).json({
         success: false,
-        message: 'Producto no encontrado'
+        message: "Producto no encontrado",
       });
     }
-    
+
     res.json({
       success: true,
-      product
+      product,
     });
   } catch (error) {
-    console.error('Error al obtener producto:', error);
+    console.error("Error al obtener producto:", error);
     res.status(500).json({
       success: false,
-      message: 'Error al obtener producto'
+      message: "Error al obtener producto",
     });
   }
 });
@@ -90,26 +97,28 @@ router.get('/:id', async (req, res) => {
 // @route   POST /api/products
 // @desc    Crear nuevo producto
 // @access  Private/Admin
-router.post('/', protect, adminOnly, async (req, res) => {
+router.post("/", protect, adminOnly, async (req, res) => {
   try {
     const productData = {
       ...req.body,
-      createdBy: req.user.id
+      createdBy: req.user.id,
     };
-    
+
     let product = await Product.create(productData);
-    product = await Product.findById(product._id).populate('createdBy', 'name').populate('categoryId', 'name slug');
+    product = await Product.findById(product._id)
+      .populate("createdBy", "name")
+      .populate("categoryId", "name slug");
 
     res.status(201).json({
       success: true,
-      product
+      product,
     });
   } catch (error) {
-    console.error('Error al crear producto:', error);
+    console.error("Error al crear producto:", error);
     res.status(500).json({
       success: false,
-      message: 'Error al crear producto',
-      error: error.message
+      message: "Error al crear producto",
+      error: error.message,
     });
   }
 });
@@ -117,34 +126,35 @@ router.post('/', protect, adminOnly, async (req, res) => {
 // @route   PUT /api/products/:id
 // @desc    Actualizar producto
 // @access  Private/Admin
-router.put('/:id', protect, adminOnly, async (req, res) => {
+router.put("/:id", protect, adminOnly, async (req, res) => {
   try {
     let product = await Product.findById(req.params.id);
-    
+
     if (!product) {
       return res.status(404).json({
         success: false,
-        message: 'Producto no encontrado'
+        message: "Producto no encontrado",
       });
     }
-    
-    product = await Product.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true, runValidators: true }
-    );
 
-    product = await Product.findById(product._id).populate('createdBy', 'name').populate('categoryId', 'name slug');
+    product = await Product.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true,
+    });
+
+    product = await Product.findById(product._id)
+      .populate("createdBy", "name")
+      .populate("categoryId", "name slug");
 
     res.json({
       success: true,
-      product
+      product,
     });
   } catch (error) {
-    console.error('Error al actualizar producto:', error);
+    console.error("Error al actualizar producto:", error);
     res.status(500).json({
       success: false,
-      message: 'Error al actualizar producto'
+      message: "Error al actualizar producto",
     });
   }
 });
@@ -152,28 +162,28 @@ router.put('/:id', protect, adminOnly, async (req, res) => {
 // @route   DELETE /api/products/:id
 // @desc    Eliminar producto
 // @access  Private/Admin
-router.delete('/:id', protect, adminOnly, async (req, res) => {
+router.delete("/:id", protect, adminOnly, async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
-    
+
     if (!product) {
       return res.status(404).json({
         success: false,
-        message: 'Producto no encontrado'
+        message: "Producto no encontrado",
       });
     }
-    
+
     await product.deleteOne();
-    
+
     res.json({
       success: true,
-      message: 'Producto eliminado correctamente'
+      message: "Producto eliminado correctamente",
     });
   } catch (error) {
-    console.error('Error al eliminar producto:', error);
+    console.error("Error al eliminar producto:", error);
     res.status(500).json({
       success: false,
-      message: 'Error al eliminar producto'
+      message: "Error al eliminar producto",
     });
   }
 });
@@ -181,19 +191,19 @@ router.delete('/:id', protect, adminOnly, async (req, res) => {
 // @route   GET /api/products/categories/list
 // @desc    Obtener lista de categorías (legacy path) - lee desde DB si está disponible
 // @access  Public
-router.get('/categories/list', async (req, res) => {
+router.get("/categories/list", async (req, res) => {
   try {
-    const categories = await Category.find().sort('name');
+    const categories = await Category.find().sort("name");
     res.json({ success: true, categories });
   } catch (error) {
-    console.error('Error al obtener lista de categorías:', error);
+    console.error("Error al obtener lista de categorías:", error);
     // fallback a lista hardcodeada si algo falla
     const fallback = [
-      'Joyería artesanal',
-      'Velas y aromáticos',
-      'Textiles y ropa',
-      'Cerámica y arcilla',
-      'Arte hecho a mano'
+      "Joyería artesanal",
+      "Velas y aromáticos",
+      "Textiles y ropa",
+      "Cerámica y arcilla",
+      "Arte hecho a mano",
     ];
     res.json({ success: true, categories: fallback });
   }

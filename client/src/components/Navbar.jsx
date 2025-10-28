@@ -1,18 +1,18 @@
-import { useState, useEffect } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import { useTheme } from '../context/ThemeContext';
-import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Sun, 
-  Moon, 
-  User, 
-  LogOut, 
-  ShoppingBag, 
-  Menu, 
+import { useState, useEffect } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import { useTheme } from "../context/ThemeContext";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  Sun,
+  Moon,
+  User,
+  LogOut,
+  ShoppingBag,
+  Menu,
   X,
-  LayoutDashboard
-} from 'lucide-react';
+  LayoutDashboard,
+} from "lucide-react";
 
 const Navbar = () => {
   const { user, logout, isAdmin } = useAuth();
@@ -27,8 +27,8 @@ const Navbar = () => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 20);
     };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   const isActive = (path) => location.pathname === path;
@@ -44,10 +44,8 @@ const Navbar = () => {
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-          scrolled
-            ? 'glass-nav shadow-lg'
-            : 'bg-transparent'
-        }`}
+        scrolled ? "glass-nav shadow-lg" : "bg-transparent"
+      }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
@@ -57,11 +55,14 @@ const Navbar = () => {
             onClick={(e) => {
               // Smooth scroll to top even when already on home
               e.preventDefault();
-              if (location.pathname === '/') {
-                window.scrollTo({ top: 0, behavior: 'smooth' });
+              if (location.pathname === "/") {
+                window.scrollTo({ top: 0, behavior: "smooth" });
               } else {
-                navigate('/');
-                setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 120);
+                navigate("/");
+                setTimeout(
+                  () => window.scrollTo({ top: 0, behavior: "smooth" }),
+                  120
+                );
               }
             }}
             className="flex items-center space-x-2 group"
@@ -76,21 +77,21 @@ const Navbar = () => {
             <Link
               to="/products"
               className={`text-sm font-medium transition-colors ${
-                isActive('/products')
-                  ? 'text-primary-500'
-                  : 'text-gray-700 dark:text-gray-300 hover:text-primary-500'
+                isActive("/products")
+                  ? "text-primary-500"
+                  : "text-gray-700 dark:text-gray-300 hover:text-primary-500"
               }`}
             >
               Productos
             </Link>
-            
+
             {isAdmin && (
               <Link
                 to="/admin"
                 className={`text-sm font-medium transition-colors flex items-center space-x-1 ${
-                  isActive('/admin')
-                    ? 'text-primary-500'
-                    : 'text-gray-700 dark:text-gray-300 hover:text-primary-500'
+                  isActive("/admin")
+                    ? "text-primary-500"
+                    : "text-gray-700 dark:text-gray-300 hover:text-primary-500"
                 }`}
               >
                 <LayoutDashboard className="w-4 h-4" />
@@ -105,7 +106,7 @@ const Navbar = () => {
               className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
               aria-label="Toggle theme"
             >
-              {theme === 'light' ? (
+              {theme === "light" ? (
                 <Moon className="w-5 h-5 text-gray-700 dark:text-gray-300" />
               ) : (
                 <Sun className="w-5 h-5 text-gray-300" />
@@ -146,7 +147,9 @@ const Navbar = () => {
                             {user.email}
                           </p>
                           <p className="text-xs text-primary-500 font-medium mt-1">
-                            {user.role === 'admin' ? 'Administrador' : 'Usuario'}
+                            {user.role === "admin"
+                              ? "Administrador"
+                              : "Usuario"}
                           </p>
                         </div>
                         <button
@@ -198,7 +201,7 @@ const Navbar = () => {
         {mobileMenuOpen && (
           <motion.div
             initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
+            animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
             className="md:hidden glass border-t border-gray-200 dark:border-gray-700"
           >
@@ -210,7 +213,7 @@ const Navbar = () => {
               >
                 Productos
               </Link>
-              
+
               {isAdmin && (
                 <Link
                   to="/admin"
@@ -228,7 +231,11 @@ const Navbar = () => {
                 }}
                 className="w-full text-left px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors flex items-center space-x-2"
               >
-                {theme === 'light' ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
+                {theme === "light" ? (
+                  <Moon className="w-4 h-4" />
+                ) : (
+                  <Sun className="w-4 h-4" />
+                )}
                 <span>Cambiar tema</span>
               </button>
 

@@ -1,41 +1,41 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { Mail, Lock, Eye, EyeOff, LogIn, Loader } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+import { Mail, Lock, Eye, EyeOff, LogIn, Loader } from "lucide-react";
+import { useAuth } from "../context/AuthContext";
 
 const Login = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
   const [formData, setFormData] = useState({
-    email: '',
-    password: ''
+    email: "",
+    password: "",
   });
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
-    setError('');
+    setError("");
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError('');
+    setError("");
 
     const result = await login(formData);
 
     if (result.success) {
-      navigate('/products');
+      navigate("/products");
     } else {
       setError(result.message);
     }
-    
+
     setLoading(false);
   };
 
@@ -47,13 +47,13 @@ const Login = () => {
         transition={{ duration: 0.5 }}
         className="max-w-md w-full"
       >
-  <div className="glass rounded-3xl shadow-2xl p-8">
+        <div className="glass rounded-3xl shadow-2xl p-8">
           {/* Header */}
           <div className="text-center mb-8">
             <motion.div
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
-              transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
+              transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
               className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-primary-500 to-primary-600 rounded-2xl mb-4"
             >
               <LogIn className="w-8 h-8 text-white" />
@@ -106,7 +106,7 @@ const Login = () => {
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input
-                  type={showPassword ? 'text' : 'password'}
+                  type={showPassword ? "text" : "password"}
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
@@ -119,7 +119,11 @@ const Login = () => {
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
                 >
-                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  {showPassword ? (
+                    <EyeOff className="w-5 h-5" />
+                  ) : (
+                    <Eye className="w-5 h-5" />
+                  )}
                 </button>
               </div>
             </div>
@@ -131,7 +135,7 @@ const Login = () => {
               type="submit"
               disabled={loading}
               className="w-full py-3 bg-gradient-to-r from-primary-500 to-primary-600 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl hover:shadow-primary-500/50 transition-shadow duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
-              style={{ willChange: 'transform' }}
+              style={{ willChange: "transform" }}
             >
               {loading ? (
                 <Loader className="w-5 h-5 animate-spin" />
@@ -147,7 +151,7 @@ const Login = () => {
           {/* Footer */}
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              ¿No tienes cuenta?{' '}
+              ¿No tienes cuenta?{" "}
               <Link
                 to="/register"
                 className="text-primary-500 hover:text-primary-600 font-semibold transition-colors"
@@ -162,7 +166,9 @@ const Login = () => {
             <p className="text-xs text-primary-700 dark:text-primary-400 text-center font-medium">
               Credenciales de Admin por defecto:
               <br />
-              <span className="font-mono">admin@creativehands.com / Admin123!</span>
+              <span className="font-mono">
+                admin@creativehands.com / Admin123!
+              </span>
             </p>
           </div>
         </div>

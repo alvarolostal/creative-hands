@@ -5,6 +5,7 @@ Portal completo de comercio electrónico de productos hechos a mano con autentic
 ## ✨ Características Principales
 
 ### 🔐 Autenticación y Autorización
+
 - Sistema de registro e inicio de sesión con JWT
 - Roles de usuario: **Usuario** y **Administrador**
 - Rutas protegidas según rol
@@ -12,6 +13,7 @@ Portal completo de comercio electrónico de productos hechos a mano con autentic
 - Administrador predefinido en el sistema
 
 ### 📦 Gestión de Productos (CRUD Completo)
+
 - **Usuarios**: Pueden ver todos los productos y filtrar por categoría
 - **Administradores**: CRUD completo (Crear, Leer, Actualizar, Eliminar)
 - 5 categorías de productos artesanales:
@@ -25,6 +27,7 @@ Portal completo de comercio electrónico de productos hechos a mano con autentic
 - Productos destacados
 
 ### 💬 Chat en Tiempo Real
+
 - **Usuarios**: Chat flotante para comunicarse con el administrador
 - **Administrador**: Panel de conversaciones con todos los usuarios
 - Indicadores de "usuario escribiendo..."
@@ -34,6 +37,7 @@ Portal completo de comercio electrónico de productos hechos a mano con autentic
 - Interfaz tipo WhatsApp/Messenger
 
 ### 🎨 Diseño Apple-Style
+
 - **Minimalista pero sofisticado**
 - Glassmorphism (efecto cristal esmerilado)
 - Animaciones suaves con Framer Motion
@@ -45,6 +49,7 @@ Portal completo de comercio electrónico de productos hechos a mano con autentic
 ### 🛠️ Tecnologías Utilizadas
 
 #### Backend
+
 - **Node.js** + **Express**: Servidor y API REST
 - **MongoDB** + **Mongoose**: Base de datos NoSQL
 - **Socket.IO**: Comunicación en tiempo real
@@ -52,6 +57,7 @@ Portal completo de comercio electrónico de productos hechos a mano con autentic
 - **bcryptjs**: Encriptación de contraseñas
 
 #### Frontend
+
 - **React 18** + **Vite**: Framework y build tool
 - **React Router**: Navegación SPA
 - **Tailwind CSS**: Estilos utility-first
@@ -138,11 +144,13 @@ npm run dev
 #### Opción B: Terminales separadas
 
 **Terminal 1 - Backend:**
+
 ```bash
 npm run server
 ```
 
 **Terminal 2 - Frontend:**
+
 ```bash
 npm run client
 ```
@@ -211,6 +219,7 @@ creative-hands/
 ## 🎯 Funcionalidades por Rol
 
 ### 👥 Usuario Normal
+
 - ✅ Registrarse e iniciar sesión
 - ✅ Ver todos los productos
 - ✅ Buscar productos por nombre/descripción
@@ -221,6 +230,7 @@ creative-hands/
 - ✅ Cambiar entre tema claro y oscuro
 
 ### 👨‍💼 Administrador
+
 - ✅ Todas las funciones de usuario normal
 - ✅ Crear nuevos productos
 - ✅ Editar productos existentes
@@ -233,6 +243,7 @@ creative-hands/
 ## 🔧 API Endpoints
 
 ### Autenticación
+
 ```
 POST   /api/auth/register       - Registrar usuario
 POST   /api/auth/login          - Iniciar sesión
@@ -241,6 +252,7 @@ POST   /api/auth/logout         - Cerrar sesión
 ```
 
 ### Productos
+
 ```
 GET    /api/products            - Obtener todos los productos
 GET    /api/products/:id        - Obtener producto por ID
@@ -250,6 +262,7 @@ DELETE /api/products/:id        - Eliminar producto (Admin)
 ```
 
 ### Chat
+
 ```
 GET    /api/chat/conversations  - Obtener conversaciones (Admin)
 GET    /api/chat/messages/:id   - Obtener mensajes de conversación
@@ -260,23 +273,27 @@ GET    /api/chat/admin          - Obtener info del admin
 ## 🎨 Decisiones de Diseño
 
 ### Por qué estos colores
+
 - **Primary (#CB6843)**: Color terracota que evoca la cerámica artesanal y productos hechos a mano
 - **Dark (#262624)**: Gris oscuro cálido para modo oscuro, menos agresivo que el negro puro
 - **Light (#F5F5F4)**: Blanco roto para modo claro, más suave para la vista
 
 ### Por qué Glassmorphism
+
 - Estética moderna y premium (Apple-style)
 - Sensación de profundidad y capas
 - Elegante sin ser recargado
 - Perfecto para productos artesanales de alta calidad
 
 ### Por qué animaciones suaves
+
 - Mejora la experiencia de usuario
 - Hace la interfaz más "viva"
 - Guía la atención del usuario
 - Transmite profesionalismo y cuidado
 
 ### Por qué chat flotante vs integrado
+
 - **Para usuarios**: No interrumpe la navegación, siempre accesible
 - **Para admin**: Panel dedicado con gestión de múltiples conversaciones
 - Mejor UX según el contexto de uso
@@ -284,12 +301,14 @@ GET    /api/chat/admin          - Obtener info del admin
 ## 🚀 Despliegue
 
 ### Backend (Render, Railway, Heroku)
+
 1. Subir código a GitHub
 2. Conectar repositorio
 3. Configurar variables de entorno
 4. Usar MongoDB Atlas para la BD
 
 ### Frontend (Vercel, Netlify)
+
 1. Hacer build: `cd client && npm run build`
 2. Subir carpeta `dist/`
 3. Configurar redirects para SPA
@@ -297,6 +316,7 @@ GET    /api/chat/admin          - Obtener info del admin
 ## 🐛 Solución de Problemas
 
 ### MongoDB no conecta
+
 ```bash
 # Verificar que MongoDB está corriendo
 mongod --version
@@ -307,16 +327,19 @@ brew services restart mongodb-community  # Mac
 ```
 
 ### Puerto ya en uso
+
 ```bash
 # Cambiar PORT en .env
 PORT=3000  # o cualquier otro puerto disponible
 ```
 
 ### Error de CORS
+
 - Verificar que el frontend está en `http://localhost:5173`
 - Verificar configuración de CORS en `server.js`
 
 ### Socket.IO no conecta
+
 - Verificar que el token JWT es válido
 - Abrir consola del navegador para ver errores
 - Verificar que el backend está corriendo
@@ -324,18 +347,21 @@ PORT=3000  # o cualquier otro puerto disponible
 ## 📝 Notas Adicionales
 
 ### Seguridad
+
 - Las contraseñas se encriptan con bcrypt (salt rounds: 10)
 - JWT expira en 7 días (configurable)
 - Rutas protegidas con middleware
 - Validación de roles en backend
 
 ### Performance
+
 - Socket.IO para comunicación eficiente en tiempo real
 - Lazy loading de componentes (posible mejora futura)
 - Índices en MongoDB para búsquedas rápidas
 - Debounce en búsqueda de productos (posible mejora futura)
 
 ### Escalabilidad
+
 - Arquitectura modular
 - Separación clara de responsabilidades
 - Fácil añadir nuevas features
@@ -343,16 +369,17 @@ PORT=3000  # o cualquier otro puerto disponible
 
 ## 🎓 Criterios de Evaluación Cubiertos
 
-| Criterio | Completado | Detalles |
-|----------|------------|----------|
-| Autenticación JWT | ✅ 20% | Login, Register, Protected Routes |
-| Roles y permisos | ✅ 15% | User/Admin con permisos diferenciados |
-| CRUD de productos | ✅ 25% | Completo con MongoDB |
-| Chat en tiempo real | ✅ 20% | Socket.IO, historial persistente |
-| Código limpio | ✅ 10% | Modular, comentado, buenas prácticas |
-| Documentación | ✅ 10% | README completo con instrucciones |
+| Criterio            | Completado | Detalles                              |
+| ------------------- | ---------- | ------------------------------------- |
+| Autenticación JWT   | ✅ 20%     | Login, Register, Protected Routes     |
+| Roles y permisos    | ✅ 15%     | User/Admin con permisos diferenciados |
+| CRUD de productos   | ✅ 25%     | Completo con MongoDB                  |
+| Chat en tiempo real | ✅ 20%     | Socket.IO, historial persistente      |
+| Código limpio       | ✅ 10%     | Modular, comentado, buenas prácticas  |
+| Documentación       | ✅ 10%     | README completo con instrucciones     |
 
 ### Puntos Extra Implementados
+
 - ✅ Persistencia del historial de chat
 - ✅ Interfaz con diseño moderno (Glassmorphism, animaciones)
 - ✅ Modo oscuro/claro
@@ -363,6 +390,7 @@ PORT=3000  # o cualquier otro puerto disponible
 ## 📞 Soporte
 
 Para cualquier duda o problema:
+
 1. Revisar esta documentación
 2. Verificar la consola del navegador y del servidor
 3. Verificar que MongoDB está corriendo
@@ -372,4 +400,4 @@ Para cualquier duda o problema:
 
 **Desarrollado con ❤️ para Creative Hands**
 
-*Un proyecto de práctica que demuestra integración completa de tecnologías modernas para desarrollo web full-stack.*
+_Un proyecto de práctica que demuestra integración completa de tecnologías modernas para desarrollo web full-stack._

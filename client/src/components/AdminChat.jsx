@@ -1,9 +1,9 @@
-import { useState, useEffect, useRef } from 'react';
-import { motion } from 'framer-motion';
-import { Send, Loader, User, Circle } from 'lucide-react';
-import { useSocket } from '../context/SocketContext';
-import { useAuth } from '../context/AuthContext';
-import axios from 'axios';
+import { useState, useEffect, useRef } from "react";
+import { motion } from "framer-motion";
+import { Send, Loader, User, Circle } from "lucide-react";
+import { useSocket } from "../context/SocketContext";
+import { useAuth } from "../context/AuthContext";
+import axios from "axios";
 
 const AdminChat = () => {
   const { socket, connected } = useSocket();
@@ -11,14 +11,14 @@ const AdminChat = () => {
   const [conversations, setConversations] = useState([]);
   const [selectedConversation, setSelectedConversation] = useState(null);
   const [messages, setMessages] = useState([]);
-  const [newMessage, setNewMessage] = useState('');
+  const [newMessage, setNewMessage] = useState("");
   const [loading, setLoading] = useState(true);
   const [typing, setTyping] = useState(false);
   const messagesEndRef = useRef(null);
   const typingTimeoutRef = useRef(null);
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
   useEffect(() => {
@@ -32,37 +32,39 @@ const AdminChat = () => {
   useEffect(() => {
     if (!socket) return;
 
-    socket.on('message:new', (message) => {
+    socket.on("message:new", (message) => {
       // Actualizar mensajes si es la conversación activa
-      if (selectedConversation && 
-          (message.sender._id === selectedConversation.user._id || 
-           message.receiver._id === selectedConversation.user._id)) {
-        setMessages(prev => [...prev, message]);
+      if (
+        selectedConversation &&
+        (message.sender._id === selectedConversation.user._id ||
+          message.receiver._id === selectedConversation.user._id)
+      ) {
+        setMessages((prev) => [...prev, message]);
       }
 
       // Actualizar lista de conversaciones
       fetchConversations();
     });
 
-    socket.on('typing:status', ({ userId, isTyping: typingStatus }) => {
+    socket.on("typing:status", ({ userId, isTyping: typingStatus }) => {
       if (selectedConversation && userId === selectedConversation.user._id) {
         setTyping(typingStatus);
       }
     });
 
     return () => {
-      socket.off('message:new');
-      socket.off('typing:status');
+      socket.off("message:new");
+      socket.off("typing:status");
     };
   }, [socket, selectedConversation]);
 
   const fetchConversations = async () => {
     try {
-      const { data } = await axios.get('/api/chat/conversations');
+      const { data } = await axios.get("/api/chat/conversations");
       setConversations(data.conversations);
       setLoading(false);
     } catch (error) {
-      console.error('Error al cargar conversaciones:', error);
+      console.error("Error al cargar conversaciones:", error);
       setLoading(false);
     }
   };
@@ -70,10 +72,12 @@ const AdminChat = () => {
   const selectConversation = async (conversation) => {
     setSelectedConversation(conversation);
     try {
-      const { data } = await axios.get(`/api/chat/messages/${conversation.user._id}`);
+      const { data } = await axios.get(
+        `/api/chat/messages/${conversation.user._id}`
+      );
       setMessages(data.messages);
     } catch (error) {
-      console.error('Error al cargar mensajes:', error);
+      console.error("Error al cargar mensajes:", error);
     }
   };
 
@@ -83,31 +87,31 @@ const AdminChat = () => {
 
     const messageData = {
       receiverId: selectedConversation.user._id,
-      content: newMessage.trim()
+      content: newMessage.trim(),
     };
 
-    socket.emit('message:send', messageData);
-    setNewMessage('');
-    
+    socket.emit("message:send", messageData);
+    setNewMessage("");
+
     if (typingTimeoutRef.current) {
       clearTimeout(typingTimeoutRef.current);
     }
-    socket.emit('typing:stop', { receiverId: selectedConversation.user._id });
+    socket.emit("typing:stop", { receiverId: selectedConversation.user._id });
   };
 
   const handleTyping = (e) => {
     setNewMessage(e.target.value);
-    
+
     if (!socket || !selectedConversation) return;
 
-    socket.emit('typing:start', { receiverId: selectedConversation.user._id });
+    socket.emit("typing:start", { receiverId: selectedConversation.user._id });
 
     if (typingTimeoutRef.current) {
       clearTimeout(typingTimeoutRef.current);
     }
 
     typingTimeoutRef.current = setTimeout(() => {
-      socket.emit('typing:stop', { receiverId: selectedConversation.user._id });
+      socket.emit("typing:stop", { receiverId: selectedConversation.user._id });
     }, 1000);
   };
 
@@ -122,11 +126,11 @@ const AdminChat = () => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 h-[calc(100vh-300px)]">
       {/* Conversations List */}
-  <div className="glass rounded-2xl p-6 overflow-y-auto">
+      <div className="glass rounded-2xl p-6 overflow-y-auto">
         <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
           Conversaciones
         </h3>
-        
+
         {conversations.length === 0 ? (
           <p className="text-gray-500 dark:text-gray-400 text-center py-8">
             No hay conversaciones aún
@@ -141,8 +145,8 @@ const AdminChat = () => {
                 onClick={() => selectConversation(conv)}
                 className={`w-full p-4 rounded-xl text-left transition-colors duration-200 ${
                   selectedConversation?.conversationId === conv.conversationId
-                    ? 'bg-gradient-to-r from-primary-500 to-primary-600 text-white'
-                    : 'bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-900 dark:text-white'
+                    ? "bg-gradient-to-r from-primary-500 to-primary-600 text-white"
+                    : "bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-900 dark:text-white"
                 }`}
               >
                 <div className="flex items-center space-x-3">
@@ -156,15 +160,18 @@ const AdminChat = () => {
                       <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-400 rounded-full border-2 border-white dark:border-gray-800"></div>
                     )}
                   </div>
-                    <div className="flex-1 min-w-0">
+                  <div className="flex-1 min-w-0">
                     <p className="font-semibold truncate text-gray-900 dark:text-white">
                       {conv.user.name}
                     </p>
-                    <p className={`text-sm truncate ${
-                      selectedConversation?.conversationId === conv.conversationId
-                        ? 'text-white/80'
-                        : 'text-gray-500 dark:text-gray-400'
-                    }`}>
+                    <p
+                      className={`text-sm truncate ${
+                        selectedConversation?.conversationId ===
+                        conv.conversationId
+                          ? "text-white/80"
+                          : "text-gray-500 dark:text-gray-400"
+                      }`}
+                    >
                       {conv.lastMessage.content}
                     </p>
                   </div>
@@ -183,7 +190,7 @@ const AdminChat = () => {
       </div>
 
       {/* Chat Window */}
-  <div className="md:col-span-2 glass rounded-2xl flex flex-col overflow-hidden">
+      <div className="md:col-span-2 glass rounded-2xl flex flex-col overflow-hidden">
         {selectedConversation ? (
           <>
             {/* Chat Header */}
@@ -217,25 +224,32 @@ const AdminChat = () => {
                     key={message._id}
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className={`flex ${isOwn ? 'justify-end' : 'justify-start'}`}
+                    className={`flex ${
+                      isOwn ? "justify-end" : "justify-start"
+                    }`}
                   >
                     <div
                       className={`max-w-[75%] rounded-2xl px-4 py-2 ${
                         isOwn
-                          ? 'bg-gradient-to-br from-primary-500 to-primary-600 text-white'
-                          : 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white'
+                          ? "bg-gradient-to-br from-primary-500 to-primary-600 text-white"
+                          : "bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
                       }`}
                     >
                       <p className="text-sm">{message.content}</p>
                       <p
                         className={`text-xs mt-1 ${
-                          isOwn ? 'text-white/70' : 'text-gray-500 dark:text-gray-400'
+                          isOwn
+                            ? "text-white/70"
+                            : "text-gray-500 dark:text-gray-400"
                         }`}
                       >
-                        {new Date(message.createdAt).toLocaleTimeString('es-ES', {
-                          hour: '2-digit',
-                          minute: '2-digit'
-                        })}
+                        {new Date(message.createdAt).toLocaleTimeString(
+                          "es-ES",
+                          {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          }
+                        )}
                       </p>
                     </div>
                   </motion.div>
@@ -249,8 +263,14 @@ const AdminChat = () => {
                 >
                   <div className="bg-white dark:bg-gray-800 rounded-2xl px-4 py-3">
                     <div className="flex space-x-1">
-                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
-                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.4s' }}></div>
+                      <div
+                        className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+                        style={{ animationDelay: "0.2s" }}
+                      ></div>
+                      <div
+                        className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+                        style={{ animationDelay: "0.4s" }}
+                      ></div>
                     </div>
                   </div>
                 </motion.div>
@@ -259,7 +279,10 @@ const AdminChat = () => {
             </div>
 
             {/* Input */}
-            <form onSubmit={handleSendMessage} className="p-4 border-t border-gray-200 dark:border-gray-700">
+            <form
+              onSubmit={handleSendMessage}
+              className="p-4 border-t border-gray-200 dark:border-gray-700"
+            >
               <div className="flex items-center space-x-2">
                 <input
                   type="text"
@@ -274,7 +297,7 @@ const AdminChat = () => {
                   type="submit"
                   disabled={!newMessage.trim() || !connected}
                   className="w-12 h-12 bg-gradient-to-br from-primary-500 to-primary-600 rounded-full flex items-center justify-center text-white disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-lg transition-shadow duration-200"
-                  style={{ willChange: 'transform' }}
+                  style={{ willChange: "transform" }}
                 >
                   <Send className="w-5 h-5" />
                 </motion.button>

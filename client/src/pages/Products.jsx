@@ -1,23 +1,23 @@
-import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { Search, Filter, Loader, Package } from 'lucide-react';
-import axios from 'axios';
-import ProductCard from '../components/ProductCard';
-import { useAuth } from '../context/AuthContext';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import { Search, Filter, Loader, Package } from "lucide-react";
+import axios from "axios";
+import ProductCard from "../components/ProductCard";
+import { useAuth } from "../context/AuthContext";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 
 const Products = () => {
   const { isAdmin } = useAuth();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [categoriesList, setCategoriesList] = useState([]);
   const [nameToSlug, setNameToSlug] = useState({});
-  const [selectedCategorySlug, setSelectedCategorySlug] = useState('');
-    const location = useLocation();
-    const navigate = useNavigate();
-    const params = useParams();
-  
+  const [selectedCategorySlug, setSelectedCategorySlug] = useState("");
+  const location = useLocation();
+  const navigate = useNavigate();
+  const params = useParams();
+
   // categoriesList will be fetched from the API; we keep a 'Todas' pseudo-category at the start
 
   useEffect(() => {
@@ -37,10 +37,10 @@ const Products = () => {
     }
 
     const query = new URLSearchParams(location.search);
-    const cat = query.get('category');
+    const cat = query.get("category");
     if (cat) {
-      if (cat === 'Todas') {
-        setSelectedCategorySlug('');
+      if (cat === "Todas") {
+        setSelectedCategorySlug("");
       } else if (nameToSlug[cat]) {
         // map known category name -> slug provided by server
         setSelectedCategorySlug(nameToSlug[cat]);
@@ -58,16 +58,18 @@ const Products = () => {
       let data;
 
       if (selectedCategorySlug) {
-        const res = await axios.get(`/api/products/category/${selectedCategorySlug}`);
+        const res = await axios.get(
+          `/api/products/category/${selectedCategorySlug}`
+        );
         data = res.data;
       } else {
-        const res = await axios.get('/api/products');
+        const res = await axios.get("/api/products");
         data = res.data;
       }
 
       setProducts(data.products);
     } catch (error) {
-      console.error('Error al cargar productos:', error);
+      console.error("Error al cargar productos:", error);
     } finally {
       setLoading(false);
     }
@@ -75,48 +77,57 @@ const Products = () => {
 
   const fetchCategories = async () => {
     try {
-      const { data } = await axios.get('/api/categories');
+      const { data } = await axios.get("/api/categories");
       // build name->slug map for robust mapping from legacy name queries
       const map = {};
-      data.categories.forEach(c => { map[c.name] = c.slug; });
+      data.categories.forEach((c) => {
+        map[c.name] = c.slug;
+      });
       setNameToSlug(map);
       // prepend 'Todas' as a pseudo-category
-      setCategoriesList([{ name: 'Todas', slug: '' }, ...data.categories.map(c => ({ name: c.name, slug: c.slug }))]);
+      setCategoriesList([
+        { name: "Todas", slug: "" },
+        ...data.categories.map((c) => ({ name: c.name, slug: c.slug })),
+      ]);
     } catch (error) {
-      console.error('Error cargando categorías, usando lista por defecto:', error);
+      console.error(
+        "Error cargando categorías, usando lista por defecto:",
+        error
+      );
       setNameToSlug({
-        'Joyería artesanal': 'joyeria-artesanal',
-        'Velas y aromáticos': 'velas-y-aromaticos',
-        'Textiles y ropa': 'textiles-y-ropa',
-        'Cerámica y arcilla': 'ceramica-y-arcilla',
-        'Arte hecho a mano': 'arte-hecho-a-mano'
+        "Joyería artesanal": "joyeria-artesanal",
+        "Velas y aromáticos": "velas-y-aromaticos",
+        "Textiles y ropa": "textiles-y-ropa",
+        "Cerámica y arcilla": "ceramica-y-arcilla",
+        "Arte hecho a mano": "arte-hecho-a-mano",
       });
       setCategoriesList([
-        { name: 'Todas', slug: '' },
-        { name: 'Joyería artesanal', slug: 'joyeria-artesanal' },
-        { name: 'Velas y aromáticos', slug: 'velas-y-aromaticos' },
-        { name: 'Textiles y ropa', slug: 'textiles-y-ropa' },
-        { name: 'Cerámica y arcilla', slug: 'ceramica-y-arcilla' },
-        { name: 'Arte hecho a mano', slug: 'arte-hecho-a-mano' }
+        { name: "Todas", slug: "" },
+        { name: "Joyería artesanal", slug: "joyeria-artesanal" },
+        { name: "Velas y aromáticos", slug: "velas-y-aromaticos" },
+        { name: "Textiles y ropa", slug: "textiles-y-ropa" },
+        { name: "Cerámica y arcilla", slug: "ceramica-y-arcilla" },
+        { name: "Arte hecho a mano", slug: "arte-hecho-a-mano" },
       ]);
     }
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm('¿Estás seguro de eliminar este producto?')) return;
-    
+    if (!window.confirm("¿Estás seguro de eliminar este producto?")) return;
+
     try {
       await axios.delete(`/api/products/${id}`);
-      setProducts(products.filter(p => p._id !== id));
+      setProducts(products.filter((p) => p._id !== id));
     } catch (error) {
-      console.error('Error al eliminar producto:', error);
-      alert('Error al eliminar el producto');
+      console.error("Error al eliminar producto:", error);
+      alert("Error al eliminar el producto");
     }
   };
 
-  const filteredProducts = products.filter(product =>
-    product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    product.description.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredProducts = products.filter(
+    (product) =>
+      product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      product.description.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -163,19 +174,20 @@ const Products = () => {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => {
-                  const val = category.slug || '';
+                  const val = category.slug || "";
                   setSelectedCategorySlug(val);
                   // update URL using slug path (preferred)
                   if (val) {
                     navigate(`/products/category/${val}`);
                   } else {
-                    navigate('/products');
+                    navigate("/products");
                   }
                 }}
                 className={`px-4 py-2 rounded-full font-medium transition-shadow duration-200 ${
-                  (selectedCategorySlug === category.slug) || (selectedCategorySlug === '' && category.name === 'Todas')
-                    ? 'bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-lg'
-                    : 'glass text-gray-700 dark:text-gray-300 hover:shadow-md'
+                  selectedCategorySlug === category.slug ||
+                  (selectedCategorySlug === "" && category.name === "Todas")
+                    ? "bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-lg"
+                    : "glass text-gray-700 dark:text-gray-300 hover:shadow-md"
                 }`}
               >
                 {category.name}
@@ -200,7 +212,9 @@ const Products = () => {
               No se encontraron productos
             </h3>
             <p className="text-gray-600 dark:text-gray-400">
-              {searchTerm ? 'Intenta con otro término de búsqueda' : 'Aún no hay productos en esta categoría'}
+              {searchTerm
+                ? "Intenta con otro término de búsqueda"
+                : "Aún no hay productos en esta categoría"}
             </p>
           </motion.div>
         ) : (
@@ -217,10 +231,7 @@ const Products = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1 }}
               >
-                <ProductCard
-                  product={product}
-                  onDelete={handleDelete}
-                />
+                <ProductCard product={product} onDelete={handleDelete} />
               </motion.div>
             ))}
           </motion.div>

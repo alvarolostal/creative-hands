@@ -1,9 +1,9 @@
-const mongoose = require('mongoose');
-const { MongoMemoryServer } = require('mongodb-memory-server');
-const request = require('supertest');
-const express = require('express');
-const authRouter = require('../routes/auth');
-const User = require('../models/User');
+const mongoose = require("mongoose");
+const { MongoMemoryServer } = require("mongodb-memory-server");
+const request = require("supertest");
+const express = require("express");
+const authRouter = require("../routes/auth");
+const User = require("../models/User");
 
 let mongoServer;
 let app;
@@ -14,12 +14,12 @@ beforeAll(async () => {
   await mongoose.connect(uri);
 
   // Ensure env for JWT
-  process.env.JWT_SECRET = process.env.JWT_SECRET || 'test_jwt_secret';
-  process.env.JWT_EXPIRE = process.env.JWT_EXPIRE || '1d';
+  process.env.JWT_SECRET = process.env.JWT_SECRET || "test_jwt_secret";
+  process.env.JWT_EXPIRE = process.env.JWT_EXPIRE || "1d";
 
   app = express();
   app.use(express.json());
-  app.use('/api/auth', authRouter);
+  app.use("/api/auth", authRouter);
 });
 
 afterAll(async () => {
@@ -31,17 +31,23 @@ afterEach(async () => {
   await User.deleteMany({});
 });
 
-test('register and login flow', async () => {
-  const newUser = { name: 'Test User', email: 'test@example.com', password: 'password123' };
+test("register and login flow", async () => {
+  const newUser = {
+    name: "Test User",
+    email: "test@example.com",
+    password: "password123",
+  };
 
-  const resReg = await request(app).post('/api/auth/register').send(newUser);
+  const resReg = await request(app).post("/api/auth/register").send(newUser);
   expect(resReg.statusCode).toBe(201);
   expect(resReg.body.success).toBe(true);
   expect(resReg.body.token).toBeDefined();
   expect(resReg.body.user).toBeDefined();
   expect(resReg.body.user.email).toBe(newUser.email);
 
-  const resLogin = await request(app).post('/api/auth/login').send({ email: newUser.email, password: newUser.password });
+  const resLogin = await request(app)
+    .post("/api/auth/login")
+    .send({ email: newUser.email, password: newUser.password });
   expect(resLogin.statusCode).toBe(200);
   expect(resLogin.body.success).toBe(true);
   expect(resLogin.body.token).toBeDefined();

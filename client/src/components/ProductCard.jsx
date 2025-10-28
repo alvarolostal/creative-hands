@@ -1,11 +1,11 @@
-import { motion } from 'framer-motion';
-import { Edit, Trash2, Package } from 'lucide-react';
+import { motion } from "framer-motion";
+import { Edit, Trash2, Package } from "lucide-react";
 
 const ProductCard = ({ product, onEdit, onDelete, isAdmin }) => {
   const formatPrice = (price) => {
-    return new Intl.NumberFormat('es-ES', {
-      style: 'currency',
-      currency: 'EUR'
+    return new Intl.NumberFormat("es-ES", {
+      style: "currency",
+      currency: "EUR",
     }).format(price);
   };
 
@@ -16,7 +16,7 @@ const ProductCard = ({ product, onEdit, onDelete, isAdmin }) => {
       whileHover={{ y: -8 }}
       // dejar la transición del transform a framer-motion y solo animar la sombra por CSS
       className="glass rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-200 group"
-      style={{ willChange: 'transform' }}
+      style={{ willChange: "transform" }}
     >
       {/* Image */}
       <div className="relative h-64 bg-gradient-to-br from-primary-100 to-primary-200 dark:from-gray-800 dark:to-gray-700 overflow-hidden">
@@ -31,7 +31,7 @@ const ProductCard = ({ product, onEdit, onDelete, isAdmin }) => {
             <Package className="w-16 h-16 text-primary-300 dark:text-gray-600" />
           </div>
         )}
-        
+
         {/* Badge de categoría */}
         <div className="absolute top-3 left-3">
           <span className="px-3 py-1 bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm text-xs font-medium text-gray-900 dark:text-white rounded-full">
@@ -67,7 +67,7 @@ const ProductCard = ({ product, onEdit, onDelete, isAdmin }) => {
         <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2 line-clamp-1">
           {product.name}
         </h3>
-        
+
         <p className="text-gray-600 dark:text-gray-400 text-sm mb-4 line-clamp-2">
           {product.description}
         </p>

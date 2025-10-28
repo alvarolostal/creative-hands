@@ -1,20 +1,20 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const jwt = require('jsonwebtoken');
-const User = require('../models/User');
-const { protect } = require('../middleware/auth');
+const jwt = require("jsonwebtoken");
+const User = require("../models/User");
+const { protect } = require("../middleware/auth");
 
 // Generar JWT
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
-    expiresIn: process.env.JWT_EXPIRE
+    expiresIn: process.env.JWT_EXPIRE,
   });
 };
 
 // @route   POST /api/auth/register
 // @desc    Registrar nuevo usuario
 // @access  Public
-router.post('/register', async (req, res) => {
+router.post("/register", async (req, res) => {
   try {
     const { name, email, password } = req.body;
 
@@ -22,7 +22,7 @@ router.post('/register', async (req, res) => {
     if (!name || !email || !password) {
       return res.status(400).json({
         success: false,
-        message: 'Por favor, completa todos los campos'
+        message: "Por favor, completa todos los campos",
       });
     }
 
@@ -31,7 +31,7 @@ router.post('/register', async (req, res) => {
     if (userExists) {
       return res.status(400).json({
         success: false,
-        message: 'Este email ya está registrado'
+        message: "Este email ya está registrado",
       });
     }
 
@@ -40,7 +40,7 @@ router.post('/register', async (req, res) => {
       name,
       email,
       password,
-      role: 'user'
+      role: "user",
     });
 
     // Generar token
@@ -53,14 +53,14 @@ router.post('/register', async (req, res) => {
         id: user._id,
         name: user.name,
         email: user.email,
-        role: user.role
-      }
+        role: user.role,
+      },
     });
   } catch (error) {
-    console.error('Error en registro:', error);
+    console.error("Error en registro:", error);
     res.status(500).json({
       success: false,
-      message: 'Error al registrar usuario'
+      message: "Error al registrar usuario",
     });
   }
 });
@@ -68,7 +68,7 @@ router.post('/register', async (req, res) => {
 // @route   POST /api/auth/login
 // @desc    Iniciar sesión
 // @access  Public
-router.post('/login', async (req, res) => {
+router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
 
@@ -76,27 +76,27 @@ router.post('/login', async (req, res) => {
     if (!email || !password) {
       return res.status(400).json({
         success: false,
-        message: 'Por favor, ingresa email y contraseña'
+        message: "Por favor, ingresa email y contraseña",
       });
     }
 
     // Buscar usuario y incluir contraseña para comparar
-    const user = await User.findOne({ email }).select('+password');
-    
+    const user = await User.findOne({ email }).select("+password");
+
     if (!user) {
       return res.status(401).json({
         success: false,
-        message: 'Credenciales inválidas'
+        message: "Credenciales inválidas",
       });
     }
 
     // Verificar contraseña
     const isMatch = await user.comparePassword(password);
-    
+
     if (!isMatch) {
       return res.status(401).json({
         success: false,
-        message: 'Credenciales inválidas'
+        message: "Credenciales inválidas",
       });
     }
 
@@ -116,14 +116,14 @@ router.post('/login', async (req, res) => {
         name: user.name,
         email: user.email,
         role: user.role,
-        avatar: user.avatar
-      }
+        avatar: user.avatar,
+      },
     });
   } catch (error) {
-    console.error('Error en login:', error);
+    console.error("Error en login:", error);
     res.status(500).json({
       success: false,
-      message: 'Error al iniciar sesión'
+      message: "Error al iniciar sesión",
     });
   }
 });
@@ -131,10 +131,10 @@ router.post('/login', async (req, res) => {
 // @route   GET /api/auth/me
 // @desc    Obtener usuario actual
 // @access  Private
-router.get('/me', protect, async (req, res) => {
+router.get("/me", protect, async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
-    
+
     res.json({
       success: true,
       user: {
@@ -143,14 +143,14 @@ router.get('/me', protect, async (req, res) => {
         email: user.email,
         role: user.role,
         avatar: user.avatar,
-        isOnline: user.isOnline
-      }
+        isOnline: user.isOnline,
+      },
     });
   } catch (error) {
-    console.error('Error al obtener usuario:', error);
+    console.error("Error al obtener usuario:", error);
     res.status(500).json({
       success: false,
-      message: 'Error al obtener información del usuario'
+      message: "Error al obtener información del usuario",
     });
   }
 });
@@ -158,23 +158,23 @@ router.get('/me', protect, async (req, res) => {
 // @route   POST /api/auth/logout
 // @desc    Cerrar sesión
 // @access  Private
-router.post('/logout', protect, async (req, res) => {
+router.post("/logout", protect, async (req, res) => {
   try {
     // Actualizar estado offline
     await User.findByIdAndUpdate(req.user.id, {
       isOnline: false,
-      lastSeen: new Date()
+      lastSeen: new Date(),
     });
 
     res.json({
       success: true,
-      message: 'Sesión cerrada correctamente'
+      message: "Sesión cerrada correctamente",
     });
   } catch (error) {
-    console.error('Error en logout:', error);
+    console.error("Error en logout:", error);
     res.status(500).json({
       success: false,
-      message: 'Error al cerrar sesión'
+      message: "Error al cerrar sesión",
     });
   }
 });

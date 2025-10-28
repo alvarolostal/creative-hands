@@ -1,16 +1,16 @@
-import { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { MessageCircle, X, Send, Loader } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
-import { useSocket } from '../context/SocketContext';
-import axios from 'axios';
+import { useState, useEffect, useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { MessageCircle, X, Send, Loader } from "lucide-react";
+import { useAuth } from "../context/AuthContext";
+import { useSocket } from "../context/SocketContext";
+import axios from "axios";
 
 const ChatWidget = () => {
   const { user, isAdmin } = useAuth();
   const { socket, connected } = useSocket();
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([]);
-  const [newMessage, setNewMessage] = useState('');
+  const [newMessage, setNewMessage] = useState("");
   const [adminInfo, setAdminInfo] = useState(null);
   const [loading, setLoading] = useState(false);
   const [typing, setTyping] = useState(false);
@@ -19,7 +19,7 @@ const ChatWidget = () => {
   const typingTimeoutRef = useRef(null);
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
   useEffect(() => {
@@ -32,13 +32,15 @@ const ChatWidget = () => {
       const fetchData = async () => {
         try {
           setLoading(true);
-          const { data: adminData } = await axios.get('/api/chat/admin');
+          const { data: adminData } = await axios.get("/api/chat/admin");
           setAdminInfo(adminData.admin);
 
-          const { data: messagesData } = await axios.get(`/api/chat/messages/${adminData.admin._id}`);
+          const { data: messagesData } = await axios.get(
+            `/api/chat/messages/${adminData.admin._id}`
+          );
           setMessages(messagesData.messages);
         } catch (error) {
-          console.error('Error al cargar datos:', error);
+          console.error("Error al cargar datos:", error);
         } finally {
           setLoading(false);
         }
@@ -51,22 +53,22 @@ const ChatWidget = () => {
   useEffect(() => {
     if (!socket || !user) return;
 
-    socket.on('message:new', (message) => {
-      setMessages(prev => [...prev, message]);
+    socket.on("message:new", (message) => {
+      setMessages((prev) => [...prev, message]);
       if (!isOpen) {
-        setUnreadCount(prev => prev + 1);
+        setUnreadCount((prev) => prev + 1);
       }
     });
 
-    socket.on('typing:status', ({ userId, isTyping: typingStatus }) => {
+    socket.on("typing:status", ({ userId, isTyping: typingStatus }) => {
       if (isAdmin || userId === adminInfo?._id) {
         setTyping(typingStatus);
       }
     });
 
     return () => {
-      socket.off('message:new');
-      socket.off('typing:status');
+      socket.off("message:new");
+      socket.off("typing:status");
     };
   }, [socket, user, isOpen, isAdmin, adminInfo]);
 
@@ -76,26 +78,26 @@ const ChatWidget = () => {
 
     const messageData = {
       receiverId: adminInfo._id,
-      content: newMessage.trim()
+      content: newMessage.trim(),
     };
 
-    socket.emit('message:send', messageData);
-    setNewMessage('');
-    
+    socket.emit("message:send", messageData);
+    setNewMessage("");
+
     // Stop typing indicator
     if (typingTimeoutRef.current) {
       clearTimeout(typingTimeoutRef.current);
     }
-    socket.emit('typing:stop', { receiverId: adminInfo._id });
+    socket.emit("typing:stop", { receiverId: adminInfo._id });
   };
 
   const handleTyping = (e) => {
     setNewMessage(e.target.value);
-    
+
     if (!socket || !adminInfo) return;
 
     // Emit typing start
-    socket.emit('typing:start', { receiverId: adminInfo._id });
+    socket.emit("typing:start", { receiverId: adminInfo._id });
 
     // Clear existing timeout
     if (typingTimeoutRef.current) {
@@ -104,7 +106,7 @@ const ChatWidget = () => {
 
     // Set timeout to stop typing
     typingTimeoutRef.current = setTimeout(() => {
-      socket.emit('typing:stop', { receiverId: adminInfo._id });
+      socket.emit("typing:stop", { receiverId: adminInfo._id });
     }, 1000);
   };
 
@@ -128,7 +130,7 @@ const ChatWidget = () => {
             whileTap={{ scale: 0.9 }}
             onClick={handleOpen}
             className="fixed bottom-6 right-6 w-14 h-14 bg-gradient-to-br from-primary-500 to-primary-600 rounded-full shadow-2xl flex items-center justify-center text-white hover:shadow-primary-500/50 transition-shadow duration-200 z-50"
-            style={{ willChange: 'transform' }}
+            style={{ willChange: "transform" }}
           >
             <MessageCircle className="w-6 h-6" />
             {unreadCount > 0 && (
@@ -167,10 +169,10 @@ const ChatWidget = () => {
                 </div>
                 <div>
                   <h3 className="text-white font-semibold text-sm">
-                    {adminInfo?.name || 'Soporte'}
+                    {adminInfo?.name || "Soporte"}
                   </h3>
                   <p className="text-white/70 text-xs">
-                    {connected ? 'En línea' : 'Desconectado'}
+                    {connected ? "En línea" : "Desconectado"}
                   </p>
                 </div>
               </div>
@@ -207,25 +209,32 @@ const ChatWidget = () => {
                         key={message._id}
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className={`flex ${isOwn ? 'justify-end' : 'justify-start'}`}
+                        className={`flex ${
+                          isOwn ? "justify-end" : "justify-start"
+                        }`}
                       >
                         <div
                           className={`max-w-[75%] rounded-2xl px-4 py-2 ${
                             isOwn
-                              ? 'bg-gradient-to-br from-primary-500 to-primary-600 text-white'
-                              : 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white'
+                              ? "bg-gradient-to-br from-primary-500 to-primary-600 text-white"
+                              : "bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
                           }`}
                         >
                           <p className="text-sm">{message.content}</p>
                           <p
                             className={`text-xs mt-1 ${
-                              isOwn ? 'text-white/70' : 'text-gray-500 dark:text-gray-400'
+                              isOwn
+                                ? "text-white/70"
+                                : "text-gray-500 dark:text-gray-400"
                             }`}
                           >
-                            {new Date(message.createdAt).toLocaleTimeString('es-ES', {
-                              hour: '2-digit',
-                              minute: '2-digit'
-                            })}
+                            {new Date(message.createdAt).toLocaleTimeString(
+                              "es-ES",
+                              {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              }
+                            )}
                           </p>
                         </div>
                       </motion.div>
@@ -239,9 +248,18 @@ const ChatWidget = () => {
                     >
                       <div className="bg-white dark:bg-gray-800 rounded-2xl px-4 py-3">
                         <div className="flex space-x-1">
-                          <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0s' }}></div>
-                          <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
-                          <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.4s' }}></div>
+                          <div
+                            className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+                            style={{ animationDelay: "0s" }}
+                          ></div>
+                          <div
+                            className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+                            style={{ animationDelay: "0.2s" }}
+                          ></div>
+                          <div
+                            className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+                            style={{ animationDelay: "0.4s" }}
+                          ></div>
                         </div>
                       </div>
                     </motion.div>
@@ -252,7 +270,10 @@ const ChatWidget = () => {
             </div>
 
             {/* Input */}
-            <form onSubmit={handleSendMessage} className="p-4 border-t border-gray-200 dark:border-gray-700">
+            <form
+              onSubmit={handleSendMessage}
+              className="p-4 border-t border-gray-200 dark:border-gray-700"
+            >
               <div className="flex items-center space-x-2">
                 <input
                   type="text"
@@ -267,7 +288,7 @@ const ChatWidget = () => {
                   type="submit"
                   disabled={!newMessage.trim() || !connected}
                   className="w-10 h-10 bg-gradient-to-br from-primary-500 to-primary-600 rounded-full flex items-center justify-center text-white disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-lg transition-shadow duration-200"
-                  style={{ willChange: 'transform' }}
+                  style={{ willChange: "transform" }}
                 >
                   <Send className="w-4 h-4" />
                 </motion.button>

@@ -1,0 +1,15 @@
+node_modules
+client/node_modules
+client/dist
+dist
+build
+.git
+.hg
+.svn
+.env
+.env.*
+coverage
+*.min.js
+public/**/*.map
+server/logs
+*.log

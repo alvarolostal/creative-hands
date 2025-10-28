@@ -31,10 +31,13 @@ const Admin = () => {
     stock: "",
     materials: "",
   });
-  const [imagesFiles, setImagesFiles] = useState([]); // archivos nuevos seleccionados
-  const [existingImages, setExistingImages] = useState([]); // URLs ya subidas en el producto
-  const [newPreviews, setNewPreviews] = useState([]); // {id, url, file}
+  // imageList mantiene el orden actual de miniaturas (mezcla de existentes y nuevas)
+  // item: { id: string, type: 'existing'|'new', url: string, file?: File }
+  const [imageList, setImageList] = useState([]);
   const fileInputRef = useRef(null);
+  const [dragActive, setDragActive] = useState(false);
+  const [fileErrors, setFileErrors] = useState([]);
+  const draggedIdRef = useRef(null);
   const [saving, setSaving] = useState(false);
   const [categoriesList, setCategoriesList] = useState([]);
   const [showCategoryModal, setShowCategoryModal] = useState(false);
@@ -86,10 +89,12 @@ const Admin = () => {
         stock: product.stock,
         materials: product.materials?.join(", ") || "",
       });
-      // populate existing images for preview/edit
-      setExistingImages(product.images ? [...product.images] : []);
-      setImagesFiles([]);
-      setNewPreviews([]);
+      // populate imageList with existing images
+      setImageList(
+        product.images && product.images.length > 0
+          ? product.images.map((url, idx) => ({ id: `e-${idx}-${Date.now()}`, type: "existing", url }))
+          : []
+      );
     } else {
       setEditingProduct(null);
       setFormData({
@@ -100,9 +105,7 @@ const Admin = () => {
         stock: "",
         materials: "",
       });
-      setExistingImages([]);
-      setImagesFiles([]);
-      setNewPreviews([]);
+      setImageList([]);
     }
     setShowProductModal(true);
   };
@@ -111,10 +114,10 @@ const Admin = () => {
     setShowProductModal(false);
     setEditingProduct(null);
     // limpiar previews y revocar URLs
-    newPreviews.forEach((p) => URL.revokeObjectURL(p.url));
-    setNewPreviews([]);
-    setImagesFiles([]);
-    setExistingImages([]);
+    imageList.forEach((it) => {
+      if (it.type === "new" && it.url) URL.revokeObjectURL(it.url);
+    });
+    setImageList([]);
   };
 
   const handleChange = (e) => {
@@ -151,12 +154,21 @@ const Admin = () => {
 
       // Si estamos editando, enviar la lista de imágenes que queremos mantener
       if (editingProduct) {
-        fd.append("keepImages", JSON.stringify(existingImages || []));
-      }
+        const keepImages = imageList.filter((it) => it.type === "existing").map((it) => it.url);
+        fd.append("keepImages", JSON.stringify(keepImages));
 
-      if (imagesFiles && imagesFiles.length > 0) {
-        for (let i = 0; i < imagesFiles.length; i++) {
-          fd.append("images", imagesFiles[i]);
+        // Build an order array mixing existing urls and placeholders for new files
+        const order = imageList.map((it) => (it.type === "existing" ? it.url : "__new__"));
+        fd.append("order", JSON.stringify(order));
+
+        // Append new files in the sequence they appear in imageList so server can map '__new__' placeholders
+        for (const it of imageList) {
+          if (it.type === "new" && it.file) fd.append("images", it.file);
+        }
+      } else {
+        // creating new product -> append all new files in their current order
+        for (const it of imageList) {
+          if (it.type === "new" && it.file) fd.append("images", it.file);
         }
       }
 
@@ -175,10 +187,10 @@ const Admin = () => {
       }
 
       // limpiar previews locales
-      newPreviews.forEach((p) => URL.revokeObjectURL(p.url));
-      setNewPreviews([]);
-      setImagesFiles([]);
-      setExistingImages([]);
+      imageList.forEach((it) => {
+        if (it.type === "new" && it.url) URL.revokeObjectURL(it.url);
+      });
+      setImageList([]);
       handleCloseModal();
     } catch (error) {
       console.error("Error al guardar producto:", error);
@@ -192,33 +204,147 @@ const Admin = () => {
     const files = Array.from(e.target.files || []);
     if (files.length === 0) return;
 
-    // crear previews
-    const previews = files.map((file, idx) => ({
-      id: Date.now() + idx,
+    const allowed = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+    const maxSize = 2 * 1024 * 1024; // 2MB
+    const errors = [];
+
+    const validFiles = [];
+    files.forEach((file) => {
+      if (!allowed.includes(file.type)) {
+        errors.push(`${file.name}: tipo no permitido`);
+        return;
+      }
+      if (file.size > maxSize) {
+        errors.push(`${file.name}: excede 2MB`);
+        return;
+      }
+      validFiles.push(file);
+    });
+
+    if (errors.length > 0) setFileErrors((prev) => [...prev, ...errors]);
+
+    if (validFiles.length === 0) {
+      if (fileInputRef.current) fileInputRef.current.value = null;
+      return;
+    }
+
+    // crear previews como items 'new' y añadir al final del imageList
+    const previews = validFiles.map((file, idx) => ({
+      id: `n-${Date.now()}-${idx}`,
+      type: "new",
       url: URL.createObjectURL(file),
       file,
     }));
 
-    setNewPreviews((prev) => [...prev, ...previews]);
-    // almacenar archivos para envio
-    setImagesFiles((prev) => [...prev, ...files]);
+    setImageList((prev) => [...prev, ...previews]);
     // reset input value to allow selecting same file again if needed
     if (fileInputRef.current) fileInputRef.current.value = null;
+  };
+
+  const onDragEnter = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(true);
+  };
+
+  const onDragLeave = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+  };
+
+  const onDragOver = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    // keep active
+    setDragActive(true);
+  };
+
+  const onDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+    const files = Array.from(e.dataTransfer.files || []);
+    if (files.length === 0) return;
+
+    // reuse logic from onFilesSelected by building a fake event
+    const fakeEvent = { target: { files } };
+    onFilesSelected(fakeEvent);
   };
 
   const triggerFileInput = () => {
     if (fileInputRef.current) fileInputRef.current.click();
   };
 
-  const removeExistingImage = (url) => {
-    setExistingImages((prev) => prev.filter((u) => u !== url));
+  const removeImage = (id) => {
+    const item = imageList.find((it) => it.id === id);
+    if (!item) return;
+
+    if (item.type === "existing") {
+      if (!editingProduct) {
+        setImageList((prev) => prev.filter((it) => it.id !== id));
+        return;
+      }
+
+      if (!window.confirm("¿Eliminar esta imagen? Esta acción borrará el archivo del servidor.")) return;
+
+      (async () => {
+        try {
+          const { data } = await axios.delete(`/api/products/${editingProduct._id}/images`, {
+            data: { image: item.url },
+          });
+          if (data && data.success) {
+            setImageList((prev) => prev.filter((it) => it.id !== id));
+            setProducts((prev) => prev.map((p) => (p._id === data.product._id ? data.product : p)));
+          } else {
+            alert(data.message || "No se pudo eliminar la imagen");
+          }
+        } catch (error) {
+          console.error("Error al eliminar imagen:", error);
+          alert(error.response?.data?.message || "Error al eliminar imagen");
+        }
+      })();
+    } else {
+      // nueva imagen local
+      if (item.url) URL.revokeObjectURL(item.url);
+      setImageList((prev) => prev.filter((it) => it.id !== id));
+    }
   };
 
-  const removeNewPreview = (id) => {
-    const p = newPreviews.find((x) => x.id === id);
-    if (p) URL.revokeObjectURL(p.url);
-    setNewPreviews((prev) => prev.filter((x) => x.id !== id));
-    setImagesFiles((prev) => prev.filter((f) => f !== (p && p.file)));
+  const onThumbDragStart = (e, id) => {
+    draggedIdRef.current = id;
+    try {
+      e.dataTransfer.setData("text/plain", id);
+      e.dataTransfer.effectAllowed = "move";
+    } catch (err) {
+      // some browsers in React synthetic events may throw; ignore
+    }
+  };
+
+  const onThumbDragOver = (e) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+  };
+
+  const onThumbDrop = (e, targetId) => {
+    e.preventDefault();
+    const fromId = draggedIdRef.current || e.dataTransfer.getData("text/plain");
+    if (!fromId || fromId === targetId) return;
+    // reorder
+    setImageList((prev) => {
+      const arr = [...prev];
+      const fromIndex = arr.findIndex((it) => it.id === fromId);
+      const toIndex = arr.findIndex((it) => it.id === targetId);
+      if (fromIndex === -1 || toIndex === -1) return prev;
+      const [moved] = arr.splice(fromIndex, 1);
+      arr.splice(toIndex, 0, moved);
+      return arr;
+    });
+    draggedIdRef.current = null;
+  };
+
+  const onThumbDragEnd = () => {
+    draggedIdRef.current = null;
   };
 
   const handleDelete = async (id) => {
@@ -691,7 +817,15 @@ const Admin = () => {
                     {/* Dropzone / selector estilizado */}
                     <div
                       onClick={triggerFileInput}
-                      className="w-full cursor-pointer rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 flex items-center gap-4"
+                      onDragEnter={onDragEnter}
+                      onDragOver={onDragOver}
+                      onDragLeave={onDragLeave}
+                      onDrop={onDrop}
+                      className={`w-full cursor-pointer rounded-xl border-2 border-dashed p-4 flex items-center gap-4 ${
+                        dragActive
+                          ? "border-primary-500 bg-primary-50/40 dark:bg-primary-900/20"
+                          : "border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800"
+                      }`}
                     >
                       <div className="p-3 rounded-lg bg-primary-50 dark:bg-gray-700 text-primary-600 dark:text-white">
                         <Upload className="w-5 h-5" />
@@ -702,39 +836,40 @@ const Admin = () => {
                       </div>
                     </div>
 
-                    {/* Existing images (already uploaded) */}
-                    {existingImages && existingImages.length > 0 && (
-                      <div className="mt-3 grid grid-cols-3 gap-3">
-                        {existingImages.map((url) => (
-                          <div key={url} className="relative rounded-lg overflow-hidden bg-gray-50 dark:bg-gray-900">
-                            <img src={url} alt="img" className="w-full h-24 object-cover" />
-                            <button
-                              type="button"
-                              onClick={() => removeExistingImage(url)}
-                              className="absolute top-2 right-2 bg-black/40 dark:bg-white/10 text-white dark:text-white p-1 rounded-full hover:bg-red-500"
-                              aria-label="Eliminar imagen existente"
-                            >
-                              <X className="w-3 h-3" />
-                            </button>
-                          </div>
+                    {/* file errors */}
+                    {fileErrors.length > 0 && (
+                      <div className="mt-2 text-sm text-red-500">
+                        {fileErrors.map((err, i) => (
+                          <div key={i}>{err}</div>
                         ))}
                       </div>
                     )}
 
-                    {/* New previews */}
-                    {newPreviews && newPreviews.length > 0 && (
+                    {/* Thumbnails: mezcla de imágenes existentes y nuevas (reordenables) */}
+                    {imageList && imageList.length > 0 && (
                       <div className="mt-3 grid grid-cols-3 gap-3">
-                        {newPreviews.map((p) => (
-                          <div key={p.id} className="relative rounded-lg overflow-hidden bg-gray-50 dark:bg-gray-900">
-                            <img src={p.url} alt={p.file.name} className="w-full h-24 object-cover" />
+                        {imageList.map((it) => (
+                          <div
+                            key={it.id}
+                            draggable
+                            onDragStart={(e) => onThumbDragStart(e, it.id)}
+                            onDragOver={onThumbDragOver}
+                            onDrop={(e) => onThumbDrop(e, it.id)}
+                            onDragEnd={onThumbDragEnd}
+                            className="relative rounded-lg overflow-hidden bg-gray-50 dark:bg-gray-900 cursor-move"
+                          >
+                            <img src={it.url} alt={it.type === "new" ? it.file?.name || "preview" : "img"} className="w-full h-24 object-cover" />
                             <button
                               type="button"
-                              onClick={() => removeNewPreview(p.id)}
+                              onClick={() => removeImage(it.id)}
                               className="absolute top-2 right-2 bg-black/40 dark:bg-white/10 text-white dark:text-white p-1 rounded-full hover:bg-red-500"
-                              aria-label="Eliminar imagen nueva"
+                              aria-label="Eliminar imagen"
                             >
                               <X className="w-3 h-3" />
                             </button>
+                            <div className="absolute left-2 bottom-2 bg-black/40 text-white text-xs px-2 py-0.5 rounded">
+                              {it.type === "existing" ? "Subida" : (it.file?.name || "Nuevo")}
+                            </div>
                           </div>
                         ))}
                       </div>

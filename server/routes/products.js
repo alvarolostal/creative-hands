@@ -24,7 +24,18 @@ const storage = multer.diskStorage({
   },
 });
 
-const upload = multer({ storage });
+// Validación y límites: solo imágenes, max 2MB por archivo
+const fileFilter = (req, file, cb) => {
+  const allowed = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+  if (allowed.includes(file.mimetype)) cb(null, true);
+  else cb(new Error("Tipo de archivo no permitido. Solo JPEG/PNG/WebP/GIF."));
+};
+
+const upload = multer({
+  storage,
+  limits: { fileSize: 2 * 1024 * 1024 }, // 2 MB
+  fileFilter,
+});
 
 // @route   GET /api/products
 // @desc    Obtener todos los productos
@@ -208,10 +219,37 @@ router.put("/:id", protect, adminOnly, upload.array("images", 5), async (req, re
       });
     }
 
-    // Construir la lista final de imágenes: keepImages + nuevas subidas
+    // Construir la lista final de imágenes teniendo en cuenta un posible 'order' enviado por el cliente.
+    // Si el cliente envía `order` (array) puede mezclar URLs existentes y placeholders '__new__' para archivos subidos.
     const baseUrl = `${req.protocol}://${req.get("host")}`;
-    const newUploaded = req.files && req.files.length > 0 ? req.files.map((f) => `${baseUrl}/uploads/${f.filename}`) : [];
-    req.body.images = [...(Array.isArray(keepImages) ? keepImages : []), ...newUploaded];
+    const newFiles = req.files && req.files.length > 0 ? req.files : [];
+
+    let finalImages = [];
+    if (req.body.order) {
+      let orderArr = [];
+      try {
+        orderArr = typeof req.body.order === "string" ? JSON.parse(req.body.order) : req.body.order;
+      } catch (err) {
+        orderArr = [];
+      }
+
+      let newIdx = 0;
+      for (const entry of orderArr) {
+        if (entry === "__new__") {
+          if (newFiles[newIdx]) {
+            finalImages.push(`${baseUrl}/uploads/${newFiles[newIdx].filename}`);
+            newIdx++;
+          }
+        } else if (typeof entry === "string") {
+          finalImages.push(entry);
+        }
+      }
+    } else {
+      const newUploaded = newFiles.length > 0 ? newFiles.map((f) => `${baseUrl}/uploads/${f.filename}`) : [];
+      finalImages = [...(Array.isArray(keepImages) ? keepImages : []), ...newUploaded];
+    }
+
+    req.body.images = finalImages;
 
     // parsear campos numéricos y arrays que vengan en body
     if (req.body.price) req.body.price = parseFloat(req.body.price);
@@ -284,6 +322,46 @@ router.delete("/:id", protect, adminOnly, async (req, res) => {
       success: false,
       message: "Error al eliminar producto",
     });
+  }
+});
+
+// @route DELETE /api/products/:id/images
+// @desc  Eliminar una imagen concreta asociada al producto
+// @access Private/Admin
+router.delete("/:id/images", protect, adminOnly, async (req, res) => {
+  try {
+    const { image } = req.body; // URL completa de la imagen
+    if (!image) {
+      return res.status(400).json({ success: false, message: "Falta el parámetro 'image'" });
+    }
+
+    const product = await Product.findById(req.params.id);
+    if (!product) {
+      return res.status(404).json({ success: false, message: "Producto no encontrado" });
+    }
+
+    // Si la imagen no está en la lista, nada que hacer
+    if (!product.images || !product.images.includes(image)) {
+      return res.status(400).json({ success: false, message: "Imagen no asociada al producto" });
+    }
+
+    // Borrar archivo del disco si existe
+    try {
+      const filename = path.basename(image);
+      const full = path.join(uploadDir, filename);
+      if (fs.existsSync(full)) fs.unlinkSync(full);
+    } catch (err) {
+      console.warn("Warning al borrar imagen (del endpoint):", err.message);
+    }
+
+    // Quitar de la lista y guardar
+    product.images = product.images.filter((u) => u !== image);
+    await product.save();
+
+    res.json({ success: true, product });
+  } catch (error) {
+    console.error("Error al eliminar imagen:", error);
+    res.status(500).json({ success: false, message: "Error al eliminar imagen" });
   }
 });
 

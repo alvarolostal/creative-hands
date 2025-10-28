@@ -364,9 +364,9 @@ const Admin = () => {
                 className="glass rounded-3xl p-6 max-w-md w-full"
               >
                 <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-lg font-semibold">Editar categoría</h3>
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Editar categoría</h3>
                   <button onClick={() => cancelEditCategory()} className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700">
-                    <X className="w-5 h-5" />
+                    <X className="w-5 h-5 text-gray-700 dark:text-gray-300" />
                   </button>
                 </div>
 
@@ -387,7 +387,7 @@ const Admin = () => {
                   </div>
 
                   <div className="flex justify-end gap-2">
-                    <button type="button" onClick={() => cancelEditCategory()} className="px-4 py-2 rounded-xl glass">Cancelar</button>
+                    <button type="button" onClick={() => cancelEditCategory()} className="px-4 py-2 rounded-xl glass text-gray-700 dark:text-gray-300">Cancelar</button>
                     <button type="submit" className="px-4 py-2 rounded-xl bg-primary-500 text-white">Guardar</button>
                   </div>
                 </form>
@@ -574,15 +574,15 @@ const Admin = () => {
                 className="glass rounded-3xl p-6 max-w-lg w-full"
               >
                 <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-lg font-semibold">Crear categoría</h3>
-                  <button onClick={() => setShowCategoryModal(false)} className="p-2 rounded-full hover:bg-gray-100">
-                    <X className="w-5 h-5" />
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Crear categoría</h3>
+                  <button onClick={() => setShowCategoryModal(false)} className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700">
+                    <X className="w-5 h-5 text-gray-700 dark:text-gray-300" />
                   </button>
                 </div>
 
                 <div className="space-y-4">
-                  <div>
-                    <h4 className="font-semibold mb-2">Categorías existentes</h4>
+                    <div>
+                      <h4 className="font-semibold mb-2 text-gray-900 dark:text-white">Categorías existentes</h4>
                     <div className="space-y-2 max-h-48 overflow-y-auto">
                       {categoriesList.map(cat => (
                         <div key={cat._id || cat.slug || cat.name} className="p-3 rounded-lg bg-white/60 dark:bg-gray-800/60 flex items-center justify-between gap-4 overflow-hidden">
@@ -592,7 +592,7 @@ const Admin = () => {
                             {cat.description ? <div className="text-xs text-gray-600 dark:text-gray-300 mt-1 truncate">{cat.description}</div> : null}
                           </div>
                           <div className="flex-shrink-0 flex items-center gap-2">
-                            <button onClick={() => startEditCategory(cat)} className="px-3 py-1 glass rounded-md">Editar</button>
+                            <button onClick={() => startEditCategory(cat)} className="px-3 py-1 glass rounded-md text-gray-700 dark:text-gray-300">Editar</button>
                             <button onClick={() => handleDeleteCategory(cat._id)} className="px-3 py-1 bg-red-500 text-white rounded-md">Eliminar</button>
                           </div>
                         </div>
@@ -602,19 +602,33 @@ const Admin = () => {
 
                   <form onSubmit={handleCreateCategory} className="space-y-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700">Nombre</label>
-                      <input value={newCategory.name} onChange={e => setNewCategory({...newCategory, name: e.target.value})} required className="w-full px-4 py-2 rounded-xl border" />
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Nombre</label>
+                      <input
+                        value={newCategory.name}
+                        onChange={e => setNewCategory({...newCategory, name: e.target.value})}
+                        required
+                        className="w-full px-4 py-2 rounded-xl border bg-white dark:bg-gray-800 text-gray-900 dark:text-white border-gray-300 dark:border-gray-700 focus:ring-2 focus:ring-primary-500"
+                      />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700">Slug (opcional)</label>
-                      <input value={newCategory.slug} onChange={e => setNewCategory({...newCategory, slug: e.target.value})} placeholder="auto" className="w-full px-4 py-2 rounded-xl border" />
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Slug (opcional)</label>
+                      <input
+                        value={newCategory.slug}
+                        onChange={e => setNewCategory({...newCategory, slug: e.target.value})}
+                        placeholder="auto"
+                        className="w-full px-4 py-2 rounded-xl border bg-white dark:bg-gray-800 text-gray-900 dark:text-white border-gray-300 dark:border-gray-700 focus:ring-2 focus:ring-primary-500"
+                      />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700">Descripción (opcional)</label>
-                      <textarea value={newCategory.description} onChange={e => setNewCategory({...newCategory, description: e.target.value})} className="w-full px-4 py-2 rounded-xl border" />
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Descripción (opcional)</label>
+                      <textarea
+                        value={newCategory.description}
+                        onChange={e => setNewCategory({...newCategory, description: e.target.value})}
+                        className="w-full px-4 py-2 rounded-xl border bg-white dark:bg-gray-800 text-gray-900 dark:text-white border-gray-300 dark:border-gray-700 focus:ring-2 focus:ring-primary-500"
+                      />
                     </div>
                     <div className="flex justify-end space-x-2">
-                      <button type="button" onClick={() => setShowCategoryModal(false)} className="px-4 py-2 rounded-xl glass">Cerrar</button>
+                      <button type="button" onClick={() => setShowCategoryModal(false)} className="px-4 py-2 rounded-xl glass text-gray-700 dark:text-gray-300">Cerrar</button>
                       <button type="submit" className="px-4 py-2 rounded-xl bg-primary-500 text-white">Crear</button>
                     </div>
                   </form>

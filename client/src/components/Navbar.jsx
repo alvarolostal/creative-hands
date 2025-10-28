@@ -118,16 +118,18 @@ const Navbar = () => {
                 <motion.button
                   whileTap={{ scale: 0.95 }}
                   onClick={() => setUserMenuOpen(!userMenuOpen)}
-                  className="flex items-center space-x-2 px-4 py-2 rounded-xl glass hover:shadow-lg transition-all"
+                  className="flex items-start space-x-2 px-2 py-2 rounded-full glass hover:shadow-lg transition-all"
                 >
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center">
+                  <div className="w-7 h-7 flex-shrink-0 rounded-full bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center overflow-hidden">
                     <span className="text-white text-sm font-semibold">
                       {user.name.charAt(0).toUpperCase()}
                     </span>
                   </div>
-                  <span className="text-sm font-medium text-gray-900 dark:text-white">
-                    {user.name}
-                  </span>
+                  <div className="flex items-center h-7">
+                    <span className="text-sm font-medium text-gray-900 dark:text-white">
+                      {user.name}
+                    </span>
+                  </div>
                 </motion.button>
 
                 <AnimatePresence>

@@ -8,6 +8,8 @@ import {
   Save,
   Loader,
   Upload,
+  GripVertical,
+  Star,
 } from "lucide-react";
 import axios from "axios";
 import { useAuth } from "../context/AuthContext";
@@ -830,9 +832,17 @@ const Admin = () => {
                       <div className="p-3 rounded-lg bg-primary-50 dark:bg-gray-700 text-primary-600 dark:text-white">
                         <Upload className="w-5 h-5" />
                       </div>
-                      <div>
-                        <div className="text-sm font-medium text-gray-900 dark:text-white">Añadir / arrastra imágenes</div>
-                        <div className="text-xs text-gray-600 dark:text-gray-300">Haz click para seleccionar o arrastra los archivos aquí</div>
+                      <div className="flex-1">
+                        <div className="text-sm font-medium text-gray-900 dark:text-white">Añadir imágenes</div>
+                        <div className="text-xs text-gray-600 dark:text-gray-300">
+                          {dragActive ? "Suelta para subir" : "Haz click para seleccionar o arrastra los archivos aquí"}
+                        </div>
+                        <div className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                          {imageList.length > 0 ? `${imageList.length} imagen(es) seleccionadas — arrastra las miniaturas para reordenar` : "Puedes seleccionar varias imágenes (máx. 5)"}
+                        </div>
+                      </div>
+                      <div className="ml-2 hidden sm:flex items-center text-xs text-gray-500 dark:text-gray-300">
+                        <span className="px-2 py-1 bg-white/60 dark:bg-gray-800/60 rounded-full">Arrastra para reordenar</span>
                       </div>
                     </div>
 
@@ -849,16 +859,29 @@ const Admin = () => {
                     {imageList && imageList.length > 0 && (
                       <div className="mt-3 grid grid-cols-3 gap-3">
                         {imageList.map((it) => (
-                          <div
+                          <motion.div
                             key={it.id}
+                            layout
                             draggable
                             onDragStart={(e) => onThumbDragStart(e, it.id)}
                             onDragOver={onThumbDragOver}
                             onDrop={(e) => onThumbDrop(e, it.id)}
                             onDragEnd={onThumbDragEnd}
-                            className="relative rounded-lg overflow-hidden bg-gray-50 dark:bg-gray-900 cursor-move"
+                            whileHover={{ scale: 1.03 }}
+                            whileTap={{ scale: 0.98 }}
+                            className="relative rounded-lg overflow-hidden bg-gray-50 dark:bg-gray-900 cursor-move shadow-sm"
                           >
-                            <img src={it.url} alt={it.type === "new" ? it.file?.name || "preview" : "img"} className="w-full h-24 object-cover" />
+                            {/* drag handle */}
+                            <div className="absolute left-2 top-2 text-white/90 dark:text-white/90">
+                              <GripVertical className="w-4 h-4 opacity-90" />
+                            </div>
+
+                            <img
+                              src={it.url}
+                              alt={it.type === "new" ? it.file?.name || "preview" : "img"}
+                              className="w-full h-24 object-cover"
+                            />
+
                             <button
                               type="button"
                               onClick={() => removeImage(it.id)}
@@ -867,10 +890,19 @@ const Admin = () => {
                             >
                               <X className="w-3 h-3" />
                             </button>
+
                             <div className="absolute left-2 bottom-2 bg-black/40 text-white text-xs px-2 py-0.5 rounded">
                               {it.type === "existing" ? "Subida" : (it.file?.name || "Nuevo")}
                             </div>
-                          </div>
+
+                            {/* badge principal para la primera miniatura */}
+                            {imageList[0] && imageList[0].id === it.id && (
+                              <div className="absolute right-2 bottom-2 flex items-center gap-1 bg-yellow-400 text-black text-xs px-2 py-0.5 rounded">
+                                <Star className="w-3 h-3" />
+                                <span>Principal</span>
+                              </div>
+                            )}
+                          </motion.div>
                         ))}
                       </div>
                     )}

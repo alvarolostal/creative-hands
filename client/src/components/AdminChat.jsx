@@ -139,7 +139,7 @@ const AdminChat = () => {
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={() => selectConversation(conv)}
-                className={`w-full p-4 rounded-xl text-left transition-all ${
+                className={`w-full p-4 rounded-xl text-left transition-colors duration-200 ${
                   selectedConversation?.conversationId === conv.conversationId
                     ? 'bg-gradient-to-r from-primary-500 to-primary-600 text-white'
                     : 'bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-900 dark:text-white'
@@ -273,7 +273,8 @@ const AdminChat = () => {
                   whileTap={{ scale: 0.9 }}
                   type="submit"
                   disabled={!newMessage.trim() || !connected}
-                  className="w-12 h-12 bg-gradient-to-br from-primary-500 to-primary-600 rounded-full flex items-center justify-center text-white disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-lg transition-all"
+                  className="w-12 h-12 bg-gradient-to-br from-primary-500 to-primary-600 rounded-full flex items-center justify-center text-white disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-lg transition-shadow duration-200"
+                  style={{ willChange: 'transform' }}
                 >
                   <Send className="w-5 h-5" />
                 </motion.button>

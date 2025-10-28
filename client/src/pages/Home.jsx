@@ -1,7 +1,6 @@
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Sparkles, Heart, Palette } from 'lucide-react';
-// kept minimal imports for the Home page (no server calls here)
 
 const Home = () => {
   const MotionLink = motion(Link);
@@ -62,7 +61,8 @@ const Home = () => {
                 <motion.button
                   whileHover={{ y: -4 }}
                   transition={{ type: 'spring', stiffness: 220, damping: 26 }}
-                  className="px-8 py-4 rounded-full font-medium text-lg shadow-md hover:shadow-xl transition-transform bg-primary-500 dark:bg-primary-600 text-white"
+                  className="px-8 py-4 rounded-2xl font-medium text-lg shadow-md hover:shadow-xl transition-shadow duration-200 bg-primary-500 dark:bg-primary-600 text-white"
+                  style={{ willChange: 'transform' }}
                 >
                   <span>Explorar Productos</span>
                 </motion.button>
@@ -72,7 +72,8 @@ const Home = () => {
                 <motion.button
                   whileHover={{ y: -3 }}
                   transition={{ type: 'spring', stiffness: 200, damping: 26 }}
-                  className="px-8 py-4 glass rounded-full font-medium text-lg text-gray-900 dark:text-white shadow-md hover:shadow-lg transition-transform"
+                  className="px-8 py-4 glass rounded-2xl font-medium text-lg text-gray-900 dark:text-white shadow-md hover:shadow-lg transition-shadow duration-200"
+                  style={{ willChange: 'transform' }}
                 >
                   Comenzar ahora
                 </motion.button>
@@ -95,19 +96,19 @@ const Home = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
               {
-                slug: 'Joyería artesanal',
+                slug: 'joyeria-artesanal',
                 title: 'Joyería artesanal',
                 text: 'Collares, anillos y piezas únicas trabajadas a mano.',
                 img: 'https://images.unsplash.com/photo-1697925493572-a8da651b0c12?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=2670'
               },
               {
-                slug: 'Cerámica y arcilla',
+                slug: 'ceramica-y-arcilla',
                 title: 'Cerámica y arcilla',
                 text: 'Vajillas y piezas de cerámica con acabados artesanales.',
                 img: 'https://images.unsplash.com/photo-1631125915902-d8abe9225ff2?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=774'
               },
               {
-                slug: 'Arte hecho a mano',
+                slug: 'arte-hecho-a-mano',
                 title: 'Arte hecho a mano',
                 text: 'Láminas, ilustraciones y obra original de artistas locales.',
                 img: 'https://plus.unsplash.com/premium_photo-1677609898243-63280b6c89a1?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=766'
@@ -120,7 +121,8 @@ const Home = () => {
                 viewport={{ once: true, amount: 0.3 }}
                 transition={{ duration: 0.5, delay: i * 0.06 }}
                 whileHover={{ y: -6 }}
-                className="glass p-4 rounded-2xl shadow-lg hover:shadow-2xl transition-transform"
+                className="glass p-4 rounded-2xl shadow-lg hover:shadow-2xl transition-shadow duration-200"
+                style={{ willChange: 'transform' }}
               >
                 <div className="flex items-start gap-4">
                   <div className="w-20 h-20 rounded-xl overflow-hidden flex-shrink-0">
@@ -131,10 +133,11 @@ const Home = () => {
                     <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">{c.text}</p>
                     <div className="mt-4">
                       <MotionLink
-                        to={`/products?category=${encodeURIComponent(c.slug)}`}
+                        to={`/products/category/${c.slug}`}
                         whileHover={{ y: -3 }}
                         transition={{ type: 'spring', stiffness: 200, damping: 26 }}
-                        className="inline-flex items-center px-3 py-2 rounded-full bg-primary-500 text-white text-sm font-medium hover:shadow-md hover:opacity-95 transition-all"
+                        className="inline-flex items-center px-3 py-2 rounded-xl bg-primary-500 text-white text-sm font-medium hover:shadow-md hover:opacity-95 transition-shadow duration-200"
+                        style={{ willChange: 'transform, opacity', transitionProperty: 'box-shadow, opacity', transitionDuration: '200ms' }}
                       >
                         Ver {c.title}
                         <ArrowRight className="w-4 h-4 ml-2" />
@@ -161,55 +164,6 @@ const Home = () => {
         </div>
       </footer>
       
-      {/* Helper: featured products component definition (local to page) */}
-    </div>
-  );
-};
-
-const FeaturedProducts = () => {
-  const { isAdmin } = useAuth();
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    let mounted = true;
-    const fetch = async () => {
-      try {
-        const { data } = await axios.get('/api/products');
-        if (!mounted) return;
-        setProducts((data.products || []).slice(0, 6));
-      } catch (e) {
-        console.error('Error fetching featured products', e);
-      } finally {
-        if (mounted) setLoading(false);
-      }
-    };
-    fetch();
-    return () => { mounted = false; };
-  }, []);
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-40">
-        <div className="w-12 h-12 border-4 border-primary-500 border-t-transparent rounded-full animate-spin"></div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="space-y-8">
-      {products.map((product, i) => (
-        <motion.div
-          key={product._id || i}
-          initial={{ opacity: 0, x: i % 2 === 0 ? -120 : 120 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          viewport={{ once: true, amount: 0.25 }}
-          transition={{ duration: 0.6, ease: 'easeOut' }}
-          className="max-w-4xl mx-auto"
-        >
-          <ProductCard product={product} isAdmin={isAdmin} />
-        </motion.div>
-      ))}
     </div>
   );
 };

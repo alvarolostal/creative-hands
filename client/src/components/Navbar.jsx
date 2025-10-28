@@ -118,7 +118,7 @@ const Navbar = () => {
                 <motion.button
                   whileTap={{ scale: 0.95 }}
                   onClick={() => setUserMenuOpen(!userMenuOpen)}
-                  className="flex items-center space-x-2 px-4 py-2 rounded-full glass hover:shadow-lg transition-all"
+                  className="flex items-center space-x-2 px-4 py-2 rounded-xl glass hover:shadow-lg transition-all"
                 >
                   <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center">
                     <span className="text-white text-sm font-semibold">

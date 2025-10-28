@@ -16,16 +16,9 @@ const productSchema = new mongoose.Schema({
     required: [true, 'El precio es obligatorio'],
     min: 0
   },
-  category: {
-    type: String,
-    required: [true, 'La categoría es obligatoria'],
-    enum: [
-      'Joyería artesanal',
-      'Velas y aromáticos',
-      'Textiles y ropa',
-      'Cerámica y arcilla',
-      'Arte hecho a mano'
-    ]
+  categoryId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Category'
   },
   stock: {
     type: Number,
@@ -35,10 +28,6 @@ const productSchema = new mongoose.Schema({
   images: [{
     type: String
   }],
-  featured: {
-    type: Boolean,
-    default: false
-  },
   materials: [String],
   dimensions: {
     height: Number,

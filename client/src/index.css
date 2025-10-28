@@ -124,10 +124,8 @@ body {
    Se deja el comportamiento por defecto del navegador para evitar efectos indeseados. */
 
 .smooth-transition {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-.smooth-transition {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  /* Evitar 'transition: all' porque anima propiedades caras; especificar solo las necesarias */
+  transition: color 0.25s ease, background-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
 }
 
 /* Gradient text */
@@ -212,7 +210,8 @@ button:active {
 
 /* Card hover effect */
 .card-hover {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  /* Animar solo transform y box-shadow para evitar repaints/relayouts innecesarios */
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .card-hover:hover {

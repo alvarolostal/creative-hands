@@ -27,12 +27,18 @@ const Admin = () => {
     name: '',
     description: '',
     price: '',
-    category: 'Joyería artesanal',
+    categoryId: '',
     stock: '',
     materials: '',
-    featured: false
   });
   const [saving, setSaving] = useState(false);
+  const [categoriesList, setCategoriesList] = useState([]);
+  const [showCategoryModal, setShowCategoryModal] = useState(false);
+  const [newCategory, setNewCategory] = useState({ name: '', slug: '', description: '' });
+  const [editingCategoryId, setEditingCategoryId] = useState(null);
+  const [editingCategoryData, setEditingCategoryData] = useState({ name: '', slug: '', description: '' });
+  const [showEditCategoryModal, setShowEditCategoryModal] = useState(false);
+  const [editingFromList, setEditingFromList] = useState(false);
 
   useEffect(() => {
     if (!isAdmin) {
@@ -40,6 +46,7 @@ const Admin = () => {
       return;
     }
     fetchProducts();
+    fetchCategories();
   }, [isAdmin, navigate]);
 
   const fetchProducts = async () => {
@@ -61,10 +68,9 @@ const Admin = () => {
         name: product.name,
         description: product.description,
         price: product.price,
-        category: product.category,
+        categoryId: product.categoryId ? (product.categoryId._id || product.categoryId) : '',
         stock: product.stock,
         materials: product.materials?.join(', ') || '',
-        featured: product.featured
       });
     } else {
       setEditingProduct(null);
@@ -72,10 +78,9 @@ const Admin = () => {
         name: '',
         description: '',
         price: '',
-        category: 'Joyería artesanal',
+        categoryId: '',
         stock: '',
         materials: '',
-        featured: false
       });
     }
     setShowProductModal(true);
@@ -88,6 +93,15 @@ const Admin = () => {
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
+    if (name === 'categoryId') {
+      // when selecting a category by id, keep the selected id only
+      setFormData({
+        ...formData,
+        categoryId: value
+      });
+      return;
+    }
+
     setFormData({
       ...formData,
       [name]: type === 'checkbox' ? checked : value
@@ -135,13 +149,89 @@ const Admin = () => {
     }
   };
 
-  const categories = [
-    'Joyería artesanal',
-    'Velas y aromáticos',
-    'Textiles y ropa',
-    'Cerámica y arcilla',
-    'Arte hecho a mano'
-  ];
+  const handleOpenCategoryModal = () => {
+    setNewCategory({ name: '', slug: '', description: '' });
+    setShowCategoryModal(true);
+  };
+
+  const handleCreateCategory = async (e) => {
+    e.preventDefault();
+    try {
+      const payload = { ...newCategory };
+      const { data } = await axios.post('/api/categories', payload);
+      // refresh categories
+      fetchCategories();
+      setShowCategoryModal(false);
+    } catch (error) {
+      console.error('Error al crear categoría:', error);
+      alert(error.response?.data?.message || 'Error al crear categoría');
+    }
+  };
+
+  const handleDeleteCategory = async (id) => {
+    if (!window.confirm('¿Eliminar esta categoría? Los productos pueden quedarse con category legacy.')) return;
+    try {
+      await axios.delete(`/api/categories/${id}`);
+      fetchCategories();
+    } catch (error) {
+      console.error('Error al eliminar categoría:', error);
+      alert(error.response?.data?.message || 'Error al eliminar categoría');
+    }
+  };
+
+  const startEditCategory = (cat) => {
+    setEditingCategoryId(cat._id);
+    setEditingCategoryData({ name: cat.name || '', slug: cat.slug || '', description: cat.description || '' });
+    // If the list modal is open, close it first so the edit modal doesn't appear behind due
+    // to stacking contexts/animations. Re-open the list when editing finishes if needed.
+    if (showCategoryModal) {
+      setEditingFromList(true);
+      setShowCategoryModal(false);
+      // wait a short moment to let the exit animation start/stacking contexts settle
+      setTimeout(() => setShowEditCategoryModal(true), 120);
+    } else {
+      setShowEditCategoryModal(true);
+    }
+  };
+
+  const cancelEditCategory = () => {
+    setEditingCategoryId(null);
+    setEditingCategoryData({ name: '', slug: '', description: '' });
+    setShowEditCategoryModal(false);
+    if (editingFromList) {
+      // restore the categories modal that the user came from
+      setShowCategoryModal(true);
+      setEditingFromList(false);
+    }
+  };
+
+  const saveEditCategory = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.put(`/api/categories/${editingCategoryId}`, editingCategoryData);
+      fetchCategories();
+      cancelEditCategory();
+    } catch (error) {
+      console.error('Error al actualizar categoría:', error);
+      alert(error.response?.data?.message || 'Error al actualizar categoría');
+    }
+  };
+
+  const fetchCategories = async () => {
+    try {
+      const { data } = await axios.get('/api/categories');
+      setCategoriesList(data.categories || []);
+    } catch (error) {
+      console.error('Error cargando categorías en admin, usando lista por defecto:', error);
+      setCategoriesList([
+        { _id: '', name: 'Joyería artesanal', slug: 'joyeria-artesanal' },
+        { _id: '', name: 'Velas y aromáticos', slug: 'velas-y-aromaticos' },
+        { _id: '', name: 'Textiles y ropa', slug: 'textiles-y-ropa' },
+        { _id: '', name: 'Cerámica y arcilla', slug: 'ceramica-y-arcilla' },
+        { _id: '', name: 'Arte hecho a mano', slug: 'arte-hecho-a-mano' }
+      ]);
+    }
+  };
 
   return (
     <div className="min-h-screen pt-20 pb-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-light-500 via-primary-50 to-light-500 dark:from-dark-500 dark:via-dark-400 dark:to-dark-600">
@@ -169,7 +259,7 @@ const Admin = () => {
         >
           <button
             onClick={() => setActiveTab('products')}
-            className={`flex items-center space-x-2 px-6 py-3 rounded-xl font-semibold transition-all ${
+            className={`flex items-center space-x-2 px-6 py-3 rounded-xl font-semibold transition-colors duration-200 ${
               activeTab === 'products'
                 ? 'bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-lg'
                 : 'glass text-gray-700 dark:text-gray-300 hover:shadow-md'
@@ -180,7 +270,7 @@ const Admin = () => {
           </button>
           <button
             onClick={() => setActiveTab('chat')}
-            className={`flex items-center space-x-2 px-6 py-3 rounded-xl font-semibold transition-all ${
+            className={`flex items-center space-x-2 px-6 py-3 rounded-xl font-semibold transition-colors duration-200 ${
               activeTab === 'chat'
                 ? 'bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-lg'
                 : 'glass text-gray-700 dark:text-gray-300 hover:shadow-md'
@@ -206,10 +296,20 @@ const Admin = () => {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={() => handleOpenModal()}
-                  className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-primary-500 to-primary-600 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all"
+                  className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-primary-500 to-primary-600 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-shadow duration-200"
+                  style={{ willChange: 'transform' }}
                 >
                   <Plus className="w-5 h-5" />
                   <span>Nuevo Producto</span>
+                </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
+                  onClick={handleOpenCategoryModal}
+                  className="ml-4 flex items-center space-x-2 px-4 py-3 glass rounded-xl font-semibold text-gray-700 dark:text-gray-300 hover:shadow-md transition-shadow duration-200"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>Gestionar categorías</span>
                 </motion.button>
               </div>
 
@@ -242,6 +342,56 @@ const Admin = () => {
               exit={{ opacity: 0, x: 20 }}
             >
               <AdminChat />
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Edit Category Modal */}
+        <AnimatePresence>
+          {showEditCategoryModal && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+              onClick={() => cancelEditCategory()}
+            >
+              <motion.div
+                initial={{ scale: 0.95, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.95, opacity: 0 }}
+                onClick={e => e.stopPropagation()}
+                className="glass rounded-3xl p-6 max-w-md w-full"
+              >
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-lg font-semibold">Editar categoría</h3>
+                  <button onClick={() => cancelEditCategory()} className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700">
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+
+                <form onSubmit={saveEditCategory} className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Nombre</label>
+                    <input value={editingCategoryData.name} onChange={e => setEditingCategoryData({...editingCategoryData, name: e.target.value})} required className="w-full px-4 py-2 rounded-xl border bg-white dark:bg-gray-800 text-gray-900 dark:text-white" />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Slug</label>
+                    <input value={editingCategoryData.slug} onChange={e => setEditingCategoryData({...editingCategoryData, slug: e.target.value})} placeholder="auto" className="w-full px-4 py-2 rounded-xl border bg-white dark:bg-gray-800 text-gray-900 dark:text-white" />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Descripción</label>
+                    <textarea value={editingCategoryData.description} onChange={e => setEditingCategoryData({...editingCategoryData, description: e.target.value})} className="w-full px-4 py-2 rounded-xl border bg-white dark:bg-gray-800 text-gray-900 dark:text-white" />
+                  </div>
+
+                  <div className="flex justify-end gap-2">
+                    <button type="button" onClick={() => cancelEditCategory()} className="px-4 py-2 rounded-xl glass">Cancelar</button>
+                    <button type="submit" className="px-4 py-2 rounded-xl bg-primary-500 text-white">Guardar</button>
+                  </div>
+                </form>
+              </motion.div>
             </motion.div>
           )}
         </AnimatePresence>
@@ -342,13 +492,14 @@ const Admin = () => {
                       Categoría
                     </label>
                     <select
-                      name="category"
-                      value={formData.category}
+                      name="categoryId"
+                      value={formData.categoryId || ''}
                       onChange={handleChange}
                       className="w-full px-4 py-3 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-primary-500 text-gray-900 dark:text-white"
                     >
-                      {categories.map(cat => (
-                        <option key={cat} value={cat}>{cat}</option>
+                      <option value="">-- Seleccionar categoría --</option>
+                      {categoriesList.map(cat => (
+                        <option key={cat._id || cat.slug || cat.name} value={cat._id || cat.slug || cat.name}>{cat.name}</option>
                       ))}
                     </select>
                   </div>
@@ -368,16 +519,7 @@ const Admin = () => {
                   </div>
 
                   <div className="flex items-center">
-                    <input
-                      type="checkbox"
-                      name="featured"
-                      checked={formData.featured}
-                      onChange={handleChange}
-                      className="w-4 h-4 text-primary-500 bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-700 rounded focus:ring-primary-500"
-                    />
-                    <label className="ml-2 text-sm text-gray-700 dark:text-gray-300">
-                      Producto destacado
-                    </label>
+                    {/* Campo 'Producto destacado' eliminado — el control de admin queda centralizado en la pestaña Admin principal */}
                   </div>
 
                   <div className="flex space-x-4 pt-4">
@@ -386,7 +528,8 @@ const Admin = () => {
                       whileTap={{ scale: 0.98 }}
                       type="submit"
                       disabled={saving}
-                      className="flex-1 py-3 bg-gradient-to-r from-primary-500 to-primary-600 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+                      className="flex-1 py-3 bg-gradient-to-r from-primary-500 to-primary-600 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-shadow duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+                      style={{ willChange: 'transform' }}
                     >
                       {saving ? (
                         <Loader className="w-5 h-5 animate-spin" />
@@ -402,12 +545,80 @@ const Admin = () => {
                       whileTap={{ scale: 0.98 }}
                       type="button"
                       onClick={handleCloseModal}
-                      className="px-6 py-3 glass rounded-xl font-semibold text-gray-700 dark:text-gray-300 hover:shadow-md transition-all"
+                      className="px-6 py-3 glass rounded-xl font-semibold text-gray-700 dark:text-gray-300 hover:shadow-md transition-shadow duration-200"
                     >
                       Cancelar
                     </motion.button>
                   </div>
                 </form>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Category Modal */}
+        <AnimatePresence>
+          {showCategoryModal && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+              onClick={() => setShowCategoryModal(false)}
+            >
+              <motion.div
+                initial={{ scale: 0.95, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.95, opacity: 0 }}
+                onClick={e => e.stopPropagation()}
+                className="glass rounded-3xl p-6 max-w-lg w-full"
+              >
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-lg font-semibold">Crear categoría</h3>
+                  <button onClick={() => setShowCategoryModal(false)} className="p-2 rounded-full hover:bg-gray-100">
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+
+                <div className="space-y-4">
+                  <div>
+                    <h4 className="font-semibold mb-2">Categorías existentes</h4>
+                    <div className="space-y-2 max-h-48 overflow-y-auto">
+                      {categoriesList.map(cat => (
+                        <div key={cat._id || cat.slug || cat.name} className="p-3 rounded-lg bg-white/60 dark:bg-gray-800/60 flex items-center justify-between gap-4 overflow-hidden">
+                          <div className="flex-1 min-w-0">
+                            <div className="font-medium text-gray-900 dark:text-white truncate">{cat.name}</div>
+                            <div className="text-xs text-gray-500 dark:text-gray-400 truncate">{cat.slug}</div>
+                            {cat.description ? <div className="text-xs text-gray-600 dark:text-gray-300 mt-1 truncate">{cat.description}</div> : null}
+                          </div>
+                          <div className="flex-shrink-0 flex items-center gap-2">
+                            <button onClick={() => startEditCategory(cat)} className="px-3 py-1 glass rounded-md">Editar</button>
+                            <button onClick={() => handleDeleteCategory(cat._id)} className="px-3 py-1 bg-red-500 text-white rounded-md">Eliminar</button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <form onSubmit={handleCreateCategory} className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">Nombre</label>
+                      <input value={newCategory.name} onChange={e => setNewCategory({...newCategory, name: e.target.value})} required className="w-full px-4 py-2 rounded-xl border" />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">Slug (opcional)</label>
+                      <input value={newCategory.slug} onChange={e => setNewCategory({...newCategory, slug: e.target.value})} placeholder="auto" className="w-full px-4 py-2 rounded-xl border" />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">Descripción (opcional)</label>
+                      <textarea value={newCategory.description} onChange={e => setNewCategory({...newCategory, description: e.target.value})} className="w-full px-4 py-2 rounded-xl border" />
+                    </div>
+                    <div className="flex justify-end space-x-2">
+                      <button type="button" onClick={() => setShowCategoryModal(false)} className="px-4 py-2 rounded-xl glass">Cerrar</button>
+                      <button type="submit" className="px-4 py-2 rounded-xl bg-primary-500 text-white">Crear</button>
+                    </div>
+                  </form>
+                </div>
               </motion.div>
             </motion.div>
           )}

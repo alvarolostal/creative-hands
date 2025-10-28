@@ -127,7 +127,8 @@ const ChatWidget = () => {
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
             onClick={handleOpen}
-            className="fixed bottom-6 right-6 w-14 h-14 bg-gradient-to-br from-primary-500 to-primary-600 rounded-full shadow-2xl flex items-center justify-center text-white hover:shadow-primary-500/50 transition-all z-50"
+            className="fixed bottom-6 right-6 w-14 h-14 bg-gradient-to-br from-primary-500 to-primary-600 rounded-full shadow-2xl flex items-center justify-center text-white hover:shadow-primary-500/50 transition-shadow duration-200 z-50"
+            style={{ willChange: 'transform' }}
           >
             <MessageCircle className="w-6 h-6" />
             {unreadCount > 0 && (
@@ -264,7 +265,8 @@ const ChatWidget = () => {
                   whileTap={{ scale: 0.9 }}
                   type="submit"
                   disabled={!newMessage.trim() || !connected}
-                  className="w-10 h-10 bg-gradient-to-br from-primary-500 to-primary-600 rounded-full flex items-center justify-center text-white disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-lg transition-all"
+                  className="w-10 h-10 bg-gradient-to-br from-primary-500 to-primary-600 rounded-full flex items-center justify-center text-white disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-lg transition-shadow duration-200"
+                  style={{ willChange: 'transform' }}
                 >
                   <Send className="w-4 h-4" />
                 </motion.button>

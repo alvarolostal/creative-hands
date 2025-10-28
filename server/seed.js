@@ -6,6 +6,7 @@ dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
 const Product = require('./models/Product');
 const User = require('./models/User');
+const Category = require('./models/Category');
 
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/creative-hands';
 
@@ -20,8 +21,7 @@ const sampleProducts = (userIds = []) => {
       price: 29.95,
       category: 'Joyería artesanal',
       stock: 12,
-      images: ['https://images.unsplash.com/photo-1516822003754-cca485356ecb?w=1000&q=80&auto=format&fit=crop'],
-      featured: true,
+  images: ['https://images.unsplash.com/photo-1516822003754-cca485356ecb?w=1000&q=80&auto=format&fit=crop'],
       materials: ['algodón', 'madera', 'cuentas'],
       dimensions: { height: 1, width: 40, depth: 0.2, unit: 'cm' },
       weight: { value: 20, unit: 'g' },
@@ -33,8 +33,7 @@ const sampleProducts = (userIds = []) => {
       price: 14.5,
       category: 'Velas y aromáticos',
       stock: 30,
-      images: ['https://images.unsplash.com/photo-1514894781395-71a34a02b6b4?w=1000&q=80&auto=format&fit=crop'],
-      featured: true,
+  images: ['https://images.unsplash.com/photo-1514894781395-71a34a02b6b4?w=1000&q=80&auto=format&fit=crop'],
       materials: ['cera de soja', 'aceites esenciales'],
       dimensions: { height: 8, width: 7, depth: 7, unit: 'cm' },
       weight: { value: 300, unit: 'g' },
@@ -46,8 +45,7 @@ const sampleProducts = (userIds = []) => {
       price: 45.0,
       category: 'Textiles y ropa',
       stock: 8,
-      images: ['https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=1000&q=80&auto=format&fit=crop'],
-      featured: false,
+  images: ['https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=1000&q=80&auto=format&fit=crop'],
       materials: ['lana reciclada'],
       dimensions: { height: 180, width: 30, depth: 0.5, unit: 'cm' },
       weight: { value: 220, unit: 'g' },
@@ -59,8 +57,7 @@ const sampleProducts = (userIds = []) => {
       price: 68.0,
       category: 'Cerámica y arcilla',
       stock: 5,
-      images: ['https://images.unsplash.com/photo-1519744792095-2f2205e87b6f?w=1000&q=80&auto=format&fit=crop'],
-      featured: false,
+  images: ['https://images.unsplash.com/photo-1519744792095-2f2205e87b6f?w=1000&q=80&auto=format&fit=crop'],
       materials: ['arcilla', 'esmalte'],
       dimensions: { height: 6, width: 15, depth: 15, unit: 'cm' },
       weight: { value: 1200, unit: 'g' },
@@ -72,8 +69,7 @@ const sampleProducts = (userIds = []) => {
       price: 35.0,
       category: 'Arte hecho a mano',
       stock: 20,
-      images: ['https://images.unsplash.com/photo-1508919801845-fc2ae1bc3b5d?w=1000&q=80&auto=format&fit=crop'],
-      featured: true,
+  images: ['https://images.unsplash.com/photo-1508919801845-fc2ae1bc3b5d?w=1000&q=80&auto=format&fit=crop'],
       materials: ['papel 300gsm', 'tinta'],
       dimensions: { height: 30, width: 21, depth: 0, unit: 'cm' },
       weight: { value: 150, unit: 'g' },
@@ -249,7 +245,37 @@ const importData = async () => {
     const userIds = [createdAdmin._id, createdUser1._id, createdUser2._id];
 
     // Crear muchos productos y asignar createdBy aleatoriamente
-    const products = sampleProducts(userIds);
+    // Ensure categories exist and build a name->id map
+    const categoryNames = [
+      'Joyería artesanal',
+      'Velas y aromáticos',
+      'Textiles y ropa',
+      'Cerámica y arcilla',
+      'Arte hecho a mano'
+    ];
+
+    const categoryMap = {};
+    for (const name of categoryNames) {
+      let cat = await Category.findOne({ name });
+      if (!cat) {
+        // create slug same way as other scripts
+        const slug = name.toString().normalize('NFD').replace(/[^\w\s-]/g, '').replace(/\s+/g, '-').toLowerCase();
+        cat = await Category.create({ name, slug });
+      }
+      categoryMap[name] = cat._id;
+    }
+
+    // Create products and set categoryId from the map
+    let products = sampleProducts(userIds);
+    products = products.map(p => {
+      const copy = { ...p };
+      if (copy.category && categoryMap[copy.category]) {
+        copy.categoryId = categoryMap[copy.category];
+      }
+      delete copy.category; // remove legacy field
+      return copy;
+    });
+
     await Product.insertMany(products);
 
     console.log('Seed completado. Usuarios y productos creados.');

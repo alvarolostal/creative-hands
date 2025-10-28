@@ -4,55 +4,101 @@ import { Search, Filter, Loader, Package } from 'lucide-react';
 import axios from 'axios';
 import ProductCard from '../components/ProductCard';
 import { useAuth } from '../context/AuthContext';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 
 const Products = () => {
   const { isAdmin } = useAuth();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('');
-  const location = useLocation();
-  const navigate = useNavigate();
+  const [categoriesList, setCategoriesList] = useState([]);
+  const [nameToSlug, setNameToSlug] = useState({});
+  const [selectedCategorySlug, setSelectedCategorySlug] = useState('');
+    const location = useLocation();
+    const navigate = useNavigate();
+    const params = useParams();
   
-  const categories = [
-    'Todas',
-    'Joyería artesanal',
-    'Velas y aromáticos',
-    'Textiles y ropa',
-    'Cerámica y arcilla',
-    'Arte hecho a mano'
-  ];
+  // categoriesList will be fetched from the API; we keep a 'Todas' pseudo-category at the start
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
 
   useEffect(() => {
     fetchProducts();
-  }, [selectedCategory]);
+  }, [selectedCategorySlug]);
 
-  // Initialize selectedCategory from query param (e.g. /products?category=Joyería%20artesanal)
+  // Initialize selectedCategorySlug: prefer path param /products/category/:slug, fallback to query param
   useEffect(() => {
-    const params = new URLSearchParams(location.search);
-    const cat = params.get('category');
+    const { slug } = params || {};
+    if (slug) {
+      setSelectedCategorySlug(slug);
+      return;
+    }
+
+    const query = new URLSearchParams(location.search);
+    const cat = query.get('category');
     if (cat) {
-      // If the query says 'Todas', treat as no filter
-      setSelectedCategory(cat === 'Todas' ? '' : cat);
+      if (cat === 'Todas') {
+        setSelectedCategorySlug('');
+      } else if (nameToSlug[cat]) {
+        // map known category name -> slug provided by server
+        setSelectedCategorySlug(nameToSlug[cat]);
+      } else {
+        // if it's already a slug-like value, use it as-is
+        setSelectedCategorySlug(cat);
+      }
     }
     // only run on mount / when search changes
-  }, [location.search]);
+  }, [location.search, params?.slug, nameToSlug]);
 
   const fetchProducts = async () => {
     try {
       setLoading(true);
-      const params = {};
-      if (selectedCategory && selectedCategory !== 'Todas') {
-        params.category = selectedCategory;
+      let data;
+
+      if (selectedCategorySlug) {
+        const res = await axios.get(`/api/products/category/${selectedCategorySlug}`);
+        data = res.data;
+      } else {
+        const res = await axios.get('/api/products');
+        data = res.data;
       }
-      
-      const { data } = await axios.get('/api/products', { params });
+
       setProducts(data.products);
     } catch (error) {
       console.error('Error al cargar productos:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchCategories = async () => {
+    try {
+      const { data } = await axios.get('/api/categories');
+      // build name->slug map for robust mapping from legacy name queries
+      const map = {};
+      data.categories.forEach(c => { map[c.name] = c.slug; });
+      setNameToSlug(map);
+      // prepend 'Todas' as a pseudo-category
+      setCategoriesList([{ name: 'Todas', slug: '' }, ...data.categories.map(c => ({ name: c.name, slug: c.slug }))]);
+    } catch (error) {
+      console.error('Error cargando categorías, usando lista por defecto:', error);
+      setNameToSlug({
+        'Joyería artesanal': 'joyeria-artesanal',
+        'Velas y aromáticos': 'velas-y-aromaticos',
+        'Textiles y ropa': 'textiles-y-ropa',
+        'Cerámica y arcilla': 'ceramica-y-arcilla',
+        'Arte hecho a mano': 'arte-hecho-a-mano'
+      });
+      setCategoriesList([
+        { name: 'Todas', slug: '' },
+        { name: 'Joyería artesanal', slug: 'joyeria-artesanal' },
+        { name: 'Velas y aromáticos', slug: 'velas-y-aromaticos' },
+        { name: 'Textiles y ropa', slug: 'textiles-y-ropa' },
+        { name: 'Cerámica y arcilla', slug: 'ceramica-y-arcilla' },
+        { name: 'Arte hecho a mano', slug: 'arte-hecho-a-mano' }
+      ]);
     }
   };
 
@@ -111,28 +157,28 @@ const Products = () => {
 
           {/* Categories */}
           <div className="flex flex-wrap justify-center gap-3">
-            {categories.map((category) => (
+            {categoriesList.map((category) => (
               <motion.button
-                key={category}
+                key={category.slug || category.name}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => {
-                  const val = category === 'Todas' ? '' : category;
-                  setSelectedCategory(val);
-                  // update URL so the selection is shareable
+                  const val = category.slug || '';
+                  setSelectedCategorySlug(val);
+                  // update URL using slug path (preferred)
                   if (val) {
-                    navigate(`/products?category=${encodeURIComponent(val)}`);
+                    navigate(`/products/category/${val}`);
                   } else {
                     navigate('/products');
                   }
                 }}
-                className={`px-4 py-2 rounded-full font-medium transition-all ${
-                  (selectedCategory === category) || (selectedCategory === '' && category === 'Todas')
+                className={`px-4 py-2 rounded-full font-medium transition-shadow duration-200 ${
+                  (selectedCategorySlug === category.slug) || (selectedCategorySlug === '' && category.name === 'Todas')
                     ? 'bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-lg'
                     : 'glass text-gray-700 dark:text-gray-300 hover:shadow-md'
                 }`}
               >
-                {category}
+                {category.name}
               </motion.button>
             ))}
           </div>
@@ -173,7 +219,6 @@ const Products = () => {
               >
                 <ProductCard
                   product={product}
-                  isAdmin={isAdmin}
                   onDelete={handleDelete}
                 />
               </motion.div>

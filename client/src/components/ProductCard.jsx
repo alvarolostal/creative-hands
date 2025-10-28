@@ -14,7 +14,9 @@ const ProductCard = ({ product, onEdit, onDelete, isAdmin }) => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       whileHover={{ y: -8 }}
-    className="glass rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all group"
+      // dejar la transición del transform a framer-motion y solo animar la sombra por CSS
+      className="glass rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-200 group"
+      style={{ willChange: 'transform' }}
     >
       {/* Image */}
       <div className="relative h-64 bg-gradient-to-br from-primary-100 to-primary-200 dark:from-gray-800 dark:to-gray-700 overflow-hidden">
@@ -33,7 +35,7 @@ const ProductCard = ({ product, onEdit, onDelete, isAdmin }) => {
         {/* Badge de categoría */}
         <div className="absolute top-3 left-3">
           <span className="px-3 py-1 bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm text-xs font-medium text-gray-900 dark:text-white rounded-full">
-            {product.category}
+            {product.categoryId?.name}
           </span>
         </div>
 
@@ -90,7 +92,8 @@ const ProductCard = ({ product, onEdit, onDelete, isAdmin }) => {
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="px-4 py-2 bg-gradient-to-r from-primary-500 to-primary-600 text-white rounded-full text-sm font-semibold shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              // dejar la animación de escala a framer-motion; CSS solo anima colores
+              className="px-4 py-2 bg-gradient-to-r from-primary-500 to-primary-600 text-white rounded-full text-sm font-semibold shadow-lg hover:shadow-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               disabled={product.stock === 0}
             >
               Ver detalles

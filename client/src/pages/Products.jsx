@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Search, Filter, Loader, Package } from "lucide-react";
 import axios from "axios";
 import ProductCard from "../components/ProductCard";
+import ProductModal from "../components/ProductModal";
 import { useAuth } from "../context/AuthContext";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 
@@ -124,6 +125,14 @@ const Products = () => {
     }
   };
 
+  const [selectedProduct, setSelectedProduct] = useState(null);
+
+  const handleViewDetails = (product) => {
+    setSelectedProduct(product);
+  };
+
+  const handleCloseModal = () => setSelectedProduct(null);
+
   const filteredProducts = products.filter(
     (product) =>
       product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -231,12 +240,27 @@ const Products = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1 }}
               >
-                <ProductCard product={product} onDelete={handleDelete} />
+                <ProductCard
+                  product={product}
+                  onDelete={handleDelete}
+                  isAdmin={isAdmin}
+                  onEdit={(p) => navigate(`/products/${p._id}/edit`)}
+                  onViewDetails={handleViewDetails}
+                />
               </motion.div>
             ))}
           </motion.div>
         )}
       </div>
+      <AnimatePresence>
+        {selectedProduct && (
+          <ProductModal
+            key={selectedProduct._id}
+            product={selectedProduct}
+            onClose={handleCloseModal}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 };

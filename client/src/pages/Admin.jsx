@@ -552,6 +552,7 @@ const Admin = () => {
                       key={product._id}
                       product={product}
                       isAdmin={true}
+                      hideDetails={true}
                       onEdit={handleOpenModal}
                       onDelete={handleDelete}
                     />

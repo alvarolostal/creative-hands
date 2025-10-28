@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { Edit, Trash2, Package } from "lucide-react";
 
-const ProductCard = ({ product, onEdit, onDelete, isAdmin }) => {
+const ProductCard = ({ product, onEdit, onDelete, isAdmin, onViewDetails, hideDetails }) => {
   const formatPrice = (price) => {
     return new Intl.NumberFormat("es-ES", {
       style: "currency",
@@ -88,13 +88,14 @@ const ProductCard = ({ product, onEdit, onDelete, isAdmin }) => {
             )}
           </div>
 
-          {!isAdmin && (
+          {!hideDetails && (
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               // dejar la animación de escala a framer-motion; CSS solo anima colores
               className="px-4 py-2 bg-gradient-to-r from-primary-500 to-primary-600 text-white rounded-full text-sm font-semibold shadow-lg hover:shadow-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               disabled={product.stock === 0}
+              onClick={() => onViewDetails && onViewDetails(product)}
             >
               Ver detalles
             </motion.button>

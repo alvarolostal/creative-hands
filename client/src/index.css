@@ -200,9 +200,11 @@ button:active {
   /* --tx guarda el translateX; ajusta aquí si quieres moverla más a la derecha/izquierda */
   /* +5px shift right for fine alignment */
   /* increase horizontal correction slightly (was +5px) */
-  --tx: translateX(calc(-50% + 7px));
+  /* ajuste intermedio: mover medio píxel hacia la izquierda respecto a 7px (punto medio visual) */
+  --tx: translateX(calc(-50% + 6.5px));
   /* sit a bit lower: increase offset so it's between the buttons and bottom of screen */
-  top: calc(100% + 1.75rem) !important;
+  /* Incrementado ligeramente para bajar la flecha un pelín */
+  top: calc(100% + 2.25rem) !important;
   transform: var(--tx) translateY(0);
   display: inline-flex;
   align-items: center;

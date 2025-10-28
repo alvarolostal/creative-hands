@@ -27,6 +27,32 @@ export const AuthProvider = ({ children }) => {
     }
   }, [token]);
 
+  // Interceptor global para capturar 401 (token expirado / inválido)
+  useEffect(() => {
+    const responseInterceptor = axios.interceptors.response.use(
+      (response) => response,
+      (error) => {
+        const status = error?.response?.status;
+        if (status === 401) {
+          // Token inválido o expirado: limpiar estado local y redirigir al login
+          setToken(null);
+          setUser(null);
+          try {
+            // Redirigimos a la página de login para que el usuario vuelva a autenticarse
+            window.location.replace('/login');
+          } catch (e) {
+            // en entornos sin window (tests) lo ignoramos
+          }
+        }
+        return Promise.reject(error);
+      }
+    );
+
+    return () => {
+      axios.interceptors.response.eject(responseInterceptor);
+    };
+  }, []);
+
   // Verificar usuario al cargar
   useEffect(() => {
     const checkAuth = async () => {

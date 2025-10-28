@@ -177,6 +177,62 @@ button:active {
   animation: fadeIn 0.5s ease-out;
 }
 
+/* Flecha de scroll del hero: sutil, centrada y sin parpadeos */
+@keyframes subtle-bounce {
+  0%, 100% {
+    transform: var(--tx) translateY(0);
+  }
+  50% {
+    transform: var(--tx) translateY(-5px);
+  }
+}
+
+.subtle-bounce {
+  animation: subtle-bounce 1.4s ease-in-out infinite;
+}
+
+.hero-scroll-btn {
+  position: absolute;
+  /* Forzar centrado horizontal exacto usando left + variable --tx (ajuste de 4px a la derecha) */
+  left: 50% !important;
+  /* Colocamos la flecha justo debajo del wrapper de CTA: top = 100% del wrapper + offset */
+  top: calc(100% + 0.75rem) !important;
+  /* --tx guarda el translateX; ajusta aquí si quieres moverla más a la derecha/izquierda */
+  /* +5px shift right for fine alignment */
+  /* increase horizontal correction slightly (was +5px) */
+  --tx: translateX(calc(-50% + 7px));
+  /* sit a bit lower: increase offset so it's between the buttons and bottom of screen */
+  top: calc(100% + 1.75rem) !important;
+  transform: var(--tx) translateY(0);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 3rem; /* 48px */
+  height: 3rem;
+  border-radius: 9999px;
+  background: rgba(255,255,255,0.92);
+  box-shadow: 0 10px 20px rgba(2,6,23,0.12);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  transition: transform 180ms ease, box-shadow 180ms ease;
+}
+
+.hero-scroll-btn:hover {
+  transform: var(--tx) translateY(-2px) scale(1.03);
+  box-shadow: 0 14px 28px rgba(2,6,23,0.16);
+}
+
+.dark .hero-scroll-btn {
+  background: rgba(20,20,20,0.85);
+}
+
+/* Ocultar en dispositivos móviles pequeños */
+@media (max-width: 640px) {
+  .hero-scroll-btn {
+    display: none;
+  }
+}
+
 /* Loading dots */
 @keyframes bounce {
   0%, 80%, 100% {

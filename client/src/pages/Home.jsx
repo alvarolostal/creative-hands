@@ -1,13 +1,16 @@
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Sparkles, Heart, Palette } from 'lucide-react';
+import { ArrowRight, Sparkles, Heart, Palette, ChevronDown } from 'lucide-react';
+import { useRef } from 'react';
 
 const Home = () => {
   const MotionLink = motion(Link);
+  const ctaRef = useRef(null);
+  const btnRef = useRef(null);
   return (
     <div className="min-h-screen flex flex-col">
     {/* Hero Section */}
-    <section className="relative h-screen flex items-center justify-center overflow-hidden">
+  <section className="relative h-screen flex items-center justify-center overflow-hidden">
         {/* Animated Background */}
         <div className="absolute inset-0 bg-gradient-to-br from-light-500 via-primary-50 to-light-500 dark:from-dark-500 dark:via-dark-400 dark:to-dark-600">
           <div className="absolute inset-0 opacity-25 pointer-events-none">
@@ -27,8 +30,8 @@ const Home = () => {
           </div>
         </div>
 
-        {/* Content */}
-        <div className="relative z-10 text-center px-4 max-w-5xl mx-auto">
+  {/* Content */}
+  <div className="relative z-10 text-center px-4 max-w-5xl mx-auto">
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }} className="space-y-8">
             {/* Logo/Icon */}
             <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.2, type: 'spring', stiffness: 200 }} className="flex justify-center mb-8">
@@ -55,8 +58,9 @@ const Home = () => {
               Arte hecho a mano que cuenta historias.
             </motion.p>
 
-            {/* CTA Buttons */}
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.7, duration: 0.8 }} className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-8">
+            {/* CTA Buttons (wrapper relative para centrar la flecha) */}
+            <div className="relative inline-block w-full">
+              <motion.div ref={ctaRef} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.7, duration: 0.8 }} className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-8">
               <Link to="/products">
                 <motion.button
                   whileHover={{ y: -4 }}
@@ -78,15 +82,30 @@ const Home = () => {
                   Comenzar ahora
                 </motion.button>
               </Link>
-            </motion.div>
-          </motion.div>
+              </motion.div>
 
-            {/* Scroll indicator removed per design request */}
+              {/* Flecha absoluta dentro del wrapper de CTA para centrarla exactamente */}
+              <motion.button
+                ref={btnRef}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.9, duration: 0.7 }}
+                onClick={() => {
+                  const el = document.getElementById('destacados');
+                  if (el) el.scrollIntoView({ behavior: 'smooth' });
+                }}
+                aria-label="Ir a destacados"
+                className="hero-scroll-btn subtle-bounce z-30 left-1/2 transform -translate-x-1/2"
+              >
+                <ChevronDown className="w-6 h-6 text-primary-600" />
+              </motion.button>
+            </div>
+          </motion.div>
         </div>
       </section>
 
       {/* Featured Products Section (rediseñado): tarjetas que aparecen lateralmente al hacer scroll */}
-      <section className="py-24 bg-white dark:bg-dark-500">
+  <section id="destacados" className="py-24 bg-white dark:bg-dark-500">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }} className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">Destacados</h2>

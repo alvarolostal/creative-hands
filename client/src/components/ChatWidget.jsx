@@ -151,7 +151,8 @@ const ChatWidget = () => {
             initial={{ opacity: 0, y: 100, scale: 0.8 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 100, scale: 0.8 }}
-            className="fixed bottom-6 right-6 w-96 h-[500px] glass rounded-2xl shadow-2xl flex flex-col overflow-hidden z-50"
+            /* Mobile: full width with small side margins. On sm+ use fixed size on the right. */
+            className="fixed bottom-3 left-3 right-3 sm:right-6 sm:bottom-6 sm:left-auto sm:w-96 h-[60vh] sm:h-[500px] glass rounded-2xl shadow-2xl flex flex-col overflow-hidden z-50"
           >
             {/* Header */}
             <div className="bg-gradient-to-r from-primary-500 to-primary-600 p-4 flex items-center justify-between">

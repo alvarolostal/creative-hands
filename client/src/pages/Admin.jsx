@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Plus,
@@ -31,6 +31,10 @@ const Admin = () => {
     stock: "",
     materials: "",
   });
+  const [imagesFiles, setImagesFiles] = useState([]); // archivos nuevos seleccionados
+  const [existingImages, setExistingImages] = useState([]); // URLs ya subidas en el producto
+  const [newPreviews, setNewPreviews] = useState([]); // {id, url, file}
+  const fileInputRef = useRef(null);
   const [saving, setSaving] = useState(false);
   const [categoriesList, setCategoriesList] = useState([]);
   const [showCategoryModal, setShowCategoryModal] = useState(false);
@@ -82,6 +86,10 @@ const Admin = () => {
         stock: product.stock,
         materials: product.materials?.join(", ") || "",
       });
+      // populate existing images for preview/edit
+      setExistingImages(product.images ? [...product.images] : []);
+      setImagesFiles([]);
+      setNewPreviews([]);
     } else {
       setEditingProduct(null);
       setFormData({
@@ -92,6 +100,9 @@ const Admin = () => {
         stock: "",
         materials: "",
       });
+      setExistingImages([]);
+      setImagesFiles([]);
+      setNewPreviews([]);
     }
     setShowProductModal(true);
   };
@@ -99,6 +110,11 @@ const Admin = () => {
   const handleCloseModal = () => {
     setShowProductModal(false);
     setEditingProduct(null);
+    // limpiar previews y revocar URLs
+    newPreviews.forEach((p) => URL.revokeObjectURL(p.url));
+    setNewPreviews([]);
+    setImagesFiles([]);
+    setExistingImages([]);
   };
 
   const handleChange = (e) => {
@@ -123,29 +139,46 @@ const Admin = () => {
     setSaving(true);
 
     try {
-      const productData = {
-        ...formData,
-        price: parseFloat(formData.price),
-        stock: parseInt(formData.stock),
-        materials: formData.materials
-          .split(",")
-          .map((m) => m.trim())
-          .filter(Boolean),
-      };
+      // Usar FormData para enviar archivos si hay imágenes
+      let response;
+      const fd = new FormData();
+      fd.append("name", formData.name);
+      fd.append("description", formData.description);
+      fd.append("price", formData.price);
+      fd.append("categoryId", formData.categoryId);
+      fd.append("stock", formData.stock);
+      fd.append("materials", formData.materials);
 
+      // Si estamos editando, enviar la lista de imágenes que queremos mantener
       if (editingProduct) {
-        const { data } = await axios.put(
-          `/api/products/${editingProduct._id}`,
-          productData
-        );
-        setProducts(
-          products.map((p) => (p._id === editingProduct._id ? data.product : p))
-        );
-      } else {
-        const { data } = await axios.post("/api/products", productData);
-        setProducts([data.product, ...products]);
+        fd.append("keepImages", JSON.stringify(existingImages || []));
       }
 
+      if (imagesFiles && imagesFiles.length > 0) {
+        for (let i = 0; i < imagesFiles.length; i++) {
+          fd.append("images", imagesFiles[i]);
+        }
+      }
+
+      if (editingProduct) {
+        response = await axios.put(`/api/products/${editingProduct._id}`, fd, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+        setProducts(
+          products.map((p) => (p._id === editingProduct._id ? response.data.product : p))
+        );
+      } else {
+        response = await axios.post("/api/products", fd, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+        setProducts([response.data.product, ...products]);
+      }
+
+      // limpiar previews locales
+      newPreviews.forEach((p) => URL.revokeObjectURL(p.url));
+      setNewPreviews([]);
+      setImagesFiles([]);
+      setExistingImages([]);
       handleCloseModal();
     } catch (error) {
       console.error("Error al guardar producto:", error);
@@ -153,6 +186,39 @@ const Admin = () => {
     } finally {
       setSaving(false);
     }
+  };
+
+  const onFilesSelected = (e) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+
+    // crear previews
+    const previews = files.map((file, idx) => ({
+      id: Date.now() + idx,
+      url: URL.createObjectURL(file),
+      file,
+    }));
+
+    setNewPreviews((prev) => [...prev, ...previews]);
+    // almacenar archivos para envio
+    setImagesFiles((prev) => [...prev, ...files]);
+    // reset input value to allow selecting same file again if needed
+    if (fileInputRef.current) fileInputRef.current.value = null;
+  };
+
+  const triggerFileInput = () => {
+    if (fileInputRef.current) fileInputRef.current.click();
+  };
+
+  const removeExistingImage = (url) => {
+    setExistingImages((prev) => prev.filter((u) => u !== url));
+  };
+
+  const removeNewPreview = (id) => {
+    const p = newPreviews.find((x) => x.id === id);
+    if (p) URL.revokeObjectURL(p.url);
+    setNewPreviews((prev) => prev.filter((x) => x.id !== id));
+    setImagesFiles((prev) => prev.filter((f) => f !== (p && p.file)));
   };
 
   const handleDelete = async (id) => {
@@ -605,6 +671,74 @@ const Admin = () => {
                       placeholder="Ej: Cerámica, Arcilla, Esmalte"
                       className="w-full px-4 py-3 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-primary-500 text-gray-900 dark:text-white"
                     />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Imágenes del producto
+                    </label>
+
+                    {/* Hidden file input */}
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      onChange={onFilesSelected}
+                      className="hidden"
+                    />
+
+                    {/* Dropzone / selector estilizado */}
+                    <div
+                      onClick={triggerFileInput}
+                      className="w-full cursor-pointer rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 flex items-center gap-4"
+                    >
+                      <div className="p-3 rounded-lg bg-primary-50 dark:bg-gray-700 text-primary-600 dark:text-white">
+                        <Upload className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <div className="text-sm font-medium text-gray-900 dark:text-white">Añadir / arrastra imágenes</div>
+                        <div className="text-xs text-gray-600 dark:text-gray-300">Haz click para seleccionar o arrastra los archivos aquí</div>
+                      </div>
+                    </div>
+
+                    {/* Existing images (already uploaded) */}
+                    {existingImages && existingImages.length > 0 && (
+                      <div className="mt-3 grid grid-cols-3 gap-3">
+                        {existingImages.map((url) => (
+                          <div key={url} className="relative rounded-lg overflow-hidden bg-gray-50 dark:bg-gray-900">
+                            <img src={url} alt="img" className="w-full h-24 object-cover" />
+                            <button
+                              type="button"
+                              onClick={() => removeExistingImage(url)}
+                              className="absolute top-2 right-2 bg-black/40 dark:bg-white/10 text-white dark:text-white p-1 rounded-full hover:bg-red-500"
+                              aria-label="Eliminar imagen existente"
+                            >
+                              <X className="w-3 h-3" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* New previews */}
+                    {newPreviews && newPreviews.length > 0 && (
+                      <div className="mt-3 grid grid-cols-3 gap-3">
+                        {newPreviews.map((p) => (
+                          <div key={p.id} className="relative rounded-lg overflow-hidden bg-gray-50 dark:bg-gray-900">
+                            <img src={p.url} alt={p.file.name} className="w-full h-24 object-cover" />
+                            <button
+                              type="button"
+                              onClick={() => removeNewPreview(p.id)}
+                              className="absolute top-2 right-2 bg-black/40 dark:bg-white/10 text-white dark:text-white p-1 rounded-full hover:bg-red-500"
+                              aria-label="Eliminar imagen nueva"
+                            >
+                              <X className="w-3 h-3" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
 
                   <div className="flex items-center">

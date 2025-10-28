@@ -3,6 +3,28 @@ const router = express.Router();
 const Product = require("../models/Product");
 const { protect, adminOnly } = require("../middleware/auth");
 const Category = require("../models/Category");
+const multer = require("multer");
+const path = require("path");
+const fs = require("fs");
+
+// Carpeta para uploads
+const uploadDir = path.join(__dirname, "..", "uploads");
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, uploadDir);
+  },
+  filename: function (req, file, cb) {
+    const ext = path.extname(file.originalname);
+    const name = Date.now() + "-" + Math.round(Math.random() * 1e9) + ext;
+    cb(null, name);
+  },
+});
+
+const upload = multer({ storage });
 
 // @route   GET /api/products
 // @desc    Obtener todos los productos
@@ -95,38 +117,60 @@ router.get("/:id", async (req, res) => {
 });
 
 // @route   POST /api/products
-// @desc    Crear nuevo producto
+// @desc    Crear nuevo producto (acepta imágenes multipart/form-data)
 // @access  Private/Admin
-router.post("/", protect, adminOnly, async (req, res) => {
-  try {
-    const productData = {
-      ...req.body,
-      createdBy: req.user.id,
-    };
+router.post(
+  "/",
+  protect,
+  adminOnly,
+  upload.array("images", 5),
+  async (req, res) => {
+    try {
+      // Construir datos del producto y parsear campos comunes
+      const productData = {
+        ...req.body,
+        createdBy: req.user.id,
+      };
 
-    let product = await Product.create(productData);
-    product = await Product.findById(product._id)
-      .populate("createdBy", "name")
-      .populate("categoryId", "name slug");
+      if (productData.price) productData.price = parseFloat(productData.price);
+      if (productData.stock) productData.stock = parseInt(productData.stock, 10);
 
-    res.status(201).json({
-      success: true,
-      product,
-    });
-  } catch (error) {
-    console.error("Error al crear producto:", error);
-    res.status(500).json({
-      success: false,
-      message: "Error al crear producto",
-      error: error.message,
-    });
+      if (productData.materials && typeof productData.materials === "string") {
+        productData.materials = productData.materials
+          .split(",")
+          .map((m) => m.trim())
+          .filter(Boolean);
+      }
+
+      if (req.files && req.files.length > 0) {
+        const baseUrl = `${req.protocol}://${req.get("host")}`;
+        productData.images = req.files.map((f) => `${baseUrl}/uploads/${f.filename}`);
+      }
+
+      let product = await Product.create(productData);
+      product = await Product.findById(product._id)
+        .populate("createdBy", "name")
+        .populate("categoryId", "name slug");
+
+      res.status(201).json({
+        success: true,
+        product,
+      });
+    } catch (error) {
+      console.error("Error al crear producto:", error);
+      res.status(500).json({
+        success: false,
+        message: "Error al crear producto",
+        error: error.message,
+      });
+    }
   }
-});
+);
 
 // @route   PUT /api/products/:id
 // @desc    Actualizar producto
 // @access  Private/Admin
-router.put("/:id", protect, adminOnly, async (req, res) => {
+router.put("/:id", protect, adminOnly, upload.array("images", 5), async (req, res) => {
   try {
     let product = await Product.findById(req.params.id);
 
@@ -135,6 +179,48 @@ router.put("/:id", protect, adminOnly, async (req, res) => {
         success: false,
         message: "Producto no encontrado",
       });
+    }
+
+    // Si vienen archivos nuevos, reemplazamos las imágenes y borramos las anteriores
+    // Manejo avanzado de imágenes: el cliente puede enviar keepImages (array de URLs que quiere conservar)
+    // y además archivos nuevos en req.files. Eliminamos solo las imágenes que el cliente no quiera conservar.
+    let keepImages = [];
+    if (req.body.keepImages) {
+      try {
+        // puede venir como JSON string o como array ya parseado
+        keepImages = typeof req.body.keepImages === "string" ? JSON.parse(req.body.keepImages) : req.body.keepImages;
+      } catch (err) {
+        keepImages = [];
+      }
+    }
+
+    // Determinar qué imágenes eliminar (las que están en product.images y no en keepImages)
+    const toDelete = (product.images || []).filter((img) => !keepImages.includes(img));
+    if (toDelete.length > 0) {
+      toDelete.forEach((imgPath) => {
+        try {
+          const filename = path.basename(imgPath);
+          const full = path.join(uploadDir, filename);
+          if (fs.existsSync(full)) fs.unlinkSync(full);
+        } catch (err) {
+          console.warn("Warning al borrar imagen antigua:", err.message);
+        }
+      });
+    }
+
+    // Construir la lista final de imágenes: keepImages + nuevas subidas
+    const baseUrl = `${req.protocol}://${req.get("host")}`;
+    const newUploaded = req.files && req.files.length > 0 ? req.files.map((f) => `${baseUrl}/uploads/${f.filename}`) : [];
+    req.body.images = [...(Array.isArray(keepImages) ? keepImages : []), ...newUploaded];
+
+    // parsear campos numéricos y arrays que vengan en body
+    if (req.body.price) req.body.price = parseFloat(req.body.price);
+    if (req.body.stock) req.body.stock = parseInt(req.body.stock, 10);
+    if (req.body.materials && typeof req.body.materials === "string") {
+      req.body.materials = req.body.materials
+        .split(",")
+        .map((m) => m.trim())
+        .filter(Boolean);
     }
 
     product = await Product.findByIdAndUpdate(req.params.id, req.body, {
@@ -170,6 +256,19 @@ router.delete("/:id", protect, adminOnly, async (req, res) => {
       return res.status(404).json({
         success: false,
         message: "Producto no encontrado",
+      });
+    }
+
+    // eliminar imágenes asociadas del disco
+    if (product.images && product.images.length > 0) {
+      product.images.forEach((imgPath) => {
+        try {
+          const filename = path.basename(imgPath);
+          const full = path.join(uploadDir, filename);
+          if (fs.existsSync(full)) fs.unlinkSync(full);
+        } catch (err) {
+          console.warn("Warning al borrar imagen en delete:", err.message);
+        }
       });
     }
 

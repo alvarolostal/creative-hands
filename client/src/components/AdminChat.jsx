@@ -142,7 +142,7 @@ const AdminChat = () => {
                 className={`w-full p-4 rounded-xl text-left transition-all ${
                   selectedConversation?.conversationId === conv.conversationId
                     ? 'bg-gradient-to-r from-primary-500 to-primary-600 text-white'
-                    : 'bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700'
+                    : 'bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-900 dark:text-white'
                 }`}
               >
                 <div className="flex items-center space-x-3">
@@ -156,8 +156,8 @@ const AdminChat = () => {
                       <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-400 rounded-full border-2 border-white dark:border-gray-800"></div>
                     )}
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-semibold truncate">
+                    <div className="flex-1 min-w-0">
+                    <p className="font-semibold truncate text-gray-900 dark:text-white">
                       {conv.user.name}
                     </p>
                     <p className={`text-sm truncate ${

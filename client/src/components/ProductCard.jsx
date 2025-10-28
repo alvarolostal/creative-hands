@@ -44,7 +44,7 @@ const ProductCard = ({ product, onEdit, onDelete, isAdmin }) => {
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
               onClick={() => onEdit(product)}
-              className="p-2 bg-white dark:bg-gray-900 rounded-full shadow-lg hover:bg-primary-500 hover:text-white transition-colors"
+              className="p-2 bg-white dark:bg-gray-900 rounded-full shadow-lg hover:bg-primary-500 hover:text-white dark:hover:bg-primary-500 dark:hover:text-white transition-colors text-gray-900 dark:text-white"
             >
               <Edit className="w-4 h-4" />
             </motion.button>
@@ -52,7 +52,7 @@ const ProductCard = ({ product, onEdit, onDelete, isAdmin }) => {
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
               onClick={() => onDelete(product._id)}
-              className="p-2 bg-white dark:bg-gray-900 rounded-full shadow-lg hover:bg-red-500 hover:text-white transition-colors"
+              className="p-2 bg-white dark:bg-gray-900 rounded-full shadow-lg hover:bg-red-500 hover:text-white dark:hover:bg-red-500 dark:hover:text-white transition-colors text-gray-900 dark:text-white"
             >
               <Trash2 className="w-4 h-4" />
             </motion.button>

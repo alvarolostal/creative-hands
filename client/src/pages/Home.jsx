@@ -78,7 +78,7 @@ const Home = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3, duration: 0.8 }}
-              className="text-5xl md:text-7xl font-bold copernicus uppercase text-primary-500"
+              className="text-5xl md:text-7xl font-bold copernicus copernicus-110 uppercase text-primary-500"
             >
               CREATIVE
               <span className="block">HANDS</span>
@@ -89,7 +89,7 @@ const Home = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.5, duration: 0.8 }}
-              className="text-lg md:text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto font-light"
+              className="text-lg md:text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto font-medium subtitle"
             >
               Descubre piezas únicas creadas con amor y dedicación.
               <br />
@@ -151,7 +151,7 @@ const Home = () => {
       {/* Featured Products Section (rediseñado): tarjetas que aparecen lateralmente al hacer scroll */}
       <section id="destacados" className="py-24 bg-white dark:bg-dark-500">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
+            <motion.div
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -242,7 +242,7 @@ const Home = () => {
 
       {/* Footer (fino) */}
       <footer className="mt-12 mb-12" role="contentinfo">
-        <div className="flex justify-center">
+            <div className="flex justify-center">
           <div className="inline-flex items-center gap-3 px-6 py-3 md:px-8 md:py-3 rounded-xl bg-white/8 dark:bg-gray-800/60 backdrop-blur-md text-sm md:text-base text-gray-700 dark:text-gray-100 shadow-md border border-white/6 dark:border-white/10">
             <span className="font-medium">© 2025 Álvaro Lostal</span>
             <span className="opacity-50">·</span>

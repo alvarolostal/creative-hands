@@ -243,7 +243,9 @@ const Products = () => {
                 <ProductCard
                   product={product}
                   onDelete={handleDelete}
-                  isAdmin={isAdmin}
+                  /* For coherence: the admin should not have edit/delete actions in the public Products view.
+                     Admin modifications are restricted to the separate Admin panel. */
+                  isAdmin={false}
                   onEdit={(p) => navigate(`/products/${p._id}/edit`)}
                   onViewDetails={handleViewDetails}
                 />

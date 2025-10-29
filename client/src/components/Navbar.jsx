@@ -67,7 +67,7 @@ const Navbar = () => {
             }}
             className="flex items-center space-x-2 group"
           >
-            <span className="text-xl font-bold copernicus uppercase text-primary-500 transition-colors brand-title">
+            <span className="text-xl font-bold copernicus copernicus-110 uppercase text-primary-500 transition-colors brand-title">
               creative hands
             </span>
           </Link>

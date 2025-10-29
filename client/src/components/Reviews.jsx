@@ -134,13 +134,13 @@ const Reviews = ({ productId, initialProduct, onProductUpdate }) => {
     <div className="mt-6">
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-lg font-semibold">Valoraciones</h3>
-          <div className="text-sm text-gray-500">{product?.reviewsCount ?? (product?.reviews || []).length} opiniones</div>
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Valoraciones</h3>
+          <div className="text-sm text-gray-500 dark:text-gray-400">{product?.reviewsCount ?? (product?.reviews || []).length} opiniones</div>
         </div>
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2">
             <StarsDisplay rating={product?.avgRating ?? 0} size="text-base" />
-            <div className="text-sm font-medium">{product?.avgRating ?? 0}</div>
+            <div className="text-sm font-medium text-gray-900 dark:text-white">{product?.avgRating ?? 0}</div>
           </div>
           {/* Mostrar botón solo para crear nueva opinión; si ya tienes una opinión, no mostrar el botón superior 'Editar tu opinión' (evita duplicidad) */}
           {isAuthenticated && user?.role !== 'admin' && !myReview && (
@@ -151,16 +151,16 @@ const Reviews = ({ productId, initialProduct, onProductUpdate }) => {
 
       <div className="mt-4 grid grid-cols-1 gap-3">
         {loading ? (
-          <div className="text-sm text-gray-500">Cargando opiniones…</div>
+          <div className="text-sm text-gray-500 dark:text-gray-400">Cargando opiniones…</div>
         ) : (product?.reviews || []).length === 0 ? (
-          <div className="text-sm text-gray-500">Aún no hay valoraciones.</div>
+          <div className="text-sm text-gray-500 dark:text-gray-400">Aún no hay valoraciones.</div>
         ) : (
           (product.reviews || []).slice().reverse().map((r) => (
             <article key={r._id || r.createdAt} className="p-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm border relative">
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <div className="text-sm font-semibold text-gray-900 dark:text-white">{r.user?.name || 'Usuario'}</div>
-                  <div className="text-xs text-gray-500">{new Date(r.createdAt).toLocaleDateString()}</div>
+                  <div className="text-xs text-gray-500 dark:text-gray-400">{new Date(r.createdAt).toLocaleDateString()}</div>
                 </div>
                 <div className="text-right">
                   <StarsDisplay rating={r.rating} />
@@ -210,12 +210,12 @@ const Reviews = ({ productId, initialProduct, onProductUpdate }) => {
                       {error && <div className="text-sm text-red-500 mb-2">{error}</div>}
                       <form onSubmit={submitInlineEdit} className="space-y-3">
                         <div>
-                          <label className="text-sm font-medium">Título</label>
-                          <input value={form.title} onChange={(e) => setForm((s) => ({ ...s, title: e.target.value }))} className="mt-1 w-full px-3 py-2 rounded border bg-white dark:bg-gray-800 text-sm" />
+                          <label className="text-sm font-medium text-gray-900 dark:text-white">Título</label>
+                          <input value={form.title} onChange={(e) => setForm((s) => ({ ...s, title: e.target.value }))} className="mt-1 w-full px-3 py-2 rounded border bg-white dark:bg-gray-800 text-sm text-gray-900 dark:text-white" />
                         </div>
                         <div>
-                          <label className="text-sm font-medium">Comentario</label>
-                          <textarea value={form.comment} onChange={(e) => setForm((s) => ({ ...s, comment: e.target.value }))} rows={3} className="mt-1 w-full px-3 py-2 rounded border bg-white dark:bg-gray-800 text-sm" />
+                          <label className="text-sm font-medium text-gray-900 dark:text-white">Comentario</label>
+                          <textarea value={form.comment} onChange={(e) => setForm((s) => ({ ...s, comment: e.target.value }))} rows={3} className="mt-1 w-full px-3 py-2 rounded border bg-white dark:bg-gray-800 text-sm text-gray-900 dark:text-white" />
                         </div>
                         <div className="flex items-center gap-3">
                           <div>
@@ -227,7 +227,7 @@ const Reviews = ({ productId, initialProduct, onProductUpdate }) => {
                             </div>
                           </div>
                           <div className="ml-auto flex gap-2">
-                            <button type="button" onClick={() => { setEditingId(null); setForm({ title: '', comment: '', rating: 5 }); setError(null); }} className="px-3 py-2 border rounded text-sm">Cancelar</button>
+                            <button type="button" onClick={() => { setEditingId(null); setForm({ title: '', comment: '', rating: 5 }); setError(null); }} className="px-3 py-2 border rounded text-sm text-gray-700 dark:text-gray-200">Cancelar</button>
                             <button type="submit" disabled={submitting} className="px-4 py-2 bg-primary-500 text-white rounded text-sm">{submitting ? 'Guardando…' : 'Guardar'}</button>
                           </div>
                         </div>
@@ -247,12 +247,12 @@ const Reviews = ({ productId, initialProduct, onProductUpdate }) => {
           {error && <div className="text-sm text-red-500 mb-2">{error}</div>}
           <form onSubmit={submit} className="space-y-3">
             <div>
-              <label className="text-sm font-medium">Título</label>
-              <input value={form.title} onChange={(e) => setForm((s) => ({ ...s, title: e.target.value }))} className="mt-1 w-full px-3 py-2 rounded border bg-white dark:bg-gray-800 text-sm" placeholder="Breve título" />
+              <label className="text-sm font-medium text-gray-900 dark:text-white">Título</label>
+              <input value={form.title} onChange={(e) => setForm((s) => ({ ...s, title: e.target.value }))} className="mt-1 w-full px-3 py-2 rounded border bg-white dark:bg-gray-800 text-sm text-gray-900 dark:text-white" placeholder="Breve título" />
             </div>
             <div>
-              <label className="text-sm font-medium">Comentario</label>
-              <textarea value={form.comment} onChange={(e) => setForm((s) => ({ ...s, comment: e.target.value }))} rows={4} className="mt-1 w-full px-3 py-2 rounded border bg-white dark:bg-gray-800 text-sm" placeholder="Cuenta tu experiencia"></textarea>
+              <label className="text-sm font-medium text-gray-900 dark:text-white">Comentario</label>
+              <textarea value={form.comment} onChange={(e) => setForm((s) => ({ ...s, comment: e.target.value }))} rows={4} className="mt-1 w-full px-3 py-2 rounded border bg-white dark:bg-gray-800 text-sm text-gray-900 dark:text-white" placeholder="Cuenta tu experiencia"></textarea>
             </div>
             <div className="flex items-center gap-3">
               <div>
@@ -264,7 +264,7 @@ const Reviews = ({ productId, initialProduct, onProductUpdate }) => {
                 </div>
               </div>
               <div className="ml-auto flex gap-2">
-                <button type="button" onClick={() => { setFormVisible(false); setEditingId(null); setForm({ title: '', comment: '', rating: 5 }); }} className="px-3 py-2 border rounded text-sm">Cancelar</button>
+                <button type="button" onClick={() => { setFormVisible(false); setEditingId(null); setForm({ title: '', comment: '', rating: 5 }); }} className="px-3 py-2 border rounded text-sm text-gray-700 dark:text-gray-200">Cancelar</button>
                 <button type="submit" disabled={submitting} className="px-4 py-2 bg-primary-500 text-white rounded text-sm">{submitting ? 'Enviando…' : editingId ? 'Guardar' : 'Enviar'}</button>
               </div>
             </div>

@@ -257,7 +257,7 @@ const ProductModal = ({ product, onClose }) => {
                   <div className="flex items-center gap-2">
                     <Star className="w-4 h-4 text-yellow-400" />
                     <span className="text-sm font-medium text-gray-900 dark:text-white">{detailedProduct?.avgRating ?? 0}</span>
-                    <span className="text-xs text-gray-500">({detailedProduct?.reviewsCount ?? 0})</span>
+                    <span className="text-xs text-gray-500 dark:text-gray-400">({detailedProduct?.reviewsCount ?? 0})</span>
                   </div>
                 </div>
               </div>

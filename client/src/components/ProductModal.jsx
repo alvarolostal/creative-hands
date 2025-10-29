@@ -153,7 +153,7 @@ const ProductModal = ({ product, onClose }) => {
       onClick={onClose}
     >
       <motion.div
-        className="relative w-full lg:w-[95%] max-w-4xl h-full lg:h-[85vh] rounded-none lg:rounded-2xl bg-white dark:bg-gray-900 shadow-2xl overflow-hidden pt-6"
+        className="relative w-full lg:w-[95%] max-w-4xl h-full lg:h-[85vh] rounded-none lg:rounded-2xl bg-white dark:bg-gray-900 shadow-2xl overflow-hidden"
         style={{ maxHeight: 'calc(100vh - 2rem)' }}
         variants={panelVariants}
         initial="hidden"
@@ -163,14 +163,7 @@ const ProductModal = ({ product, onClose }) => {
         ref={containerRef}
         tabIndex={-1}
       >
-          {/* Close button */}
-          <button
-            onClick={onClose}
-            className="absolute top-4 right-4 z-30 p-2 rounded-full bg-white/80 dark:bg-gray-800/80 hover:bg-white dark:hover:bg-gray-700 shadow"
-            aria-label="Cerrar"
-          >
-            <X className="w-5 h-5 text-gray-800 dark:text-white" />
-          </button>
+          {/* Note: moved close button into the right column header to avoid overlapping the title */}
 
           <div className="flex flex-col lg:flex-row h-full items-stretch min-h-0">
             {/* Left: Gallery */}
@@ -248,7 +241,16 @@ const ProductModal = ({ product, onClose }) => {
 
             {/* Right: Details */}
             <div className="lg:w-1/2 p-4 lg:p-6 overflow-y-auto min-h-0">
-              <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">{product.name}</h2>
+              <div className="flex items-start justify-between">
+                <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">{product.name}</h2>
+                <button
+                  onClick={onClose}
+                  className="ml-4 p-2 rounded-full bg-white/80 dark:bg-gray-800/80 hover:bg-white dark:hover:bg-gray-700 shadow"
+                  aria-label="Cerrar"
+                >
+                  <X className="w-5 h-5 text-gray-800 dark:text-white" />
+                </button>
+              </div>
               <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-2">
                 <p className="text-primary-500 text-2xl font-extrabold">{new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' }).format(product.price)}</p>
                 <div className="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-300">

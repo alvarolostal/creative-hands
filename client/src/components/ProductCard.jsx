@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Edit, Trash2, Package } from "lucide-react";
+import { Edit, Trash2, Package, Star } from "lucide-react";
 
 const ProductCard = ({ product, onEdit, onDelete, isAdmin, onViewDetails, hideDetails }) => {
   const formatPrice = (price) => {
@@ -64,9 +64,21 @@ const ProductCard = ({ product, onEdit, onDelete, isAdmin, onViewDetails, hideDe
 
       {/* Content */}
       <div className="p-6">
-        <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2 line-clamp-1">
-          {product.name}
-        </h3>
+        <div className="flex items-start justify-between mb-2">
+          <h3 className="flex-1 min-w-0 text-xl font-bold text-gray-900 dark:text-white line-clamp-1 mr-3">
+            {product.name}
+          </h3>
+
+          {/* Media compacta: icono hueco (Star) + número (solo si hay valoraciones) */}
+          {(product.reviewsCount ?? (product.reviews ? product.reviews.length : 0)) > 0 ? (
+            <div className="flex items-center flex-shrink-0 text-sm text-gray-700 dark:text-gray-300">
+              <Star className="w-4 h-4 text-yellow-400 mr-1" />
+              <span className="font-medium">
+                {product.avgRating ?? (product.reviews && product.reviews.length ? Math.round((product.reviews.reduce((s, r) => s + (r.rating || 0), 0) / product.reviews.length) * 10) / 10 : '')}
+              </span>
+            </div>
+          ) : null}
+        </div>
 
         <p className="text-gray-600 dark:text-gray-400 text-sm mb-4 line-clamp-2">
           {product.description}

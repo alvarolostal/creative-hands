@@ -154,7 +154,8 @@ const ProductModal = ({ product, onClose }) => {
     >
       <motion.div
         className="relative w-full md:w-[95%] lg:w-[90%] max-w-[90vw] md:max-w-3xl lg:max-w-[1100px] rounded-none lg:rounded-2xl bg-white dark:bg-gray-900 shadow-2xl overflow-hidden"
-        style={{ maxHeight: '80vh' }}
+        // use explicit height so children with h-full can fill and inner scrolls work reliably
+        style={{ maxHeight: '80vh', height: '80vh' }}
         variants={panelVariants}
         initial="hidden"
         animate="visible"

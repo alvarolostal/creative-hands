@@ -149,14 +149,16 @@ const Reviews = ({ productId, initialProduct, onProductUpdate }) => {
         </div>
       </div>
 
-      <div className="mt-4 grid grid-cols-1 gap-3">
-        {loading ? (
-          <div className="text-sm text-gray-500">Cargando opiniones…</div>
-        ) : (product?.reviews || []).length === 0 ? (
-          <div className="text-sm text-gray-500">Aún no hay valoraciones.</div>
-        ) : (
-          (product.reviews || []).slice().reverse().map((r) => (
-            <article key={r._id || r.createdAt} className="p-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm border relative">
+      {/* Lista de valoraciones: limitar altura y permitir scroll para evitar que el panel se estire */}
+      <div className="mt-4">
+        <div className="max-h-[45vh] md:max-h-[55vh] overflow-y-auto grid grid-cols-1 gap-3 pr-2">
+          {loading ? (
+            <div className="text-sm text-gray-500">Cargando opiniones…</div>
+          ) : (product?.reviews || []).length === 0 ? (
+            <div className="text-sm text-gray-500">Aún no hay valoraciones.</div>
+          ) : (
+            (product.reviews || []).slice().reverse().map((r) => (
+              <article key={r._id || r.createdAt} className="p-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm border relative">
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <div className="text-sm font-semibold text-gray-900 dark:text-white">{r.user?.name || 'Usuario'}</div>
@@ -237,8 +239,9 @@ const Reviews = ({ productId, initialProduct, onProductUpdate }) => {
                 )}
               </AnimatePresence>
             </article>
-          ))
-        )}
+            ))
+          )}
+        </div>
       </div>
 
       {/* Form area */}

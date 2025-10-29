@@ -1,8 +1,9 @@
 import { useEffect, useState, useRef } from "react";
 import { motion } from "framer-motion";
-import { X, ChevronLeft, ChevronRight } from "lucide-react";
+import { X, ChevronLeft, ChevronRight, Star } from "lucide-react";
 import axios from "axios";
 import { useAuth } from "../context/AuthContext";
+import Reviews from "./Reviews";
 
 const backdropVariants = {
   hidden: { opacity: 0 },
@@ -61,15 +62,8 @@ const ProductModal = ({ product, onClose }) => {
   const [detailedProduct, setDetailedProduct] = useState(product);
   const [loadingDetails, setLoadingDetails] = useState(false);
 
-  // review form
-  const [reviewTitle, setReviewTitle] = useState("");
-  const [reviewComment, setReviewComment] = useState("");
-  const [reviewRating, setReviewRating] = useState(5);
-  const [submittingReview, setSubmittingReview] = useState(false);
-  const [reviewError, setReviewError] = useState(null);
-  const [editingReviewId, setEditingReviewId] = useState(null);
-
   const images = product.images && product.images.length > 0 ? product.images : ["/placeholder.png"];
+  const [selectedTab, setSelectedTab] = useState('details');
 
   // Fetch detailed product (with reviews) when modal opens or product changes
   useEffect(() => {
@@ -93,75 +87,7 @@ const ProductModal = ({ product, onClose }) => {
     };
   }, [product._id]);
 
-  const handleSubmitReview = async (e) => {
-    e.preventDefault();
-    setReviewError(null);
-    if (!isAuthenticated) {
-      setReviewError("Debes estar logueado para dejar una valoración");
-      return;
-    }
-    if (user?.role === "admin") {
-      setReviewError("Los administradores no pueden dejar valoraciones");
-      return;
-    }
-    if (!reviewTitle.trim() || !reviewComment.trim()) {
-      setReviewError("Rellena el título y el comentario");
-      return;
-    }
-
-    try {
-      setSubmittingReview(true);
-      let res;
-      if (editingReviewId) {
-        // editar
-        res = await axios.put(`/api/products/${product._id}/reviews/${editingReviewId}`, {
-          title: reviewTitle,
-          comment: reviewComment,
-          rating: reviewRating,
-        });
-      } else {
-        // crear
-        res = await axios.post(`/api/products/${product._id}/reviews`, {
-          title: reviewTitle,
-          comment: reviewComment,
-          rating: reviewRating,
-        });
-      }
-
-      if (res.data?.product) {
-        setDetailedProduct(res.data.product);
-        // limpiar formulario
-        setReviewTitle("");
-        setReviewComment("");
-        setReviewRating(5);
-        setEditingReviewId(null);
-      }
-    } catch (err) {
-      setReviewError(err.response?.data?.message || "Error al enviar la valoración");
-    } finally {
-      setSubmittingReview(false);
-    }
-  };
-
-  const handleEditClick = (review) => {
-    setEditingReviewId(review._id || review.id || null);
-    setReviewTitle(review.title || "");
-    setReviewComment(review.comment || "");
-    setReviewRating(review.rating || 5);
-    // scroll to form or focus? keep simple
-  };
-
-  const handleDeleteReview = async (review) => {
-    if (!window.confirm("¿Eliminar tu valoración?")) return;
-    try {
-      const id = review._id || review.id;
-      const res = await axios.delete(`/api/products/${product._id}/reviews/${id}`);
-      if (res.data?.product) setDetailedProduct(res.data.product);
-    } catch (err) {
-      console.error("Error al borrar review:", err);
-      alert(err.response?.data?.message || "Error al eliminar valoración");
-    }
-  };
+  // review handling moved to ReviewSection
 
   // touch/swipe handlers for mobile
   const onTouchStart = (e) => {
@@ -199,10 +125,24 @@ const ProductModal = ({ product, onClose }) => {
     touchEndX.current = null;
   };
 
+  // helper: render stars for display (rating may be decimal)
+  const renderStars = (rating, size = 'text-sm') => {
+    const r = parseFloat(rating) || 0;
+    const full = Math.floor(r);
+    const half = r - full >= 0.5;
+    const stars = [];
+    for (let i = 1; i <= 5; i++) {
+      if (i <= full) stars.push(<span key={i} className={`${size} text-yellow-400`}>★</span>);
+      else if (i === full + 1 && half) stars.push(<span key={i} className={`${size} text-yellow-400`}>☆</span>);
+      else stars.push(<span key={i} className={`${size} text-gray-300 dark:text-gray-600`}>★</span>);
+    }
+    return <span className="inline-flex gap-1" aria-hidden>{stars}</span>;
+  };
+
   return (
     <motion.div
       key={product._id}
-      className="fixed inset-0 z-50 flex items-center justify-center"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 lg:p-0"
       variants={backdropVariants}
       initial="hidden"
       animate="visible"
@@ -213,7 +153,8 @@ const ProductModal = ({ product, onClose }) => {
       onClick={onClose}
     >
       <motion.div
-        className="relative w-[95%] max-w-6xl max-h-[95vh] overflow-auto rounded-3xl bg-white dark:bg-gray-900 shadow-2xl"
+        className="relative w-full lg:w-[95%] max-w-4xl h-full lg:h-[85vh] rounded-none lg:rounded-2xl bg-white dark:bg-gray-900 shadow-2xl overflow-hidden pt-6"
+        style={{ maxHeight: 'calc(100vh - 2rem)' }}
         variants={panelVariants}
         initial="hidden"
         animate="visible"
@@ -231,17 +172,17 @@ const ProductModal = ({ product, onClose }) => {
             <X className="w-5 h-5 text-gray-800 dark:text-white" />
           </button>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-full">
+          <div className="flex flex-col lg:flex-row h-full items-stretch min-h-0">
             {/* Left: Gallery */}
-            <div className="bg-gradient-to-br from-primary-50 to-white dark:from-gray-800 dark:to-gray-900 p-6 flex flex-col items-center justify-center">
+            <div className="lg:w-1/2 bg-gradient-to-br from-primary-50 to-white dark:from-gray-800 dark:to-gray-900 p-4 lg:p-6 flex flex-col items-start justify-start min-h-0 h-full lg:rounded-l-2xl overflow-hidden">
               <div
-                className="relative w-full flex items-center justify-center"
+                className="relative w-full flex items-center justify-center lg:flex-1 lg:min-h-0"
                 onTouchStart={onTouchStart}
                 onTouchMove={onTouchMove}
                 onTouchEnd={onTouchEnd}
               >
                 {/* Contenedor con altura razonable y estable para evitar estirados y saltos */}
-                <div className="w-full rounded-xl overflow-hidden flex items-center justify-center bg-white h-72 md:h-96 relative">
+                <div className="w-full rounded-xl overflow-hidden flex items-center justify-center bg-white h-56 sm:h-72 md:h-96 lg:h-full relative">
                   {/* Prev image (exiting) */}
                   {prevIndex !== null && (
                     <motion.img
@@ -287,7 +228,7 @@ const ProductModal = ({ product, onClose }) => {
               </div>
 
               {/* Thumbnails */}
-              <div className="mt-4 w-full flex gap-3 overflow-x-auto items-center justify-start">
+              <div className="mt-3 w-full flex gap-3 overflow-x-auto items-center justify-start px-1">
                 {images.map((img, i) => (
                   <button
                     key={i}
@@ -306,116 +247,73 @@ const ProductModal = ({ product, onClose }) => {
             </div>
 
             {/* Right: Details */}
-            <div className="p-6 overflow-y-auto max-h-[60vh] md:max-h-[70vh]">
+            <div className="lg:w-1/2 p-4 lg:p-6 overflow-y-auto min-h-0">
               <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">{product.name}</h2>
-              <div className="flex items-center gap-4 mb-2">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-2">
                 <p className="text-primary-500 text-2xl font-extrabold">{new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' }).format(product.price)}</p>
-                <div className="text-sm text-gray-600 dark:text-gray-300">
-                  <div>Valoración: <span className="font-semibold text-gray-900 dark:text-white">{detailedProduct?.avgRating ?? detailedProduct?.avgRating === 0 ? detailedProduct.avgRating : '-'}</span> <span className="text-xs text-gray-500">({detailedProduct?.reviewsCount ?? 0})</span></div>
+                <div className="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-300">
+                  <div className="flex items-center gap-2">
+                    <Star className="w-4 h-4 text-yellow-400" />
+                    <span className="text-sm font-medium text-gray-900 dark:text-white">{detailedProduct?.avgRating ?? 0}</span>
+                    <span className="text-xs text-gray-500">({detailedProduct?.reviewsCount ?? 0})</span>
+                  </div>
                 </div>
               </div>
 
-              <div className="mb-4 text-sm text-gray-600 dark:text-gray-300">
-                <strong>Categoría: </strong>
-                <span>{product.categoryId?.name || '—'}</span>
-              </div>
-
-              <div className="mb-4 text-sm text-gray-600 dark:text-gray-300">
-                <strong>Estado: </strong>
-                {product.stock > 0 ? (
-                  <span className="text-green-600 dark:text-green-400">{product.stock} en stock</span>
-                ) : (
-                  <span className="text-red-600 dark:text-red-400">Agotado</span>
-                )}
-              </div>
-
-              <div className="prose prose-slate dark:prose-invert max-w-none text-gray-700 dark:text-gray-300 mb-6">
-                <p>{product.description}</p>
-              </div>
-
-              {/* Extra details area: propiedades, tags, seller info, etc. (si existen) */}
-              {product.features && product.features.length > 0 && (
-                <div className="mb-4">
-                  <h3 className="text-lg font-semibold mb-2">Características</h3>
-                  <ul className="list-disc pl-5 text-sm text-gray-700 dark:text-gray-300">
-                    {product.features.map((f, idx) => (
-                      <li key={idx}>{f}</li>
-                    ))}
-                  </ul>
+              {/* Tabs to separate details and reviews to avoid long scroll */}
+              <div className="mt-4 border-b border-gray-100 dark:border-gray-800 mb-4">
+                <div className="flex gap-2">
+                  <button onClick={() => setSelectedTab('details')} className={`py-2 px-3 -mb-px ${selectedTab === 'details' ? 'border-b-2 border-primary-500 text-primary-600' : 'text-gray-600 dark:text-gray-300'}`}>Detalles</button>
+                  <button onClick={() => setSelectedTab('reviews')} className={`py-2 px-3 -mb-px ${selectedTab === 'reviews' ? 'border-b-2 border-primary-500 text-primary-600' : 'text-gray-600 dark:text-gray-300'}`}>Valoraciones ({detailedProduct?.reviewsCount ?? 0})</button>
                 </div>
-              )}
-
-              {/* CTA */}
-              <div className="mt-6 flex items-center gap-4">
-                <button className="px-5 py-3 bg-gradient-to-r from-primary-500 to-primary-600 text-white rounded-full font-semibold shadow-lg hover:shadow-xl">Añadir al carrito</button>
-                <button onClick={onClose} className="px-4 py-3 border rounded-full text-gray-700 dark:text-gray-200">Cerrar</button>
               </div>
-              <div className="mt-6 text-xs text-gray-400">ID del producto: {product._id}</div>
 
-              {/* Reviews */}
-              <div className="mt-6">
-                <h3 className="text-lg font-semibold mb-3">Valoraciones</h3>
+              {selectedTab === 'details' && (
+                <>
+                  <div className="mb-4 text-sm text-gray-600 dark:text-gray-300">
+                    <strong>Categoría: </strong>
+                    <span>{product.categoryId?.name || '—'}</span>
+                  </div>
 
-                {loadingDetails ? (
-                  <div className="text-sm text-gray-500">Cargando opiniones...</div>
-                ) : (
-                  <div className="space-y-4">
-                    {(detailedProduct?.reviews || []).length === 0 ? (
-                      <div className="text-sm text-gray-500">Aún no hay valoraciones. Sé el primero en opinar.</div>
+                  <div className="mb-4 text-sm text-gray-600 dark:text-gray-300">
+                    <strong>Estado: </strong>
+                    {product.stock > 0 ? (
+                      <span className="text-green-600 dark:text-green-400">{product.stock} en stock</span>
                     ) : (
-                      (detailedProduct.reviews || []).slice().reverse().map((r) => {
-                        const isMine = (user && (user._id === r.user?._id || user.id === r.user?._id || user._id === r.user?._id)) || (r.user?._id === user?._id);
-                        return (
-                        <div key={r._id || r.createdAt} className="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                          <div className="flex items-center justify-between">
-                            <div className="font-semibold text-sm text-gray-900 dark:text-white">{r.user?.name || 'Usuario'}</div>
-                            <div className="text-xs text-gray-500">{new Date(r.createdAt).toLocaleDateString()}</div>
-                          </div>
-                          <div className="mt-1 text-sm text-yellow-500">{'★'.repeat(r.rating) + '☆'.repeat(5 - r.rating)}</div>
-                          <div className="mt-2 font-medium">{r.title}</div>
-                          <div className="mt-1 text-sm text-gray-700 dark:text-gray-300">{r.comment}</div>
-                          {isMine && (
-                            <div className="mt-2 flex gap-2">
-                              <button onClick={() => handleEditClick(r)} className="text-sm text-primary-500">Editar</button>
-                              <button onClick={() => handleDeleteReview(r)} className="text-sm text-red-500">Eliminar</button>
-                            </div>
-                          )}
-                        </div>
-                        )
-                      })
+                      <span className="text-red-600 dark:text-red-400">Agotado</span>
                     )}
                   </div>
-                )}
 
-                {/* Formulario para añadir review */}
-                <div className="mt-5">
-                  <h4 className="text-sm font-medium mb-2">Deja tu valoración</h4>
-                  {!isAuthenticated ? (
-                    <div className="text-sm text-gray-500">Debes estar <a href="/login" className="text-primary-500">logueado</a> para dejar una opinión.</div>
-                  ) : user?.role === 'admin' ? (
-                    <div className="text-sm text-gray-500">Los administradores no pueden dejar opiniones.</div>
-                  ) : (
-                    <form onSubmit={handleSubmitReview} className="space-y-3">
-                      {reviewError && <div className="text-sm text-red-500">{reviewError}</div>}
-                      <input type="text" placeholder="Título" value={reviewTitle} onChange={(e) => setReviewTitle(e.target.value)} className="w-full px-3 py-2 rounded border bg-white dark:bg-gray-900 text-sm" />
-                      <textarea placeholder="Comentario" value={reviewComment} onChange={(e) => setReviewComment(e.target.value)} className="w-full px-3 py-2 rounded border bg-white dark:bg-gray-900 text-sm" rows={3} />
-                      <div className="flex items-center gap-3">
-                        <label className="text-sm">Puntuación:</label>
-                        <select value={reviewRating} onChange={(e) => setReviewRating(parseInt(e.target.value,10))} className="px-3 py-2 rounded border bg-white dark:bg-gray-900 text-sm">
-                          <option value={5}>5 - Excelente</option>
-                          <option value={4}>4 - Muy bueno</option>
-                          <option value={3}>3 - Bien</option>
-                          <option value={2}>2 - Regular</option>
-                          <option value={1}>1 - Malo</option>
-                        </select>
-                        <button type="submit" disabled={submittingReview} className="ml-auto px-4 py-2 bg-primary-500 text-white rounded">
-                          {submittingReview ? 'Enviando...' : 'Enviar opinión'}
-                        </button>
-                      </div>
-                    </form>
+                  <div className="prose prose-slate dark:prose-invert max-w-none text-gray-700 dark:text-gray-300 mb-6">
+                    <p>{product.description}</p>
+                  </div>
+
+                  {/* Extra details area: propiedades, tags, seller info, etc. (si existen) */}
+                  {product.features && product.features.length > 0 && (
+                    <div className="mb-4">
+                      <h3 className="text-lg font-semibold mb-2">Características</h3>
+                      <ul className="list-disc pl-5 text-sm text-gray-700 dark:text-gray-300">
+                        {product.features.map((f, idx) => (
+                          <li key={idx}>{f}</li>
+                        ))}
+                      </ul>
+                    </div>
                   )}
+
+                  {/* CTA */}
+                  <div className="mt-6 flex items-center gap-4">
+                    <button className="px-5 py-3 bg-gradient-to-r from-primary-500 to-primary-600 text-white rounded-full font-semibold shadow-lg hover:shadow-xl">Añadir al carrito</button>
+                    <button onClick={onClose} className="px-4 py-3 border rounded-full text-gray-700 dark:text-gray-200">Cerrar</button>
+                  </div>
+                  <div className="mt-6 text-xs text-gray-400">ID del producto: {product._id}</div>
+                </>
+              )}
+
+              {selectedTab === 'reviews' && (
+                <div className="mt-6">
+                  <Reviews productId={product._id} initialProduct={detailedProduct} onProductUpdate={(p) => setDetailedProduct(p)} />
                 </div>
-              </div>
+              )}
             </div>
           </div>
         </motion.div>

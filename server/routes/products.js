@@ -56,10 +56,19 @@ router.get("/", async (req, res) => {
       .populate("createdBy", "name")
       .populate("categoryId", "name slug");
 
+    const enriched = products.map((p) => {
+      const reviews = p.reviews || [];
+      const count = reviews.length;
+      const avg = count
+        ? Math.round((reviews.reduce((sum, r) => sum + (r.rating || 0), 0) / count) * 10) / 10
+        : 0;
+      return { ...p.toObject(), reviewsCount: count, avgRating: avg };
+    });
+
     res.json({
       success: true,
       count: products.length,
-      products,
+      products: enriched,
     });
   } catch (error) {
     console.error("Error al obtener productos:", error);
@@ -89,7 +98,17 @@ router.get("/category/:slug", async (req, res) => {
       .populate("createdBy", "name")
       .populate("categoryId", "name slug");
 
-    res.json({ success: true, count: products.length, products });
+    // Añadir métricas de reviews (avg y count) a cada producto
+    const enriched = products.map((p) => {
+      const reviews = p.reviews || [];
+      const count = reviews.length;
+      const avg = count
+        ? Math.round((reviews.reduce((sum, r) => sum + (r.rating || 0), 0) / count) * 10) / 10
+        : 0;
+      return { ...p.toObject(), reviewsCount: count, avgRating: avg };
+    });
+
+    res.json({ success: true, count: products.length, products: enriched });
   } catch (error) {
     console.error("Error al obtener productos por categoría:", error);
     res
@@ -105,7 +124,8 @@ router.get("/:id", async (req, res) => {
   try {
     const product = await Product.findById(req.params.id)
       .populate("createdBy", "name email")
-      .populate("categoryId", "name slug");
+      .populate("categoryId", "name slug")
+      .populate("reviews.user", "name email");
 
     if (!product) {
       return res.status(404).json({
@@ -114,9 +134,16 @@ router.get("/:id", async (req, res) => {
       });
     }
 
+    // calcular avg y count
+    const reviews = product.reviews || [];
+    const reviewsCount = reviews.length;
+    const avgRating = reviewsCount
+      ? Math.round((reviews.reduce((s, r) => s + (r.rating || 0), 0) / reviewsCount) * 10) / 10
+      : 0;
+
     res.json({
       success: true,
-      product,
+      product: { ...product.toObject(), reviewsCount, avgRating },
     });
   } catch (error) {
     console.error("Error al obtener producto:", error);
@@ -124,6 +151,152 @@ router.get("/:id", async (req, res) => {
       success: false,
       message: "Error al obtener producto",
     });
+  }
+});
+
+// @route   POST /api/products/:id/reviews
+// @desc    Añadir una valoración/review a un producto (title, comment, rating)
+// @access  Private (usuarios autenticados, no admin)
+router.post("/:id/reviews", protect, async (req, res) => {
+  try {
+    const { title, comment, rating } = req.body;
+
+    // Validación básica
+    if (!title || !comment || rating === undefined) {
+      return res.status(400).json({ success: false, message: "Faltan campos: title, comment o rating" });
+    }
+
+    const numericRating = parseInt(rating, 10);
+    if (isNaN(numericRating) || numericRating < 1 || numericRating > 5) {
+      return res.status(400).json({ success: false, message: "Rating debe ser un entero entre 1 y 5" });
+    }
+
+    // No permitir que administradores añadan reviews
+    if (req.user && req.user.role === "admin") {
+      return res.status(403).json({ success: false, message: "Administradores no pueden dejar valoraciones" });
+    }
+
+    const product = await Product.findById(req.params.id);
+    if (!product) {
+      return res.status(404).json({ success: false, message: "Producto no encontrado" });
+    }
+
+    // Evitar que un mismo usuario publique más de una review: debe editar o borrar la anterior
+    const existing = (product.reviews || []).find((r) => r.user && r.user.toString() === req.user.id.toString());
+    if (existing) {
+      return res.status(400).json({ success: false, message: "Ya has dejado una valoración en este producto. Edita o elimina tu valoración para publicar otra." });
+    }
+
+    // Crear review
+    const review = {
+      user: req.user.id,
+      title: String(title).trim(),
+      comment: String(comment).trim(),
+      rating: numericRating,
+    };
+
+    product.reviews = product.reviews || [];
+    product.reviews.push(review);
+    await product.save();
+
+    // Devolver el producto actualizado con reviews pobladas y métricas
+    const updated = await Product.findById(product._id)
+      .populate("createdBy", "name email")
+      .populate("categoryId", "name slug")
+      .populate("reviews.user", "name email");
+
+    const reviews = updated.reviews || [];
+    const reviewsCount = reviews.length;
+    const avgRating = reviewsCount
+      ? Math.round((reviews.reduce((s, r) => s + (r.rating || 0), 0) / reviewsCount) * 10) / 10
+      : 0;
+
+    res.status(201).json({ success: true, product: { ...updated.toObject(), reviewsCount, avgRating } });
+  } catch (error) {
+    console.error("Error al añadir review:", error);
+    res.status(500).json({ success: false, message: "Error al añadir review" });
+  }
+});
+
+// @route   PUT /api/products/:id/reviews/:reviewId
+// @desc    Editar una review propia
+// @access  Private (propietario de la review)
+router.put("/:id/reviews/:reviewId", protect, async (req, res) => {
+  try {
+    const { title, comment, rating } = req.body;
+    const numericRating = rating !== undefined ? parseInt(rating, 10) : undefined;
+
+    const product = await Product.findById(req.params.id);
+    if (!product) return res.status(404).json({ success: false, message: "Producto no encontrado" });
+
+    const review = (product.reviews || []).id(req.params.reviewId) || (product.reviews || []).find((r) => r._id && r._id.toString() === req.params.reviewId);
+    if (!review) return res.status(404).json({ success: false, message: "Review no encontrada" });
+
+    if (review.user.toString() !== req.user.id.toString()) {
+      return res.status(403).json({ success: false, message: "No tienes permiso para editar esta review" });
+    }
+
+    if (title !== undefined) review.title = String(title).trim();
+    if (comment !== undefined) review.comment = String(comment).trim();
+    if (numericRating !== undefined) {
+      if (isNaN(numericRating) || numericRating < 1 || numericRating > 5) return res.status(400).json({ success: false, message: "Rating debe ser un entero entre 1 y 5" });
+      review.rating = numericRating;
+    }
+
+    await product.save();
+
+    const updated = await Product.findById(product._id)
+      .populate("createdBy", "name email")
+      .populate("categoryId", "name slug")
+      .populate("reviews.user", "name email");
+
+    const reviews = updated.reviews || [];
+    const reviewsCount = reviews.length;
+    const avgRating = reviewsCount
+      ? Math.round((reviews.reduce((s, r) => s + (r.rating || 0), 0) / reviewsCount) * 10) / 10
+      : 0;
+
+    res.json({ success: true, product: { ...updated.toObject(), reviewsCount, avgRating } });
+  } catch (error) {
+    console.error("Error editing review:", error);
+    res.status(500).json({ success: false, message: "Error al editar review" });
+  }
+});
+
+// @route   DELETE /api/products/:id/reviews/:reviewId
+// @desc    Eliminar una review propia
+// @access  Private (propietario de la review)
+router.delete("/:id/reviews/:reviewId", protect, async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.id);
+    if (!product) return res.status(404).json({ success: false, message: "Producto no encontrado" });
+
+    const review = (product.reviews || []).id(req.params.reviewId) || (product.reviews || []).find((r) => r._id && r._id.toString() === req.params.reviewId);
+    if (!review) return res.status(404).json({ success: false, message: "Review no encontrada" });
+
+    if (review.user.toString() !== req.user.id.toString()) {
+      return res.status(403).json({ success: false, message: "No tienes permiso para eliminar esta review" });
+    }
+
+    // remover la review
+    product.reviews = (product.reviews || []).filter((r) => !(r._id && r._id.toString() === req.params.reviewId));
+    await product.save();
+
+    const updated = await Product.findById(product._id)
+      .populate("createdBy", "name email")
+      .populate("categoryId", "name slug")
+      .populate("reviews.user", "name email");
+
+    const reviews = updated.reviews || [];
+    const reviewsCount = reviews.length;
+    const avgRating = reviewsCount
+      ? Math.round((reviews.reduce((s, r) => s + (r.rating || 0), 0) / reviewsCount) * 10) / 10
+      : 0;
+
+    res.json({ success: true, product: { ...updated.toObject(), reviewsCount, avgRating } });
+  } catch (error) {
+    console.error("Error deleting review:", error);
+    res.status(500).json({ success: false, message: "Error al eliminar review" });
   }
 });
 

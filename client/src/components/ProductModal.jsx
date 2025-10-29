@@ -1,6 +1,8 @@
 import { useEffect, useState, useRef } from "react";
 import { motion } from "framer-motion";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
+import axios from "axios";
+import { useAuth } from "../context/AuthContext";
 
 const backdropVariants = {
   hidden: { opacity: 0 },
@@ -53,7 +55,113 @@ const ProductModal = ({ product, onClose }) => {
 
   if (!product) return null;
 
+  const { user, isAuthenticated } = useAuth();
+
+  // detailedProduct: fetched product with reviews
+  const [detailedProduct, setDetailedProduct] = useState(product);
+  const [loadingDetails, setLoadingDetails] = useState(false);
+
+  // review form
+  const [reviewTitle, setReviewTitle] = useState("");
+  const [reviewComment, setReviewComment] = useState("");
+  const [reviewRating, setReviewRating] = useState(5);
+  const [submittingReview, setSubmittingReview] = useState(false);
+  const [reviewError, setReviewError] = useState(null);
+  const [editingReviewId, setEditingReviewId] = useState(null);
+
   const images = product.images && product.images.length > 0 ? product.images : ["/placeholder.png"];
+
+  // Fetch detailed product (with reviews) when modal opens or product changes
+  useEffect(() => {
+    let mounted = true;
+    const fetchDetails = async () => {
+      try {
+        setLoadingDetails(true);
+        const { data } = await axios.get(`/api/products/${product._id}`);
+        if (mounted && data?.product) setDetailedProduct(data.product);
+      } catch (err) {
+        console.warn("No se pudo cargar detalles del producto:", err.message);
+      } finally {
+        if (mounted) setLoadingDetails(false);
+      }
+    };
+
+    fetchDetails();
+
+    return () => {
+      mounted = false;
+    };
+  }, [product._id]);
+
+  const handleSubmitReview = async (e) => {
+    e.preventDefault();
+    setReviewError(null);
+    if (!isAuthenticated) {
+      setReviewError("Debes estar logueado para dejar una valoración");
+      return;
+    }
+    if (user?.role === "admin") {
+      setReviewError("Los administradores no pueden dejar valoraciones");
+      return;
+    }
+    if (!reviewTitle.trim() || !reviewComment.trim()) {
+      setReviewError("Rellena el título y el comentario");
+      return;
+    }
+
+    try {
+      setSubmittingReview(true);
+      let res;
+      if (editingReviewId) {
+        // editar
+        res = await axios.put(`/api/products/${product._id}/reviews/${editingReviewId}`, {
+          title: reviewTitle,
+          comment: reviewComment,
+          rating: reviewRating,
+        });
+      } else {
+        // crear
+        res = await axios.post(`/api/products/${product._id}/reviews`, {
+          title: reviewTitle,
+          comment: reviewComment,
+          rating: reviewRating,
+        });
+      }
+
+      if (res.data?.product) {
+        setDetailedProduct(res.data.product);
+        // limpiar formulario
+        setReviewTitle("");
+        setReviewComment("");
+        setReviewRating(5);
+        setEditingReviewId(null);
+      }
+    } catch (err) {
+      setReviewError(err.response?.data?.message || "Error al enviar la valoración");
+    } finally {
+      setSubmittingReview(false);
+    }
+  };
+
+  const handleEditClick = (review) => {
+    setEditingReviewId(review._id || review.id || null);
+    setReviewTitle(review.title || "");
+    setReviewComment(review.comment || "");
+    setReviewRating(review.rating || 5);
+    // scroll to form or focus? keep simple
+  };
+
+  const handleDeleteReview = async (review) => {
+    if (!window.confirm("¿Eliminar tu valoración?")) return;
+    try {
+      const id = review._id || review.id;
+      const res = await axios.delete(`/api/products/${product._id}/reviews/${id}`);
+      if (res.data?.product) setDetailedProduct(res.data.product);
+    } catch (err) {
+      console.error("Error al borrar review:", err);
+      alert(err.response?.data?.message || "Error al eliminar valoración");
+    }
+  };
 
   // touch/swipe handlers for mobile
   const onTouchStart = (e) => {
@@ -105,7 +213,7 @@ const ProductModal = ({ product, onClose }) => {
       onClick={onClose}
     >
       <motion.div
-        className="relative w-[95%] max-w-6xl max-h-[95vh] overflow-hidden rounded-3xl bg-white dark:bg-gray-900 shadow-2xl"
+        className="relative w-[95%] max-w-6xl max-h-[95vh] overflow-auto rounded-3xl bg-white dark:bg-gray-900 shadow-2xl"
         variants={panelVariants}
         initial="hidden"
         animate="visible"
@@ -198,9 +306,14 @@ const ProductModal = ({ product, onClose }) => {
             </div>
 
             {/* Right: Details */}
-            <div className="p-6 overflow-y-auto">
+            <div className="p-6 overflow-y-auto max-h-[60vh] md:max-h-[70vh]">
               <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">{product.name}</h2>
-              <p className="text-primary-500 text-2xl font-extrabold mb-4">{new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' }).format(product.price)}</p>
+              <div className="flex items-center gap-4 mb-2">
+                <p className="text-primary-500 text-2xl font-extrabold">{new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' }).format(product.price)}</p>
+                <div className="text-sm text-gray-600 dark:text-gray-300">
+                  <div>Valoración: <span className="font-semibold text-gray-900 dark:text-white">{detailedProduct?.avgRating ?? detailedProduct?.avgRating === 0 ? detailedProduct.avgRating : '-'}</span> <span className="text-xs text-gray-500">({detailedProduct?.reviewsCount ?? 0})</span></div>
+                </div>
+              </div>
 
               <div className="mb-4 text-sm text-gray-600 dark:text-gray-300">
                 <strong>Categoría: </strong>
@@ -237,8 +350,72 @@ const ProductModal = ({ product, onClose }) => {
                 <button className="px-5 py-3 bg-gradient-to-r from-primary-500 to-primary-600 text-white rounded-full font-semibold shadow-lg hover:shadow-xl">Añadir al carrito</button>
                 <button onClick={onClose} className="px-4 py-3 border rounded-full text-gray-700 dark:text-gray-200">Cerrar</button>
               </div>
-
               <div className="mt-6 text-xs text-gray-400">ID del producto: {product._id}</div>
+
+              {/* Reviews */}
+              <div className="mt-6">
+                <h3 className="text-lg font-semibold mb-3">Valoraciones</h3>
+
+                {loadingDetails ? (
+                  <div className="text-sm text-gray-500">Cargando opiniones...</div>
+                ) : (
+                  <div className="space-y-4">
+                    {(detailedProduct?.reviews || []).length === 0 ? (
+                      <div className="text-sm text-gray-500">Aún no hay valoraciones. Sé el primero en opinar.</div>
+                    ) : (
+                      (detailedProduct.reviews || []).slice().reverse().map((r) => {
+                        const isMine = (user && (user._id === r.user?._id || user.id === r.user?._id || user._id === r.user?._id)) || (r.user?._id === user?._id);
+                        return (
+                        <div key={r._id || r.createdAt} className="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                          <div className="flex items-center justify-between">
+                            <div className="font-semibold text-sm text-gray-900 dark:text-white">{r.user?.name || 'Usuario'}</div>
+                            <div className="text-xs text-gray-500">{new Date(r.createdAt).toLocaleDateString()}</div>
+                          </div>
+                          <div className="mt-1 text-sm text-yellow-500">{'★'.repeat(r.rating) + '☆'.repeat(5 - r.rating)}</div>
+                          <div className="mt-2 font-medium">{r.title}</div>
+                          <div className="mt-1 text-sm text-gray-700 dark:text-gray-300">{r.comment}</div>
+                          {isMine && (
+                            <div className="mt-2 flex gap-2">
+                              <button onClick={() => handleEditClick(r)} className="text-sm text-primary-500">Editar</button>
+                              <button onClick={() => handleDeleteReview(r)} className="text-sm text-red-500">Eliminar</button>
+                            </div>
+                          )}
+                        </div>
+                        )
+                      })
+                    )}
+                  </div>
+                )}
+
+                {/* Formulario para añadir review */}
+                <div className="mt-5">
+                  <h4 className="text-sm font-medium mb-2">Deja tu valoración</h4>
+                  {!isAuthenticated ? (
+                    <div className="text-sm text-gray-500">Debes estar <a href="/login" className="text-primary-500">logueado</a> para dejar una opinión.</div>
+                  ) : user?.role === 'admin' ? (
+                    <div className="text-sm text-gray-500">Los administradores no pueden dejar opiniones.</div>
+                  ) : (
+                    <form onSubmit={handleSubmitReview} className="space-y-3">
+                      {reviewError && <div className="text-sm text-red-500">{reviewError}</div>}
+                      <input type="text" placeholder="Título" value={reviewTitle} onChange={(e) => setReviewTitle(e.target.value)} className="w-full px-3 py-2 rounded border bg-white dark:bg-gray-900 text-sm" />
+                      <textarea placeholder="Comentario" value={reviewComment} onChange={(e) => setReviewComment(e.target.value)} className="w-full px-3 py-2 rounded border bg-white dark:bg-gray-900 text-sm" rows={3} />
+                      <div className="flex items-center gap-3">
+                        <label className="text-sm">Puntuación:</label>
+                        <select value={reviewRating} onChange={(e) => setReviewRating(parseInt(e.target.value,10))} className="px-3 py-2 rounded border bg-white dark:bg-gray-900 text-sm">
+                          <option value={5}>5 - Excelente</option>
+                          <option value={4}>4 - Muy bueno</option>
+                          <option value={3}>3 - Bien</option>
+                          <option value={2}>2 - Regular</option>
+                          <option value={1}>1 - Malo</option>
+                        </select>
+                        <button type="submit" disabled={submittingReview} className="ml-auto px-4 py-2 bg-primary-500 text-white rounded">
+                          {submittingReview ? 'Enviando...' : 'Enviar opinión'}
+                        </button>
+                      </div>
+                    </form>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
         </motion.div>

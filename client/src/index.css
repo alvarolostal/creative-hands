@@ -318,3 +318,15 @@ button:active {
     rgba(213, 124, 85, 0.1) 100%
   );
 }
+
+/* Product modal image wrapper: force a natural landscape aspect on desktop while
+   preserving fixed heights on smaller screens. This avoids very tall/narrow
+   previews on large viewports. */
+@media (min-width: 768px) {
+  .product-modal__image-wrapper {
+    aspect-ratio: 4 / 3;
+    height: auto !important; /* override any lg:h-* utilities */
+    max-height: calc(80vh - 4rem); /* keep it within modal height */
+    width: 100%;
+  }
+}

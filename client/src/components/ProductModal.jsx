@@ -153,8 +153,8 @@ const ProductModal = ({ product, onClose }) => {
       onClick={onClose}
     >
       <motion.div
-        className="relative w-full lg:w-[95%] max-w-4xl h-full lg:h-[85vh] rounded-none lg:rounded-2xl bg-white dark:bg-gray-900 shadow-2xl overflow-hidden"
-        style={{ maxHeight: 'calc(100vh - 2rem)' }}
+        className="relative w-full md:w-[95%] lg:w-[90%] max-w-[90vw] md:max-w-3xl lg:max-w-[1100px] rounded-none lg:rounded-2xl bg-white dark:bg-gray-900 shadow-2xl overflow-hidden"
+        style={{ maxHeight: '80vh' }}
         variants={panelVariants}
         initial="hidden"
         animate="visible"
@@ -165,17 +165,17 @@ const ProductModal = ({ product, onClose }) => {
       >
           {/* Note: moved close button into the right column header to avoid overlapping the title */}
 
-          <div className="flex flex-col lg:flex-row h-full items-stretch min-h-0">
+          <div className="flex flex-col md:flex-row h-full items-stretch min-h-0">
             {/* Left: Gallery */}
-            <div className="lg:w-1/2 bg-gradient-to-br from-primary-50 to-white dark:from-gray-800 dark:to-gray-900 p-4 lg:p-6 flex flex-col items-start justify-start min-h-0 h-full lg:rounded-l-2xl overflow-hidden">
+            <div className="md:w-1/2 lg:w-[60%] bg-gradient-to-br from-primary-50 to-white dark:from-gray-800 dark:to-gray-900 p-4 md:p-6 flex flex-col items-start justify-start min-h-0 h-full lg:rounded-l-2xl overflow-hidden">
               <div
-                className="relative w-full flex items-center justify-center lg:flex-1 lg:min-h-0"
+                className="relative w-full flex items-center justify-center lg:flex-none lg:min-h-0"
                 onTouchStart={onTouchStart}
                 onTouchMove={onTouchMove}
                 onTouchEnd={onTouchEnd}
               >
                 {/* Contenedor con altura razonable y estable para evitar estirados y saltos */}
-                <div className="w-full rounded-xl overflow-hidden flex items-center justify-center bg-white h-56 sm:h-72 md:h-96 lg:h-full relative">
+                <div className="w-full rounded-xl overflow-hidden flex items-center justify-center bg-white h-56 sm:h-72 md:h-96 lg:h-full relative product-modal__image-wrapper">
                   {/* Prev image (exiting) */}
                   {prevIndex !== null && (
                     <motion.img
@@ -240,7 +240,7 @@ const ProductModal = ({ product, onClose }) => {
             </div>
 
             {/* Right: Details */}
-            <div className="lg:w-1/2 p-4 lg:p-6 overflow-y-auto min-h-0">
+            <div className="md:w-1/2 lg:w-[40%] p-4 md:p-6 overflow-y-auto min-h-0">
               <div className="flex items-start justify-between">
                 <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">{product.name}</h2>
                 <button

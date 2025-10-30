@@ -14,16 +14,19 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [token, setToken] = useState(localStorage.getItem("token"));
+  // Usar sessionStorage para que cada pestaña/ventana tenga su propia sesión.
+  // sessionStorage persiste al refrescar la misma pestaña, pero no se comparte
+  // entre pestañas diferentes (comportamiento deseado para sesiones independientes).
+  const [token, setToken] = useState(sessionStorage.getItem("token"));
 
   // Configurar axios con el token
   useEffect(() => {
     if (token) {
       axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-      localStorage.setItem("token", token);
+      sessionStorage.setItem("token", token);
     } else {
       delete axios.defaults.headers.common["Authorization"];
-      localStorage.removeItem("token");
+      sessionStorage.removeItem("token");
     }
   }, [token]);
 
@@ -92,9 +95,10 @@ export const AuthProvider = ({ children }) => {
       // Guardar token y establecer header de axios inmediatamente para evitar
       // race conditions donde componentes montados hagan peticiones protegidas
       // antes de que el useEffect tenga oportunidad de ejecutar.
-      axios.defaults.headers.common["Authorization"] = `Bearer ${data.token}`;
-      localStorage.setItem("token", data.token);
-      setToken(data.token);
+  axios.defaults.headers.common["Authorization"] = `Bearer ${data.token}`;
+  // Guardar en sessionStorage para que la autenticación sea independiente por pestaña
+  sessionStorage.setItem("token", data.token);
+  setToken(data.token);
 
       try {
         const { data: me } = await axios.get("/api/auth/me");

@@ -1,3 +1,4 @@
+import React, { Suspense, lazy } from "react";
 import {
   BrowserRouter as Router,
   Routes,
@@ -8,13 +9,13 @@ import { AuthProvider, useAuth } from "./context/AuthContext";
 import { SocketProvider } from "./context/SocketContext";
 import { ThemeProvider } from "./context/ThemeContext";
 import Navbar from "./components/Navbar";
-import ChatWidget from "./components/ChatWidget";
+const ChatWidget = lazy(() => import("./components/ChatWidget"));
 import ErrorBoundary from "./components/ErrorBoundary";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Products from "./pages/Products";
-import Admin from "./pages/Admin";
+const Admin = lazy(() => import("./pages/Admin"));
 import { Loader } from "lucide-react";
 
 // Protected Route Component
@@ -70,14 +71,18 @@ function AppContent() {
             path="/admin"
             element={
               <ProtectedRoute adminOnly>
-                <Admin />
+                <Suspense fallback={<div />}>
+                  <Admin />
+                </Suspense>
               </ProtectedRoute>
             }
           />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </ErrorBoundary>
-      <ChatWidget />
+      <Suspense fallback={null}>
+        <ChatWidget />
+      </Suspense>
     </div>
   );
 }

@@ -198,11 +198,15 @@ const Home = () => {
                 style={{ willChange: "transform" }}
               >
                 <div className="flex items-start gap-4">
-                  <div className="w-20 h-20 rounded-xl overflow-hidden flex-shrink-0">
+                    <div className="w-20 h-20 rounded-xl overflow-hidden flex-shrink-0">
                     <img
                       src={c.img}
                       alt={c.title}
                       className="w-full h-full object-cover"
+                      width="80"
+                      height="80"
+                      loading="lazy"
+                      decoding="async"
                     />
                   </div>
                   <div className="flex-1">

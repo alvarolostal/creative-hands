@@ -25,6 +25,7 @@ const ProductCard = ({ product, onEdit, onDelete, isAdmin, onViewDetails, hideDe
             src={product.images[0]}
             alt={product.name}
             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+            decoding="async"
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
@@ -46,6 +47,7 @@ const ProductCard = ({ product, onEdit, onDelete, isAdmin, onViewDetails, hideDe
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
               onClick={() => onEdit(product)}
+              aria-label="Editar producto"
               className="p-2 bg-white dark:bg-gray-900 rounded-full shadow-lg hover:bg-primary-500 hover:text-white dark:hover:bg-primary-500 dark:hover:text-white transition-colors text-gray-900 dark:text-white"
             >
               <Edit className="w-4 h-4" />
@@ -54,6 +56,7 @@ const ProductCard = ({ product, onEdit, onDelete, isAdmin, onViewDetails, hideDe
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
               onClick={() => onDelete(product._id)}
+              aria-label="Eliminar producto"
               className="p-2 bg-white dark:bg-gray-900 rounded-full shadow-lg hover:bg-red-500 hover:text-white dark:hover:bg-red-500 dark:hover:text-white transition-colors text-gray-900 dark:text-white"
             >
               <Trash2 className="w-4 h-4" />

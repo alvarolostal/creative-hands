@@ -225,6 +225,7 @@ const ProductModal = ({ product, onClose }) => {
                 {images.map((img, i) => (
                   <button
                     key={i}
+                    aria-label={`Seleccionar imagen ${i + 1}`}
                     onClick={() => {
                       if (i === index) return;
                       setPrevIndex(index);
@@ -233,7 +234,7 @@ const ProductModal = ({ product, onClose }) => {
                     }}
                     className={`flex-none w-20 h-20 rounded-xl overflow-hidden border-2 ${i === index ? "border-primary-500" : "border-transparent"}`}
                   >
-                    <img src={img} alt={`${product.name} thumb ${i + 1}`} className="w-full h-full object-cover" />
+                    <img src={img} alt={`${product.name} thumb ${i + 1}`} className="w-full h-full object-cover" width="80" height="80" loading="lazy" decoding="async" />
                   </button>
                 ))}
               </div>

@@ -22,7 +22,14 @@ export const SocketProvider = ({ children }) => {
     // para evitar conectar un socket con un token que luego el servidor invalide y
     // provoque una desconexión inmediata.
     if (!loading && isAuthenticated && token) {
-      const newSocket = io("http://localhost:5000", {
+      // Determinar URL del servidor de sockets:
+      // 1) Preferir la variable Vite `VITE_API_URL` si está definida (útil en .env)
+      // 2) Si no, usar el hostname de la página actual y asumir puerto 5000
+      const apiFromEnv = import.meta.env.VITE_API_URL;
+      const defaultApi = `${window.location.protocol}//${window.location.hostname}:5000`;
+      const serverUrl = apiFromEnv || defaultApi;
+
+      const newSocket = io(serverUrl, {
         auth: { token },
       });
 

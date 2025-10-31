@@ -160,17 +160,6 @@ const Login = () => {
               </Link>
             </p>
           </div>
-
-          {/* Admin Credentials Info */}
-          <div className="mt-6 p-4 bg-primary-50 dark:bg-primary-900/20 border border-primary-200 dark:border-primary-800 rounded-xl">
-            <p className="text-xs text-primary-700 dark:text-primary-400 text-center font-medium">
-              Credenciales de Admin por defecto:
-              <br />
-              <span className="font-mono">
-                admin@creativehands.com / Admin123!
-              </span>
-            </p>
-          </div>
         </div>
       </motion.div>
     </div>

@@ -60,7 +60,9 @@ router.get("/", async (req, res) => {
       const reviews = p.reviews || [];
       const count = reviews.length;
       const avg = count
-        ? Math.round((reviews.reduce((sum, r) => sum + (r.rating || 0), 0) / count) * 10) / 10
+        ? Math.round(
+            (reviews.reduce((sum, r) => sum + (r.rating || 0), 0) / count) * 10
+          ) / 10
         : 0;
       return { ...p.toObject(), reviewsCount: count, avgRating: avg };
     });
@@ -103,7 +105,9 @@ router.get("/category/:slug", async (req, res) => {
       const reviews = p.reviews || [];
       const count = reviews.length;
       const avg = count
-        ? Math.round((reviews.reduce((sum, r) => sum + (r.rating || 0), 0) / count) * 10) / 10
+        ? Math.round(
+            (reviews.reduce((sum, r) => sum + (r.rating || 0), 0) / count) * 10
+          ) / 10
         : 0;
       return { ...p.toObject(), reviewsCount: count, avgRating: avg };
     });
@@ -111,12 +115,10 @@ router.get("/category/:slug", async (req, res) => {
     res.json({ success: true, count: products.length, products: enriched });
   } catch (error) {
     console.error("Error al obtener productos por categoría:", error);
-    res
-      .status(500)
-      .json({
-        success: false,
-        message: "Error al obtener productos por categoría",
-      });
+    res.status(500).json({
+      success: false,
+      message: "Error al obtener productos por categoría",
+    });
   }
 });
 
@@ -138,7 +140,9 @@ router.get("/:id", async (req, res) => {
     const reviews = product.reviews || [];
     const reviewsCount = reviews.length;
     const avgRating = reviewsCount
-      ? Math.round((reviews.reduce((s, r) => s + (r.rating || 0), 0) / reviewsCount) * 10) / 10
+      ? Math.round(
+          (reviews.reduce((s, r) => s + (r.rating || 0), 0) / reviewsCount) * 10
+        ) / 10
       : 0;
 
     res.json({
@@ -163,28 +167,53 @@ router.post("/:id/reviews", protect, async (req, res) => {
 
     // Validación básica
     if (!title || !comment || rating === undefined) {
-      return res.status(400).json({ success: false, message: "Faltan campos: title, comment o rating" });
+      return res
+        .status(400)
+        .json({
+          success: false,
+          message: "Faltan campos: title, comment o rating",
+        });
     }
 
     const numericRating = parseInt(rating, 10);
     if (isNaN(numericRating) || numericRating < 1 || numericRating > 5) {
-      return res.status(400).json({ success: false, message: "Rating debe ser un entero entre 1 y 5" });
+      return res
+        .status(400)
+        .json({
+          success: false,
+          message: "Rating debe ser un entero entre 1 y 5",
+        });
     }
 
     // No permitir que administradores añadan reviews
     if (req.user && req.user.role === "admin") {
-      return res.status(403).json({ success: false, message: "Administradores no pueden dejar valoraciones" });
+      return res
+        .status(403)
+        .json({
+          success: false,
+          message: "Administradores no pueden dejar valoraciones",
+        });
     }
 
     const product = await Product.findById(req.params.id);
     if (!product) {
-      return res.status(404).json({ success: false, message: "Producto no encontrado" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Producto no encontrado" });
     }
 
     // Evitar que un mismo usuario publique más de una review: debe editar o borrar la anterior
-    const existing = (product.reviews || []).find((r) => r.user && r.user.toString() === req.user.id.toString());
+    const existing = (product.reviews || []).find(
+      (r) => r.user && r.user.toString() === req.user.id.toString()
+    );
     if (existing) {
-      return res.status(400).json({ success: false, message: "Ya has dejado una valoración en este producto. Edita o elimina tu valoración para publicar otra." });
+      return res
+        .status(400)
+        .json({
+          success: false,
+          message:
+            "Ya has dejado una valoración en este producto. Edita o elimina tu valoración para publicar otra.",
+        });
     }
 
     // Crear review
@@ -208,10 +237,17 @@ router.post("/:id/reviews", protect, async (req, res) => {
     const reviews = updated.reviews || [];
     const reviewsCount = reviews.length;
     const avgRating = reviewsCount
-      ? Math.round((reviews.reduce((s, r) => s + (r.rating || 0), 0) / reviewsCount) * 10) / 10
+      ? Math.round(
+          (reviews.reduce((s, r) => s + (r.rating || 0), 0) / reviewsCount) * 10
+        ) / 10
       : 0;
 
-    res.status(201).json({ success: true, product: { ...updated.toObject(), reviewsCount, avgRating } });
+    res
+      .status(201)
+      .json({
+        success: true,
+        product: { ...updated.toObject(), reviewsCount, avgRating },
+      });
   } catch (error) {
     console.error("Error al añadir review:", error);
     res.status(500).json({ success: false, message: "Error al añadir review" });
@@ -224,22 +260,44 @@ router.post("/:id/reviews", protect, async (req, res) => {
 router.put("/:id/reviews/:reviewId", protect, async (req, res) => {
   try {
     const { title, comment, rating } = req.body;
-    const numericRating = rating !== undefined ? parseInt(rating, 10) : undefined;
+    const numericRating =
+      rating !== undefined ? parseInt(rating, 10) : undefined;
 
     const product = await Product.findById(req.params.id);
-    if (!product) return res.status(404).json({ success: false, message: "Producto no encontrado" });
+    if (!product)
+      return res
+        .status(404)
+        .json({ success: false, message: "Producto no encontrado" });
 
-    const review = (product.reviews || []).id(req.params.reviewId) || (product.reviews || []).find((r) => r._id && r._id.toString() === req.params.reviewId);
-    if (!review) return res.status(404).json({ success: false, message: "Review no encontrada" });
+    const review =
+      (product.reviews || []).id(req.params.reviewId) ||
+      (product.reviews || []).find(
+        (r) => r._id && r._id.toString() === req.params.reviewId
+      );
+    if (!review)
+      return res
+        .status(404)
+        .json({ success: false, message: "Review no encontrada" });
 
     if (review.user.toString() !== req.user.id.toString()) {
-      return res.status(403).json({ success: false, message: "No tienes permiso para editar esta review" });
+      return res
+        .status(403)
+        .json({
+          success: false,
+          message: "No tienes permiso para editar esta review",
+        });
     }
 
     if (title !== undefined) review.title = String(title).trim();
     if (comment !== undefined) review.comment = String(comment).trim();
     if (numericRating !== undefined) {
-      if (isNaN(numericRating) || numericRating < 1 || numericRating > 5) return res.status(400).json({ success: false, message: "Rating debe ser un entero entre 1 y 5" });
+      if (isNaN(numericRating) || numericRating < 1 || numericRating > 5)
+        return res
+          .status(400)
+          .json({
+            success: false,
+            message: "Rating debe ser un entero entre 1 y 5",
+          });
       review.rating = numericRating;
     }
 
@@ -253,10 +311,15 @@ router.put("/:id/reviews/:reviewId", protect, async (req, res) => {
     const reviews = updated.reviews || [];
     const reviewsCount = reviews.length;
     const avgRating = reviewsCount
-      ? Math.round((reviews.reduce((s, r) => s + (r.rating || 0), 0) / reviewsCount) * 10) / 10
+      ? Math.round(
+          (reviews.reduce((s, r) => s + (r.rating || 0), 0) / reviewsCount) * 10
+        ) / 10
       : 0;
 
-    res.json({ success: true, product: { ...updated.toObject(), reviewsCount, avgRating } });
+    res.json({
+      success: true,
+      product: { ...updated.toObject(), reviewsCount, avgRating },
+    });
   } catch (error) {
     console.error("Error editing review:", error);
     res.status(500).json({ success: false, message: "Error al editar review" });
@@ -269,17 +332,34 @@ router.put("/:id/reviews/:reviewId", protect, async (req, res) => {
 router.delete("/:id/reviews/:reviewId", protect, async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
-    if (!product) return res.status(404).json({ success: false, message: "Producto no encontrado" });
+    if (!product)
+      return res
+        .status(404)
+        .json({ success: false, message: "Producto no encontrado" });
 
-    const review = (product.reviews || []).id(req.params.reviewId) || (product.reviews || []).find((r) => r._id && r._id.toString() === req.params.reviewId);
-    if (!review) return res.status(404).json({ success: false, message: "Review no encontrada" });
+    const review =
+      (product.reviews || []).id(req.params.reviewId) ||
+      (product.reviews || []).find(
+        (r) => r._id && r._id.toString() === req.params.reviewId
+      );
+    if (!review)
+      return res
+        .status(404)
+        .json({ success: false, message: "Review no encontrada" });
 
     if (review.user.toString() !== req.user.id.toString()) {
-      return res.status(403).json({ success: false, message: "No tienes permiso para eliminar esta review" });
+      return res
+        .status(403)
+        .json({
+          success: false,
+          message: "No tienes permiso para eliminar esta review",
+        });
     }
 
     // remover la review
-    product.reviews = (product.reviews || []).filter((r) => !(r._id && r._id.toString() === req.params.reviewId));
+    product.reviews = (product.reviews || []).filter(
+      (r) => !(r._id && r._id.toString() === req.params.reviewId)
+    );
     await product.save();
 
     const updated = await Product.findById(product._id)
@@ -290,13 +370,20 @@ router.delete("/:id/reviews/:reviewId", protect, async (req, res) => {
     const reviews = updated.reviews || [];
     const reviewsCount = reviews.length;
     const avgRating = reviewsCount
-      ? Math.round((reviews.reduce((s, r) => s + (r.rating || 0), 0) / reviewsCount) * 10) / 10
+      ? Math.round(
+          (reviews.reduce((s, r) => s + (r.rating || 0), 0) / reviewsCount) * 10
+        ) / 10
       : 0;
 
-    res.json({ success: true, product: { ...updated.toObject(), reviewsCount, avgRating } });
+    res.json({
+      success: true,
+      product: { ...updated.toObject(), reviewsCount, avgRating },
+    });
   } catch (error) {
     console.error("Error deleting review:", error);
-    res.status(500).json({ success: false, message: "Error al eliminar review" });
+    res
+      .status(500)
+      .json({ success: false, message: "Error al eliminar review" });
   }
 });
 
@@ -317,7 +404,8 @@ router.post(
       };
 
       if (productData.price) productData.price = parseFloat(productData.price);
-      if (productData.stock) productData.stock = parseInt(productData.stock, 10);
+      if (productData.stock)
+        productData.stock = parseInt(productData.stock, 10);
 
       if (productData.materials && typeof productData.materials === "string") {
         productData.materials = productData.materials
@@ -328,7 +416,9 @@ router.post(
 
       if (req.files && req.files.length > 0) {
         const baseUrl = `${req.protocol}://${req.get("host")}`;
-        productData.images = req.files.map((f) => `${baseUrl}/uploads/${f.filename}`);
+        productData.images = req.files.map(
+          (f) => `${baseUrl}/uploads/${f.filename}`
+        );
       }
 
       let product = await Product.create(productData);
@@ -354,107 +444,129 @@ router.post(
 // @route   PUT /api/products/:id
 // @desc    Actualizar producto
 // @access  Private/Admin
-router.put("/:id", protect, adminOnly, upload.array("images", 5), async (req, res) => {
-  try {
-    let product = await Product.findById(req.params.id);
+router.put(
+  "/:id",
+  protect,
+  adminOnly,
+  upload.array("images", 5),
+  async (req, res) => {
+    try {
+      let product = await Product.findById(req.params.id);
 
-    if (!product) {
-      return res.status(404).json({
-        success: false,
-        message: "Producto no encontrado",
-      });
-    }
-
-    // Si vienen archivos nuevos, reemplazamos las imágenes y borramos las anteriores
-    // Manejo avanzado de imágenes: el cliente puede enviar keepImages (array de URLs que quiere conservar)
-    // y además archivos nuevos en req.files. Eliminamos solo las imágenes que el cliente no quiera conservar.
-    let keepImages = [];
-    if (req.body.keepImages) {
-      try {
-        // puede venir como JSON string o como array ya parseado
-        keepImages = typeof req.body.keepImages === "string" ? JSON.parse(req.body.keepImages) : req.body.keepImages;
-      } catch (err) {
-        keepImages = [];
+      if (!product) {
+        return res.status(404).json({
+          success: false,
+          message: "Producto no encontrado",
+        });
       }
-    }
 
-    // Determinar qué imágenes eliminar (las que están en product.images y no en keepImages)
-    const toDelete = (product.images || []).filter((img) => !keepImages.includes(img));
-    if (toDelete.length > 0) {
-      toDelete.forEach((imgPath) => {
+      // Si vienen archivos nuevos, reemplazamos las imágenes y borramos las anteriores
+      // Manejo avanzado de imágenes: el cliente puede enviar keepImages (array de URLs que quiere conservar)
+      // y además archivos nuevos en req.files. Eliminamos solo las imágenes que el cliente no quiera conservar.
+      let keepImages = [];
+      if (req.body.keepImages) {
         try {
-          const filename = path.basename(imgPath);
-          const full = path.join(uploadDir, filename);
-          if (fs.existsSync(full)) fs.unlinkSync(full);
+          // puede venir como JSON string o como array ya parseado
+          keepImages =
+            typeof req.body.keepImages === "string"
+              ? JSON.parse(req.body.keepImages)
+              : req.body.keepImages;
         } catch (err) {
-          console.warn("Warning al borrar imagen antigua:", err.message);
+          keepImages = [];
         }
+      }
+
+      // Determinar qué imágenes eliminar (las que están en product.images y no en keepImages)
+      const toDelete = (product.images || []).filter(
+        (img) => !keepImages.includes(img)
+      );
+      if (toDelete.length > 0) {
+        toDelete.forEach((imgPath) => {
+          try {
+            const filename = path.basename(imgPath);
+            const full = path.join(uploadDir, filename);
+            if (fs.existsSync(full)) fs.unlinkSync(full);
+          } catch (err) {
+            console.warn("Warning al borrar imagen antigua:", err.message);
+          }
+        });
+      }
+
+      // Construir la lista final de imágenes teniendo en cuenta un posible 'order' enviado por el cliente.
+      // Si el cliente envía `order` (array) puede mezclar URLs existentes y placeholders '__new__' para archivos subidos.
+      const baseUrl = `${req.protocol}://${req.get("host")}`;
+      const newFiles = req.files && req.files.length > 0 ? req.files : [];
+
+      let finalImages = [];
+      if (req.body.order) {
+        let orderArr = [];
+        try {
+          orderArr =
+            typeof req.body.order === "string"
+              ? JSON.parse(req.body.order)
+              : req.body.order;
+        } catch (err) {
+          orderArr = [];
+        }
+
+        let newIdx = 0;
+        for (const entry of orderArr) {
+          if (entry === "__new__") {
+            if (newFiles[newIdx]) {
+              finalImages.push(
+                `${baseUrl}/uploads/${newFiles[newIdx].filename}`
+              );
+              newIdx++;
+            }
+          } else if (typeof entry === "string") {
+            finalImages.push(entry);
+          }
+        }
+      } else {
+        const newUploaded =
+          newFiles.length > 0
+            ? newFiles.map((f) => `${baseUrl}/uploads/${f.filename}`)
+            : [];
+        finalImages = [
+          ...(Array.isArray(keepImages) ? keepImages : []),
+          ...newUploaded,
+        ];
+      }
+
+      req.body.images = finalImages;
+
+      // parsear campos numéricos y arrays que vengan en body
+      if (req.body.price) req.body.price = parseFloat(req.body.price);
+      if (req.body.stock) req.body.stock = parseInt(req.body.stock, 10);
+      if (req.body.materials && typeof req.body.materials === "string") {
+        req.body.materials = req.body.materials
+          .split(",")
+          .map((m) => m.trim())
+          .filter(Boolean);
+      }
+
+      product = await Product.findByIdAndUpdate(req.params.id, req.body, {
+        new: true,
+        runValidators: true,
+      });
+
+      product = await Product.findById(product._id)
+        .populate("createdBy", "name")
+        .populate("categoryId", "name slug");
+
+      res.json({
+        success: true,
+        product,
+      });
+    } catch (error) {
+      console.error("Error al actualizar producto:", error);
+      res.status(500).json({
+        success: false,
+        message: "Error al actualizar producto",
       });
     }
-
-    // Construir la lista final de imágenes teniendo en cuenta un posible 'order' enviado por el cliente.
-    // Si el cliente envía `order` (array) puede mezclar URLs existentes y placeholders '__new__' para archivos subidos.
-    const baseUrl = `${req.protocol}://${req.get("host")}`;
-    const newFiles = req.files && req.files.length > 0 ? req.files : [];
-
-    let finalImages = [];
-    if (req.body.order) {
-      let orderArr = [];
-      try {
-        orderArr = typeof req.body.order === "string" ? JSON.parse(req.body.order) : req.body.order;
-      } catch (err) {
-        orderArr = [];
-      }
-
-      let newIdx = 0;
-      for (const entry of orderArr) {
-        if (entry === "__new__") {
-          if (newFiles[newIdx]) {
-            finalImages.push(`${baseUrl}/uploads/${newFiles[newIdx].filename}`);
-            newIdx++;
-          }
-        } else if (typeof entry === "string") {
-          finalImages.push(entry);
-        }
-      }
-    } else {
-      const newUploaded = newFiles.length > 0 ? newFiles.map((f) => `${baseUrl}/uploads/${f.filename}`) : [];
-      finalImages = [...(Array.isArray(keepImages) ? keepImages : []), ...newUploaded];
-    }
-
-    req.body.images = finalImages;
-
-    // parsear campos numéricos y arrays que vengan en body
-    if (req.body.price) req.body.price = parseFloat(req.body.price);
-    if (req.body.stock) req.body.stock = parseInt(req.body.stock, 10);
-    if (req.body.materials && typeof req.body.materials === "string") {
-      req.body.materials = req.body.materials
-        .split(",")
-        .map((m) => m.trim())
-        .filter(Boolean);
-    }
-
-    product = await Product.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-      runValidators: true,
-    });
-
-    product = await Product.findById(product._id)
-      .populate("createdBy", "name")
-      .populate("categoryId", "name slug");
-
-    res.json({
-      success: true,
-      product,
-    });
-  } catch (error) {
-    console.error("Error al actualizar producto:", error);
-    res.status(500).json({
-      success: false,
-      message: "Error al actualizar producto",
-    });
   }
-});
+);
 
 // @route   DELETE /api/products/:id
 // @desc    Eliminar producto
@@ -505,17 +617,23 @@ router.delete("/:id/images", protect, adminOnly, async (req, res) => {
   try {
     const { image } = req.body; // URL completa de la imagen
     if (!image) {
-      return res.status(400).json({ success: false, message: "Falta el parámetro 'image'" });
+      return res
+        .status(400)
+        .json({ success: false, message: "Falta el parámetro 'image'" });
     }
 
     const product = await Product.findById(req.params.id);
     if (!product) {
-      return res.status(404).json({ success: false, message: "Producto no encontrado" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Producto no encontrado" });
     }
 
     // Si la imagen no está en la lista, nada que hacer
     if (!product.images || !product.images.includes(image)) {
-      return res.status(400).json({ success: false, message: "Imagen no asociada al producto" });
+      return res
+        .status(400)
+        .json({ success: false, message: "Imagen no asociada al producto" });
     }
 
     // Borrar archivo del disco si existe
@@ -534,7 +652,9 @@ router.delete("/:id/images", protect, adminOnly, async (req, res) => {
     res.json({ success: true, product });
   } catch (error) {
     console.error("Error al eliminar imagen:", error);
-    res.status(500).json({ success: false, message: "Error al eliminar imagen" });
+    res
+      .status(500)
+      .json({ success: false, message: "Error al eliminar imagen" });
   }
 });
 

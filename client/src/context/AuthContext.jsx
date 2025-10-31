@@ -95,10 +95,10 @@ export const AuthProvider = ({ children }) => {
       // Guardar token y establecer header de axios inmediatamente para evitar
       // race conditions donde componentes montados hagan peticiones protegidas
       // antes de que el useEffect tenga oportunidad de ejecutar.
-  axios.defaults.headers.common["Authorization"] = `Bearer ${data.token}`;
-  // Guardar en sessionStorage para que la autenticación sea independiente por pestaña
-  sessionStorage.setItem("token", data.token);
-  setToken(data.token);
+      axios.defaults.headers.common["Authorization"] = `Bearer ${data.token}`;
+      // Guardar en sessionStorage para que la autenticación sea independiente por pestaña
+      sessionStorage.setItem("token", data.token);
+      setToken(data.token);
 
       try {
         const { data: me } = await axios.get("/api/auth/me");
@@ -113,7 +113,8 @@ export const AuthProvider = ({ children }) => {
         return {
           success: false,
           message:
-            err.response?.data?.message || "Error al verificar usuario después del login",
+            err.response?.data?.message ||
+            "Error al verificar usuario después del login",
         };
       }
     } catch (error) {

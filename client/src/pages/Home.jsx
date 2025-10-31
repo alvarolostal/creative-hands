@@ -151,7 +151,7 @@ const Home = () => {
       {/* Featured Products Section (rediseñado): tarjetas que aparecen lateralmente al hacer scroll */}
       <section id="destacados" className="py-24 bg-white dark:bg-dark-500">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <motion.div
+          <motion.div
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -198,7 +198,7 @@ const Home = () => {
                 style={{ willChange: "transform" }}
               >
                 <div className="flex items-start gap-4">
-                    <div className="w-20 h-20 rounded-xl overflow-hidden flex-shrink-0">
+                  <div className="w-20 h-20 rounded-xl overflow-hidden flex-shrink-0">
                     <img
                       src={c.img}
                       alt={c.title}
@@ -246,7 +246,7 @@ const Home = () => {
 
       {/* Footer (fino) */}
       <footer className="mt-12 mb-12" role="contentinfo">
-            <div className="flex justify-center">
+        <div className="flex justify-center">
           <div className="inline-flex items-center gap-3 px-6 py-3 md:px-8 md:py-3 rounded-xl bg-white/8 dark:bg-gray-800/60 backdrop-blur-md text-sm md:text-base text-gray-700 dark:text-gray-100 shadow-md border border-white/6 dark:border-white/10">
             <span className="font-medium">© 2025 Álvaro Lostal</span>
             <span className="opacity-50">·</span>

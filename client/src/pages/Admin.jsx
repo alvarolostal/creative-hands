@@ -94,7 +94,11 @@ const Admin = () => {
       // populate imageList with existing images
       setImageList(
         product.images && product.images.length > 0
-          ? product.images.map((url, idx) => ({ id: `e-${idx}-${Date.now()}`, type: "existing", url }))
+          ? product.images.map((url, idx) => ({
+              id: `e-${idx}-${Date.now()}`,
+              type: "existing",
+              url,
+            }))
           : []
       );
     } else {
@@ -156,11 +160,15 @@ const Admin = () => {
 
       // Si estamos editando, enviar la lista de imágenes que queremos mantener
       if (editingProduct) {
-        const keepImages = imageList.filter((it) => it.type === "existing").map((it) => it.url);
+        const keepImages = imageList
+          .filter((it) => it.type === "existing")
+          .map((it) => it.url);
         fd.append("keepImages", JSON.stringify(keepImages));
 
         // Build an order array mixing existing urls and placeholders for new files
-        const order = imageList.map((it) => (it.type === "existing" ? it.url : "__new__"));
+        const order = imageList.map((it) =>
+          it.type === "existing" ? it.url : "__new__"
+        );
         fd.append("order", JSON.stringify(order));
 
         // Append new files in the sequence they appear in imageList so server can map '__new__' placeholders
@@ -179,7 +187,9 @@ const Admin = () => {
           headers: { "Content-Type": "multipart/form-data" },
         });
         setProducts(
-          products.map((p) => (p._id === editingProduct._id ? response.data.product : p))
+          products.map((p) =>
+            p._id === editingProduct._id ? response.data.product : p
+          )
         );
       } else {
         response = await axios.post("/api/products", fd, {
@@ -288,16 +298,26 @@ const Admin = () => {
         return;
       }
 
-      if (!window.confirm("¿Eliminar esta imagen? Esta acción borrará el archivo del servidor.")) return;
+      if (
+        !window.confirm(
+          "¿Eliminar esta imagen? Esta acción borrará el archivo del servidor."
+        )
+      )
+        return;
 
       (async () => {
         try {
-          const { data } = await axios.delete(`/api/products/${editingProduct._id}/images`, {
-            data: { image: item.url },
-          });
+          const { data } = await axios.delete(
+            `/api/products/${editingProduct._id}/images`,
+            {
+              data: { image: item.url },
+            }
+          );
           if (data && data.success) {
             setImageList((prev) => prev.filter((it) => it.id !== id));
-            setProducts((prev) => prev.map((p) => (p._id === data.product._id ? data.product : p)));
+            setProducts((prev) =>
+              prev.map((p) => (p._id === data.product._id ? data.product : p))
+            );
           } else {
             alert(data.message || "No se pudo eliminar la imagen");
           }
@@ -834,16 +854,24 @@ const Admin = () => {
                         <Upload className="w-5 h-5" />
                       </div>
                       <div className="flex-1">
-                        <div className="text-sm font-medium text-gray-900 dark:text-white">Añadir imágenes</div>
+                        <div className="text-sm font-medium text-gray-900 dark:text-white">
+                          Añadir imágenes
+                        </div>
                         <div className="text-xs text-gray-600 dark:text-gray-300">
-                          {dragActive ? "Suelta para subir" : "Haz click para seleccionar o arrastra los archivos aquí"}
+                          {dragActive
+                            ? "Suelta para subir"
+                            : "Haz click para seleccionar o arrastra los archivos aquí"}
                         </div>
                         <div className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                          {imageList.length > 0 ? `${imageList.length} imagen(es) seleccionadas — arrastra las miniaturas para reordenar` : "Puedes seleccionar varias imágenes (máx. 5)"}
+                          {imageList.length > 0
+                            ? `${imageList.length} imagen(es) seleccionadas — arrastra las miniaturas para reordenar`
+                            : "Puedes seleccionar varias imágenes (máx. 5)"}
                         </div>
                       </div>
                       <div className="ml-2 hidden sm:flex items-center text-xs text-gray-500 dark:text-gray-300">
-                        <span className="px-2 py-1 bg-white/60 dark:bg-gray-800/60 rounded-full">Arrastra para reordenar</span>
+                        <span className="px-2 py-1 bg-white/60 dark:bg-gray-800/60 rounded-full">
+                          Arrastra para reordenar
+                        </span>
                       </div>
                     </div>
 
@@ -879,7 +907,11 @@ const Admin = () => {
 
                             <img
                               src={it.url}
-                              alt={it.type === "new" ? it.file?.name || "preview" : "img"}
+                              alt={
+                                it.type === "new"
+                                  ? it.file?.name || "preview"
+                                  : "img"
+                              }
                               className="w-full h-24 object-cover"
                             />
 
@@ -893,7 +925,9 @@ const Admin = () => {
                             </button>
 
                             <div className="absolute left-2 bottom-2 bg-black/40 text-white text-xs px-2 py-0.5 rounded">
-                              {it.type === "existing" ? "Subida" : (it.file?.name || "Nuevo")}
+                              {it.type === "existing"
+                                ? "Subida"
+                                : it.file?.name || "Nuevo"}
                             </div>
 
                             {/* badge principal para la primera miniatura */}

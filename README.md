@@ -103,8 +103,8 @@ cd ..
 Crear archivo `.env` en la raíz del proyecto con:
 
 ```env
-# MongoDB
-MONGODB_URI=mongodb://localhost:27017/creative-hands
+# MongoDB (usa MongoDB Atlas)
+MONGODB_URI=mongodb+srv://usuario:password@cluster.xxxxx.mongodb.net/creative-hands?retryWrites=true&w=majority
 
 # JWT
 JWT_SECRET=tu_secreto_super_seguro_cambiar_en_produccion_12345
@@ -120,16 +120,7 @@ ADMIN_PASSWORD=Admin123!
 ADMIN_NAME=Administrador
 ```
 
-### 5. Iniciar MongoDB
-
-```bash
-# En Windows (si está instalado localmente)
-mongod
-
-# O usar MongoDB Atlas (cambiar MONGODB_URI en .env)
-```
-
-### 6. Ejecutar la aplicación
+### 5. Ejecutar la aplicación
 
 #### Opción A: Desarrollo con un solo comando (Recomendado)
 
@@ -155,11 +146,10 @@ npm run server
 npm run client
 ```
 
-### 7. Acceder a la aplicación
+### 6. Acceder a la aplicación
 
 - **Frontend**: http://localhost:5173
 - **Backend API**: http://localhost:5000
-- **MongoDB**: mongodb://localhost:27017
 
 ## 👤 Credenciales de Administrador
 
@@ -300,18 +290,30 @@ GET    /api/chat/admin          - Obtener info del admin
 
 ## 🚀 Despliegue
 
-### Backend (Render, Railway, Heroku)
+### 📚 Guías de Deploy Disponibles
 
-1. Subir código a GitHub
-2. Conectar repositorio
-3. Configurar variables de entorno
-4. Usar MongoDB Atlas para la BD
+Hemos creado guías completas para hacer el deploy de este proyecto:
 
-### Frontend (Vercel, Netlify)
+1. **[GUIA_VISUAL_DEPLOY.md](GUIA_VISUAL_DEPLOY.md)** - 📱 Guía paso a paso con instrucciones visuales (RECOMENDADA)
+2. **[DEPLOY.md](DEPLOY.md)** - 📖 Guía detallada completa con todos los detalles
+3. **[DEPLOY_CHECKLIST.md](DEPLOY_CHECKLIST.md)** - ✅ Lista de verificación
+4. **[COMANDOS_RAPIDOS.md](COMANDOS_RAPIDOS.md)** - 📋 Comandos para copiar y pegar
 
-1. Hacer build: `cd client && npm run build`
-2. Subir carpeta `dist/`
-3. Configurar redirects para SPA
+### Deploy con MongoDB Atlas + Render (Gratis)
+
+El proyecto está listo para desplegarse en:
+- **Base de datos**: MongoDB Atlas (plan gratuito)
+- **Backend + Frontend**: Render (plan gratuito)
+
+Sigue la [GUIA_VISUAL_DEPLOY.md](GUIA_VISUAL_DEPLOY.md) para instrucciones paso a paso.
+
+### Resumen Rápido
+
+1. Crear cluster en MongoDB Atlas
+2. Subir código a GitHub
+3. Crear Web Service en Render
+4. Configurar variables de entorno
+5. ¡Listo! Tu app está en producción
 
 ## 🐛 Solución de Problemas
 

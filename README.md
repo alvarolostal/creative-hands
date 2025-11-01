@@ -179,6 +179,6 @@ creative-hands/
 <div align="center">
 
 **Álvaro Lostal**  
-_Ingeniería Informática | Universidad Europea del Atlantico
+_Ingeniería Informática | Universidad Europea del Atlantico_
 
 </div>

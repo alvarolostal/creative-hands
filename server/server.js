@@ -75,6 +75,17 @@ app.get("/api/health", (req, res) => {
   res.json({ status: "OK", timestamp: new Date() });
 });
 
+// Servir frontend en producción
+if (process.env.NODE_ENV === "production") {
+  // Servir archivos estáticos del cliente
+  app.use(express.static(path.join(__dirname, "../client/dist")));
+
+  // Todas las rutas no-API deben servir index.html (para React Router)
+  app.get("*", (req, res) => {
+    res.sendFile(path.join(__dirname, "../client/dist/index.html"));
+  });
+}
+
 // Socket.IO - Manejo de conexiones en tiempo real
 const connectedUsers = new Map();
 

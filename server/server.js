@@ -258,6 +258,11 @@ const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => {
   console.log(`\n🚀 Servidor corriendo en puerto ${PORT}`);
   console.log(`📡 Entorno: ${process.env.NODE_ENV || "development"}`);
-  console.log(`🌐 Frontend: http://localhost:5173`);
+  if (process.env.NODE_ENV === "production") {
+    console.log(`🌐 App: ${process.env.CLIENT_URL || "https://tu-app.onrender.com"}`);
+  } else {
+    console.log(`🌐 Frontend: http://localhost:5173`);
+    console.log(`🔗 API: http://localhost:${PORT}`);
+  }
   console.log(`🔌 Socket.IO listo para conexiones\n`);
 });

@@ -4,25 +4,7 @@ const Product = require("../models/Product");
 const { protect, adminOnly } = require("../middleware/auth");
 const Category = require("../models/Category");
 const multer = require("multer");
-const path = require("path");
-const fs = require("fs");
-
-// Carpeta para uploads
-const uploadDir = path.join(__dirname, "..", "uploads");
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
-}
-
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, uploadDir);
-  },
-  filename: function (req, file, cb) {
-    const ext = path.extname(file.originalname);
-    const name = Date.now() + "-" + Math.round(Math.random() * 1e9) + ext;
-    cb(null, name);
-  },
-});
+const { cloudinary, storage } = require("../config/cloudinary");
 
 // Validación y límites: solo imágenes, max 2MB por archivo
 const fileFilter = (req, file, cb) => {
@@ -32,7 +14,7 @@ const fileFilter = (req, file, cb) => {
 };
 
 const upload = multer({
-  storage,
+  storage, // Ahora usa Cloudinary storage
   limits: { fileSize: 2 * 1024 * 1024 }, // 2 MB
   fileFilter,
 });
@@ -415,10 +397,8 @@ router.post(
       }
 
       if (req.files && req.files.length > 0) {
-        const baseUrl = `${req.protocol}://${req.get("host")}`;
-        productData.images = req.files.map(
-          (f) => `${baseUrl}/uploads/${f.filename}`
-        );
+        // Cloudinary devuelve directamente las URLs en file.path
+        productData.images = req.files.map((f) => f.path);
       }
 
       let product = await Product.create(productData);
@@ -481,20 +461,25 @@ router.put(
         (img) => !keepImages.includes(img)
       );
       if (toDelete.length > 0) {
-        toDelete.forEach((imgPath) => {
+        // Eliminar de Cloudinary usando el public_id extraído de la URL
+        for (const imgUrl of toDelete) {
           try {
-            const filename = path.basename(imgPath);
-            const full = path.join(uploadDir, filename);
-            if (fs.existsSync(full)) fs.unlinkSync(full);
+            // Extraer public_id de la URL de Cloudinary
+            // Ejemplo: https://res.cloudinary.com/demo/image/upload/v123456/creative-hands/products/abc123.jpg
+            // public_id sería: creative-hands/products/abc123
+            const matches = imgUrl.match(/\/creative-hands\/products\/([^/.]+)/);
+            if (matches && matches[0]) {
+              const publicId = matches[0].substring(1); // Remover el / inicial
+              await cloudinary.uploader.destroy(publicId);
+            }
           } catch (err) {
-            console.warn("Warning al borrar imagen antigua:", err.message);
+            console.warn("Warning al borrar imagen de Cloudinary:", err.message);
           }
-        });
+        }
       }
 
       // Construir la lista final de imágenes teniendo en cuenta un posible 'order' enviado por el cliente.
       // Si el cliente envía `order` (array) puede mezclar URLs existentes y placeholders '__new__' para archivos subidos.
-      const baseUrl = `${req.protocol}://${req.get("host")}`;
       const newFiles = req.files && req.files.length > 0 ? req.files : [];
 
       let finalImages = [];
@@ -513,9 +498,8 @@ router.put(
         for (const entry of orderArr) {
           if (entry === "__new__") {
             if (newFiles[newIdx]) {
-              finalImages.push(
-                `${baseUrl}/uploads/${newFiles[newIdx].filename}`
-              );
+              // Cloudinary devuelve la URL en file.path
+              finalImages.push(newFiles[newIdx].path);
               newIdx++;
             }
           } else if (typeof entry === "string") {
@@ -524,9 +508,7 @@ router.put(
         }
       } else {
         const newUploaded =
-          newFiles.length > 0
-            ? newFiles.map((f) => `${baseUrl}/uploads/${f.filename}`)
-            : [];
+          newFiles.length > 0 ? newFiles.map((f) => f.path) : [];
         finalImages = [
           ...(Array.isArray(keepImages) ? keepImages : []),
           ...newUploaded,
@@ -582,17 +564,20 @@ router.delete("/:id", protect, adminOnly, async (req, res) => {
       });
     }
 
-    // eliminar imágenes asociadas del disco
+    // eliminar imágenes asociadas de Cloudinary
     if (product.images && product.images.length > 0) {
-      product.images.forEach((imgPath) => {
+      for (const imgUrl of product.images) {
         try {
-          const filename = path.basename(imgPath);
-          const full = path.join(uploadDir, filename);
-          if (fs.existsSync(full)) fs.unlinkSync(full);
+          // Extraer public_id de la URL de Cloudinary
+          const matches = imgUrl.match(/\/creative-hands\/products\/([^/.]+)/);
+          if (matches && matches[0]) {
+            const publicId = matches[0].substring(1);
+            await cloudinary.uploader.destroy(publicId);
+          }
         } catch (err) {
           console.warn("Warning al borrar imagen en delete:", err.message);
         }
-      });
+      }
     }
 
     await product.deleteOne();
@@ -636,11 +621,13 @@ router.delete("/:id/images", protect, adminOnly, async (req, res) => {
         .json({ success: false, message: "Imagen no asociada al producto" });
     }
 
-    // Borrar archivo del disco si existe
+    // Borrar archivo de Cloudinary si existe
     try {
-      const filename = path.basename(image);
-      const full = path.join(uploadDir, filename);
-      if (fs.existsSync(full)) fs.unlinkSync(full);
+      const matches = image.match(/\/creative-hands\/products\/([^/.]+)/);
+      if (matches && matches[0]) {
+        const publicId = matches[0].substring(1);
+        await cloudinary.uploader.destroy(publicId);
+      }
     } catch (err) {
       console.warn("Warning al borrar imagen (del endpoint):", err.message);
     }

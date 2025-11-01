@@ -50,7 +50,7 @@ cd client && npm install && cd ..
 
 # Configurar variables de entorno
 cp .env.example .env
-# Editar .env con tus credenciales de MongoDB y JWT_SECRET
+# Editar .env con tus credenciales de MongoDB, JWT_SECRET y Cloudinary
 ```
 
 #### Desarrollo
@@ -93,7 +93,7 @@ Los tests cubren autenticación, gestión de productos, categorías y chat usand
 - MongoDB + Mongoose
 - Socket.io
 - JWT + bcrypt
-- Multer (subida de imágenes)
+- Multer + Cloudinary (almacenamiento de imágenes en la nube)
 
 ## 📁 Estructura
 
@@ -127,7 +127,7 @@ creative-hands/
 ### Administradores
 ✅ Panel de administración protegido  
 ✅ CRUD completo de productos y categorías  
-✅ Subida de imágenes  
+✅ Subida de imágenes a Cloudinary con optimización automática  
 ✅ Gestión de múltiples conversaciones simultáneas  
 ✅ Indicadores de estado (online/escribiendo)
 
@@ -153,6 +153,7 @@ creative-hands/
 ### Despliegue
 - **Render**: Elegido por su plan gratuito, integración Git y soporte WebSockets
 - **MongoDB Atlas**: Cluster M0 gratuito con 512MB de almacenamiento
+- **Cloudinary**: Almacenamiento CDN para imágenes (evita pérdida en redeploys de Render)
 - **Variables de entorno**: Configuradas en dashboard de Render para seguridad
 - **Build automatizado**: Deploy automático en cada push a rama `main`
 

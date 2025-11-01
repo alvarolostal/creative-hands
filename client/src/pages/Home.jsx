@@ -123,7 +123,7 @@ const Home = () => {
                     className="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 glass rounded-2xl font-medium text-base sm:text-lg text-gray-900 dark:text-white shadow-md hover:shadow-lg transition-shadow duration-200 min-h-[44px]"
                     style={{ willChange: "transform" }}
                   >
-                    Regíistrate ahora
+                    Regístrate ahora
                   </motion.button>
                 </Link>
               </motion.div>

@@ -40,28 +40,28 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-light-500 via-primary-50 to-light-500 dark:from-dark-500 dark:via-dark-400 dark:to-dark-600">
+    <div className="min-h-screen flex items-center justify-center py-8 sm:py-12 px-3 sm:px-4 md:px-6 lg:px-8 bg-gradient-to-br from-light-500 via-primary-50 to-light-500 dark:from-dark-500 dark:via-dark-400 dark:to-dark-600">
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
         className="max-w-md w-full"
       >
-        <div className="glass rounded-3xl shadow-2xl p-8">
+        <div className="glass rounded-2xl sm:rounded-3xl shadow-2xl p-6 sm:p-8">
           {/* Header */}
-          <div className="text-center mb-8">
+          <div className="text-center mb-6 sm:mb-8">
             <motion.div
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-              className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-primary-500 to-primary-600 rounded-2xl mb-4"
+              className="inline-flex items-center justify-center w-14 sm:w-16 h-14 sm:h-16 bg-gradient-to-br from-primary-500 to-primary-600 rounded-2xl mb-4"
             >
-              <LogIn className="w-8 h-8 text-white" />
+              <LogIn className="w-7 sm:w-8 h-7 sm:h-8 text-white" />
             </motion.div>
-            <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
+            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
               Iniciar sesión
             </h2>
-            <p className="text-gray-600 dark:text-gray-400 mt-2">
+            <p className="text-gray-600 dark:text-gray-400 mt-2 text-sm sm:text-base">
               Bienvenido de nuevo a Creative Hands
             </p>
           </div>
@@ -78,7 +78,7 @@ const Login = () => {
           )}
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-5 sm:space-y-6">
             {/* Email */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -92,7 +92,7 @@ const Login = () => {
                   value={formData.email}
                   onChange={handleChange}
                   required
-                  className="w-full pl-10 pr-4 py-3 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent text-gray-900 dark:text-white transition-all"
+                  className="w-full pl-10 pr-4 py-3 sm:py-3.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent text-gray-900 dark:text-white transition-all text-base"
                   placeholder="tu@email.com"
                 />
               </div>
@@ -111,13 +111,14 @@ const Login = () => {
                   value={formData.password}
                   onChange={handleChange}
                   required
-                  className="w-full pl-10 pr-12 py-3 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent text-gray-900 dark:text-white transition-all"
+                  className="w-full pl-10 pr-12 py-3 sm:py-3.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent text-gray-900 dark:text-white transition-all text-base"
                   placeholder="••••••••"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-2 min-w-[40px] min-h-[40px] flex items-center justify-center"
+                  aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
                 >
                   {showPassword ? (
                     <EyeOff className="w-5 h-5" />
@@ -134,7 +135,7 @@ const Login = () => {
               whileTap={{ scale: 0.98 }}
               type="submit"
               disabled={loading}
-              className="w-full py-3 bg-gradient-to-r from-primary-500 to-primary-600 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl hover:shadow-primary-500/50 transition-shadow duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+              className="w-full py-3 sm:py-3.5 bg-gradient-to-r from-primary-500 to-primary-600 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl hover:shadow-primary-500/50 transition-shadow duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 min-h-[48px] text-base"
               style={{ willChange: "transform" }}
             >
               {loading ? (

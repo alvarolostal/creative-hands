@@ -47,8 +47,8 @@ const Navbar = () => {
         scrolled ? "glass-nav shadow-lg" : "bg-transparent"
       }`}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
+        <div className="flex justify-between items-center h-14 sm:h-16">
           {/* Logo */}
           <Link
             to="/"
@@ -67,7 +67,7 @@ const Navbar = () => {
             }}
             className="flex items-center space-x-2 group"
           >
-            <span className="text-xl font-bold copernicus copernicus-110 uppercase text-primary-500 transition-colors brand-title">
+            <span className="text-base sm:text-lg md:text-xl font-bold copernicus copernicus-110 uppercase text-primary-500 transition-colors brand-title">
               creative hands
             </span>
           </Link>
@@ -185,7 +185,8 @@ const Navbar = () => {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+            className="md:hidden p-2.5 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
+            aria-label={mobileMenuOpen ? "Cerrar menú" : "Abrir menú"}
           >
             {mobileMenuOpen ? (
               <X className="w-6 h-6 text-gray-700 dark:text-gray-300" />
@@ -203,13 +204,13 @@ const Navbar = () => {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            className="md:hidden glass border-t border-gray-200 dark:border-gray-700"
+            className="md:hidden glass border-t border-gray-200 dark:border-gray-700 overflow-hidden"
           >
-            <div className="px-4 py-4 space-y-3">
+            <div className="px-3 py-4 space-y-1 max-h-[calc(100vh-4rem)] overflow-y-auto">
               <Link
                 to="/products"
                 onClick={() => setMobileMenuOpen(false)}
-                className="block px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+                className="flex items-center px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors text-base font-medium min-h-[44px]"
               >
                 Productos
               </Link>
@@ -218,7 +219,7 @@ const Navbar = () => {
                 <Link
                   to="/admin"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="block px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+                  className="flex items-center px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors text-base font-medium min-h-[44px]"
                 >
                   Panel Admin
                 </Link>
@@ -229,7 +230,7 @@ const Navbar = () => {
                   toggleTheme();
                   setMobileMenuOpen(false);
                 }}
-                className="w-full text-left px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors flex items-center space-x-2"
+                className="w-full text-left px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors flex items-center space-x-2 text-base font-medium min-h-[44px]"
               >
                 {theme === "light" ? (
                   <Moon className="w-4 h-4" />
@@ -241,35 +242,35 @@ const Navbar = () => {
 
               {user ? (
                 <>
-                  <div className="px-4 py-2 border-t border-gray-200 dark:border-gray-700">
-                    <p className="text-sm font-medium text-gray-900 dark:text-white">
+                  <div className="px-4 py-3 border-t border-gray-200 dark:border-gray-700 mt-2 pt-4">
+                    <p className="text-base font-medium text-gray-900 dark:text-white truncate">
                       {user.name}
                     </p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                    <p className="text-sm text-gray-500 dark:text-gray-400 truncate">
                       {user.email}
                     </p>
                   </div>
                   <button
                     onClick={handleLogout}
-                    className="w-full text-left px-4 py-2 text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors flex items-center space-x-2"
+                    className="w-full text-left px-4 py-3 text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors flex items-center space-x-2 text-base font-medium min-h-[44px]"
                   >
-                    <LogOut className="w-4 h-4" />
+                    <LogOut className="w-5 h-5" />
                     <span>Cerrar sesión</span>
                   </button>
                 </>
               ) : (
-                <div className="space-y-2 pt-2 border-t border-gray-200 dark:border-gray-700">
+                <div className="space-y-2 pt-2 border-t border-gray-200 dark:border-gray-700 mt-2">
                   <Link
                     to="/login"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="block px-4 py-2 text-center text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+                    className="flex items-center justify-center px-4 py-3 text-center text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors text-base font-medium min-h-[44px]"
                   >
                     Iniciar sesión
                   </Link>
                   <Link
                     to="/register"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="block px-4 py-2 text-center bg-gradient-to-r from-primary-500 to-primary-600 text-white rounded-lg hover:shadow-lg transition-all"
+                    className="flex items-center justify-center px-4 py-3 text-center bg-gradient-to-r from-primary-500 to-primary-600 text-white rounded-lg hover:shadow-lg transition-all text-base font-medium min-h-[44px]"
                   >
                     Registrarse
                   </Link>

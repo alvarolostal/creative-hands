@@ -481,18 +481,18 @@ const Admin = () => {
   };
 
   return (
-    <div className="min-h-screen pt-20 pb-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-light-500 via-primary-50 to-light-500 dark:from-dark-500 dark:via-dark-400 dark:to-dark-600">
+    <div className="min-h-screen pt-16 sm:pt-20 pb-8 sm:pb-12 px-3 sm:px-4 md:px-6 lg:px-8 bg-gradient-to-br from-light-500 via-primary-50 to-light-500 dark:from-dark-500 dark:via-dark-400 dark:to-dark-600">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-8"
+          className="mb-6 sm:mb-8"
         >
-          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">
+          <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-2">
             Panel de <span className="gradient-text">Administración</span>
           </h1>
-          <p className="text-gray-600 dark:text-gray-400">
+          <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base">
             Gestiona productos y conversaciones con clientes
           </p>
         </motion.div>
@@ -502,11 +502,11 @@ const Admin = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="flex space-x-4 mb-8"
+          className="flex flex-col sm:flex-row gap-2 sm:gap-4 mb-6 sm:mb-8"
         >
           <button
             onClick={() => setActiveTab("products")}
-            className={`flex items-center space-x-2 px-6 py-3 rounded-xl font-semibold transition-colors duration-200 ${
+            className={`flex items-center justify-center sm:justify-start space-x-2 px-4 sm:px-6 py-3 rounded-xl font-semibold transition-colors duration-200 min-h-[48px] text-base ${
               activeTab === "products"
                 ? "bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-lg"
                 : "glass text-gray-700 dark:text-gray-300 hover:shadow-md"
@@ -517,7 +517,7 @@ const Admin = () => {
           </button>
           <button
             onClick={() => setActiveTab("chat")}
-            className={`flex items-center space-x-2 px-6 py-3 rounded-xl font-semibold transition-colors duration-200 ${
+            className={`flex items-center justify-center sm:justify-start space-x-2 px-4 sm:px-6 py-3 rounded-xl font-semibold transition-colors duration-200 min-h-[48px] text-base ${
               activeTab === "chat"
                 ? "bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-lg"
                 : "glass text-gray-700 dark:text-gray-300 hover:shadow-md"
@@ -538,12 +538,12 @@ const Admin = () => {
               exit={{ opacity: 0, x: 20 }}
             >
               {/* Add Product Button */}
-              <div className="mb-6 flex justify-end">
+              <div className="mb-4 sm:mb-6 flex flex-col sm:flex-row justify-end gap-3">
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={() => handleOpenModal()}
-                  className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-primary-500 to-primary-600 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-shadow duration-200"
+                  className="flex items-center justify-center space-x-2 px-4 sm:px-6 py-3 bg-gradient-to-r from-primary-500 to-primary-600 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-shadow duration-200 min-h-[48px] text-base"
                   style={{ willChange: "transform" }}
                 >
                   <Plus className="w-5 h-5" />
@@ -553,7 +553,7 @@ const Admin = () => {
                   whileHover={{ scale: 1.03 }}
                   whileTap={{ scale: 0.97 }}
                   onClick={handleOpenCategoryModal}
-                  className="ml-4 flex items-center space-x-2 px-4 py-3 glass rounded-xl font-semibold text-gray-700 dark:text-gray-300 hover:shadow-md transition-shadow duration-200"
+                  className="flex items-center justify-center space-x-2 px-4 py-3 glass rounded-xl font-semibold text-gray-700 dark:text-gray-300 hover:shadow-md transition-shadow duration-200 min-h-[48px] text-base"
                 >
                   <Plus className="w-4 h-4" />
                   <span>Gestionar categorías</span>
@@ -566,7 +566,7 @@ const Admin = () => {
                   <Loader className="w-12 h-12 text-primary-500 animate-spin" />
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                   {products.map((product) => (
                     <ProductCard
                       key={product._id}

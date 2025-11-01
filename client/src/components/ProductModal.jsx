@@ -173,7 +173,7 @@ const ProductModal = ({ product, onClose }) => {
   return (
     <motion.div
       key={product._id}
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 lg:p-0"
+      className="fixed inset-0 z-50 flex items-center justify-center p-0 sm:p-4 lg:p-0"
       variants={backdropVariants}
       initial="hidden"
       animate="visible"
@@ -184,8 +184,8 @@ const ProductModal = ({ product, onClose }) => {
       onClick={onClose}
     >
       <motion.div
-        className="relative w-full md:w-[95%] lg:w-[90%] max-w-[90vw] md:max-w-3xl lg:max-w-[1100px] rounded-none lg:rounded-2xl bg-white dark:bg-gray-900 shadow-2xl overflow-hidden"
-        style={{ maxHeight: "80vh" }}
+        className="relative w-full h-full sm:h-auto sm:w-[95%] lg:w-[90%] sm:max-w-3xl lg:max-w-[1100px] rounded-none sm:rounded-2xl bg-white dark:bg-gray-900 shadow-2xl overflow-hidden"
+        style={{ maxHeight: "100vh" }}
         variants={panelVariants}
         initial="hidden"
         animate="visible"
@@ -196,9 +196,9 @@ const ProductModal = ({ product, onClose }) => {
       >
         {/* Note: moved close button into the right column header to avoid overlapping the title */}
 
-        <div className="flex flex-col md:flex-row h-full items-stretch min-h-0">
+        <div className="flex flex-col md:flex-row h-full items-stretch min-h-0 overflow-y-auto md:overflow-y-hidden">
           {/* Left: Gallery */}
-          <div className="md:w-1/2 lg:w-[60%] bg-gradient-to-br from-primary-50 to-white dark:from-gray-800 dark:to-gray-900 p-4 md:p-6 flex flex-col items-start justify-start min-h-0 h-full lg:rounded-l-2xl overflow-hidden">
+          <div className="md:w-1/2 lg:w-[60%] bg-gradient-to-br from-primary-50 to-white dark:from-gray-800 dark:to-gray-900 p-3 sm:p-4 md:p-6 flex flex-col items-start justify-start min-h-0 h-auto md:h-full lg:rounded-l-2xl overflow-hidden">
             <div
               className="relative w-full flex items-center justify-center lg:flex-none lg:min-h-0"
               onTouchStart={onTouchStart}
@@ -206,7 +206,7 @@ const ProductModal = ({ product, onClose }) => {
               onTouchEnd={onTouchEnd}
             >
               {/* Contenedor con altura razonable y estable para evitar estirados y saltos */}
-              <div className="w-full rounded-xl overflow-hidden flex items-center justify-center bg-white h-56 sm:h-72 md:h-96 lg:h-full relative product-modal__image-wrapper">
+              <div className="w-full rounded-none sm:rounded-xl overflow-hidden flex items-center justify-center bg-white h-64 sm:h-72 md:h-96 lg:h-full relative product-modal__image-wrapper">
                 {/* Prev image (exiting) */}
                 {prevIndex !== null && (
                   <motion.img
@@ -242,24 +242,24 @@ const ProductModal = ({ product, onClose }) => {
                 <>
                   <button
                     onClick={prevImage}
-                    className="absolute left-3 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/90 dark:bg-gray-800/90 shadow z-40 focus:outline-none transform-gpu will-change-transform active:scale-95 transition-transform duration-100"
+                    className="absolute left-2 sm:left-3 top-1/2 -translate-y-1/2 p-2 sm:p-2.5 rounded-full bg-white/90 dark:bg-gray-800/90 shadow z-40 focus:outline-none transform-gpu will-change-transform active:scale-95 transition-transform duration-100 min-w-[40px] min-h-[40px]"
                     aria-label="Anterior imagen"
                   >
-                    <ChevronLeft className="w-6 h-6 text-gray-900 dark:text-white" />
+                    <ChevronLeft className="w-5 sm:w-6 h-5 sm:h-6 text-gray-900 dark:text-white" />
                   </button>
                   <button
                     onClick={nextImage}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/90 dark:bg-gray-800/90 shadow z-40 focus:outline-none transform-gpu will-change-transform active:scale-95 transition-transform duration-100"
+                    className="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 p-2 sm:p-2.5 rounded-full bg-white/90 dark:bg-gray-800/90 shadow z-40 focus:outline-none transform-gpu will-change-transform active:scale-95 transition-transform duration-100 min-w-[40px] min-h-[40px]"
                     aria-label="Siguiente imagen"
                   >
-                    <ChevronRight className="w-6 h-6 text-gray-900 dark:text-white" />
+                    <ChevronRight className="w-5 sm:w-6 h-5 sm:h-6 text-gray-900 dark:text-white" />
                   </button>
                 </>
               )}
             </div>
 
             {/* Thumbnails */}
-            <div className="mt-3 w-full flex gap-3 overflow-x-auto items-center justify-start px-1">
+            <div className="mt-2 sm:mt-3 w-full flex gap-2 sm:gap-3 overflow-x-auto items-center justify-start px-1">
               {images.map((img, i) => (
                 <button
                   key={i}
@@ -270,9 +270,9 @@ const ProductModal = ({ product, onClose }) => {
                     setDirection(i > index ? 1 : -1);
                     setIndex(i);
                   }}
-                  className={`flex-none w-20 h-20 rounded-xl overflow-hidden border-2 ${
+                  className={`flex-none w-16 h-16 sm:w-20 sm:h-20 rounded-lg sm:rounded-xl overflow-hidden border-2 ${
                     i === index ? "border-primary-500" : "border-transparent"
-                  }`}
+                  } min-w-[64px] min-h-[64px]`}
                 >
                   <img
                     src={img}
@@ -289,29 +289,29 @@ const ProductModal = ({ product, onClose }) => {
           </div>
 
           {/* Right: Details */}
-          <div className="md:w-1/2 lg:w-[40%] p-4 md:p-6 overflow-y-auto min-h-0">
-            <div className="flex items-start justify-between">
-              <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+          <div className="md:w-1/2 lg:w-[40%] p-4 sm:p-5 md:p-6 overflow-y-auto min-h-0">
+            <div className="flex items-start justify-between mb-3 sm:mb-4">
+              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-2 pr-2">
                 {product.name}
               </h2>
               <button
                 onClick={onClose}
-                className="ml-4 p-2 rounded-full bg-white/80 dark:bg-gray-800/80 hover:bg-white dark:hover:bg-gray-700 shadow"
+                className="ml-2 p-2 rounded-full bg-white/80 dark:bg-gray-800/80 hover:bg-white dark:hover:bg-gray-700 shadow flex-shrink-0 min-w-[40px] min-h-[40px] flex items-center justify-center"
                 aria-label="Cerrar"
               >
                 <X className="w-5 h-5 text-gray-800 dark:text-white" />
               </button>
             </div>
-            <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-2">
-              <p className="text-primary-500 text-2xl font-extrabold">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
+              <p className="text-primary-500 text-xl sm:text-2xl font-extrabold">
                 {new Intl.NumberFormat("es-ES", {
                   style: "currency",
                   currency: "EUR",
                 }).format(product.price)}
               </p>
-              <div className="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-300">
-                <div className="flex items-center gap-2">
-                  <Star className="w-4 h-4 text-yellow-400" />
+              <div className="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm text-gray-600 dark:text-gray-300">
+                <div className="flex items-center gap-1.5 sm:gap-2">
+                  <Star className="w-3.5 sm:w-4 h-3.5 sm:h-4 text-yellow-400" />
                   <span className="text-sm font-medium text-gray-900 dark:text-white">
                     {detailedProduct?.avgRating ?? 0}
                   </span>
@@ -323,13 +323,13 @@ const ProductModal = ({ product, onClose }) => {
             </div>
 
             {/* Tabs to separate details and reviews to avoid long scroll */}
-            <div className="mt-4 border-b border-gray-100 dark:border-gray-800 mb-4">
-              <div className="flex gap-2">
+            <div className="mt-3 sm:mt-4 border-b border-gray-100 dark:border-gray-800 mb-3 sm:mb-4">
+              <div className="flex gap-1 sm:gap-2">
                 <button
                   onClick={() => setSelectedTab("details")}
-                  className={`py-2 px-3 -mb-px ${
+                  className={`py-2 sm:py-2.5 px-3 sm:px-4 -mb-px text-sm sm:text-base min-h-[44px] flex items-center ${
                     selectedTab === "details"
-                      ? "border-b-2 border-primary-500 text-primary-600"
+                      ? "border-b-2 border-primary-500 text-primary-600 font-medium"
                       : "text-gray-600 dark:text-gray-300"
                   }`}
                 >
@@ -337,9 +337,9 @@ const ProductModal = ({ product, onClose }) => {
                 </button>
                 <button
                   onClick={() => setSelectedTab("reviews")}
-                  className={`py-2 px-3 -mb-px ${
+                  className={`py-2 sm:py-2.5 px-3 sm:px-4 -mb-px text-sm sm:text-base min-h-[44px] flex items-center ${
                     selectedTab === "reviews"
-                      ? "border-b-2 border-primary-500 text-primary-600"
+                      ? "border-b-2 border-primary-500 text-primary-600 font-medium"
                       : "text-gray-600 dark:text-gray-300"
                   }`}
                 >
@@ -387,25 +387,25 @@ const ProductModal = ({ product, onClose }) => {
                 )}
 
                 {/* CTA */}
-                <div className="mt-6 flex items-center gap-4">
-                  <button className="px-5 py-3 bg-gradient-to-r from-primary-500 to-primary-600 text-white rounded-full font-semibold shadow-lg hover:shadow-xl">
+                <div className="mt-4 sm:mt-6 flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
+                  <button className="px-4 sm:px-5 py-3 bg-gradient-to-r from-primary-500 to-primary-600 text-white rounded-full font-semibold shadow-lg hover:shadow-xl text-base min-h-[44px] flex items-center justify-center">
                     Añadir al carrito
                   </button>
                   <button
                     onClick={onClose}
-                    className="px-4 py-3 border rounded-full text-gray-700 dark:text-gray-200"
+                    className="px-4 py-3 border rounded-full text-gray-700 dark:text-gray-200 text-base min-h-[44px] flex items-center justify-center"
                   >
                     Cerrar
                   </button>
                 </div>
-                <div className="mt-6 text-xs text-gray-400">
+                <div className="mt-4 sm:mt-6 text-xs text-gray-400">
                   ID del producto: {product._id}
                 </div>
               </>
             )}
 
             {selectedTab === "reviews" && (
-              <div className="mt-6">
+              <div className="mt-4 sm:mt-6">
                 <Reviews
                   productId={product._id}
                   initialProduct={detailedProduct}

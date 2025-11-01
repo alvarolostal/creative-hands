@@ -78,7 +78,7 @@ const Home = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3, duration: 0.8 }}
-              className="text-5xl md:text-7xl font-bold copernicus copernicus-110 uppercase text-primary-500"
+              className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold copernicus copernicus-110 uppercase text-primary-500"
             >
               CREATIVE
               <span className="block">HANDS</span>
@@ -89,7 +89,7 @@ const Home = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.5, duration: 0.8 }}
-              className="text-lg md:text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto font-medium subtitle"
+              className="text-base sm:text-lg md:text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto font-medium subtitle px-4"
             >
               Descubre piezas únicas creadas con amor y dedicación.
               <br />
@@ -103,24 +103,24 @@ const Home = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.7, duration: 0.8 }}
-                className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-8"
+                className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 pt-8 px-4"
               >
-                <Link to="/products">
+                <Link to="/products" className="w-full sm:w-auto">
                   <motion.button
                     whileHover={{ y: -4 }}
                     transition={{ type: "spring", stiffness: 220, damping: 26 }}
-                    className="px-8 py-4 rounded-2xl font-medium text-lg shadow-md hover:shadow-xl transition-shadow duration-200 bg-primary-500 dark:bg-primary-600 text-white"
+                    className="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 rounded-2xl font-medium text-base sm:text-lg shadow-md hover:shadow-xl transition-shadow duration-200 bg-primary-500 dark:bg-primary-600 text-white min-h-[44px]"
                     style={{ willChange: "transform" }}
                   >
                     <span>Explorar Productos</span>
                   </motion.button>
                 </Link>
 
-                <Link to="/register">
+                <Link to="/register" className="w-full sm:w-auto">
                   <motion.button
                     whileHover={{ y: -3 }}
                     transition={{ type: "spring", stiffness: 200, damping: 26 }}
-                    className="px-8 py-4 glass rounded-2xl font-medium text-lg text-gray-900 dark:text-white shadow-md hover:shadow-lg transition-shadow duration-200"
+                    className="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 glass rounded-2xl font-medium text-base sm:text-lg text-gray-900 dark:text-white shadow-md hover:shadow-lg transition-shadow duration-200 min-h-[44px]"
                     style={{ willChange: "transform" }}
                   >
                     Comenzar ahora
@@ -149,24 +149,24 @@ const Home = () => {
       </section>
 
       {/* Featured Products Section (rediseñado): tarjetas que aparecen lateralmente al hacer scroll */}
-      <section id="destacados" className="py-24 bg-white dark:bg-dark-500">
+      <section id="destacados" className="py-16 sm:py-20 md:py-24 bg-white dark:bg-dark-500">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
-            className="text-center mb-12"
+            className="text-center mb-8 sm:mb-10 md:mb-12"
           >
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-3 sm:mb-4">
               Destacados
             </h2>
-            <p className="text-base md:text-lg text-gray-600 dark:text-gray-400">
+            <p className="text-sm sm:text-base md:text-lg text-gray-600 dark:text-gray-400 px-4">
               Lo mejor de nuestro taller — calidad artesanal y diseño único.
             </p>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
             {[
               {
                 slug: "joyeria-artesanal",
@@ -194,11 +194,11 @@ const Home = () => {
                 viewport={{ once: true, amount: 0.3 }}
                 transition={{ duration: 0.5, delay: i * 0.06 }}
                 whileHover={{ y: -6 }}
-                className="glass p-4 rounded-2xl shadow-lg hover:shadow-2xl transition-shadow duration-200"
+                className="glass p-3 sm:p-4 rounded-2xl shadow-lg hover:shadow-2xl transition-shadow duration-200"
                 style={{ willChange: "transform" }}
               >
-                <div className="flex items-start gap-4">
-                  <div className="w-20 h-20 rounded-xl overflow-hidden flex-shrink-0">
+                <div className="flex flex-col sm:flex-row items-start gap-3 sm:gap-4">
+                  <div className="w-full sm:w-20 h-48 sm:h-20 rounded-xl overflow-hidden flex-shrink-0">
                     <img
                       src={c.img}
                       alt={c.title}
@@ -209,14 +209,14 @@ const Home = () => {
                       decoding="async"
                     />
                   </div>
-                  <div className="flex-1">
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  <div className="flex-1 w-full">
+                    <h3 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white mb-2">
                       {c.title}
                     </h3>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-3 sm:mb-4">
                       {c.text}
                     </p>
-                    <div className="mt-4">
+                    <div className="mt-3 sm:mt-4">
                       <MotionLink
                         to={`/products/category/${c.slug}`}
                         whileHover={{ y: -3 }}
@@ -225,7 +225,7 @@ const Home = () => {
                           stiffness: 200,
                           damping: 26,
                         }}
-                        className="inline-flex items-center px-3 py-2 rounded-xl bg-primary-500 text-white text-sm font-medium hover:shadow-md hover:opacity-95 transition-shadow duration-200"
+                        className="inline-flex items-center px-4 py-2.5 rounded-xl bg-primary-500 text-white text-sm font-medium hover:shadow-md hover:opacity-95 transition-shadow duration-200 min-h-[44px]"
                         style={{
                           willChange: "transform, opacity",
                           transitionProperty: "box-shadow, opacity",
@@ -245,15 +245,15 @@ const Home = () => {
       </section>
 
       {/* Footer (fino) */}
-      <footer className="mt-12 mb-12" role="contentinfo">
+      <footer className="mt-8 sm:mt-10 md:mt-12 mb-8 sm:mb-10 md:mb-12 px-4" role="contentinfo">
         <div className="flex justify-center">
-          <div className="inline-flex items-center gap-3 px-6 py-3 md:px-8 md:py-3 rounded-xl bg-white/8 dark:bg-gray-800/60 backdrop-blur-md text-sm md:text-base text-gray-700 dark:text-gray-100 shadow-md border border-white/6 dark:border-white/10">
+          <div className="inline-flex flex-col sm:flex-row items-center gap-2 sm:gap-3 px-4 sm:px-6 md:px-8 py-3 rounded-xl bg-white/8 dark:bg-gray-800/60 backdrop-blur-md text-sm md:text-base text-gray-700 dark:text-gray-100 shadow-md border border-white/6 dark:border-white/10">
             <span className="font-medium">© 2025 Álvaro Lostal</span>
-            <span className="opacity-50">·</span>
+            <span className="hidden sm:inline opacity-50">·</span>
             <span aria-hidden="true" className="text-red-400">
               ♥
             </span>
-            <span className="opacity-50">·</span>
+            <span className="hidden sm:inline opacity-50">·</span>
             <span className="font-medium">Creative Hands</span>
           </div>
         </div>

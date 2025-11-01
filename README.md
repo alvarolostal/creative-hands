@@ -10,7 +10,7 @@
 **Portal de productos artesanales con autenticación JWT y chat en tiempo real**  
 _Trabajo práctico para Desarrollo Web I_
 
-[🌐 Ver Demo en Vivo](https://creative-hands.onrender.com)
+[🌐 Ver Demo en Vivo](https://creative-hands-cjzg.onrender.com)
 
 </div>
 
@@ -26,7 +26,7 @@ Aplicación web full-stack para la venta de productos artesanales que permite a 
 
 La aplicación está desplegada en **Render** con **MongoDB Atlas**:
 
-🔗 **[https://creative-hands.onrender.com](https://creative-hands-cjzg.onrender.com/)**
+🔗 **[https://creative-hands-cjzg.onrender.com](https://creative-hands-cjzg.onrender.com/)**
 
 > ⚠️ **Nota**: El primer acceso puede tardar ~1 minuto (Render hiberna servicios gratuitos tras inactividad)
 

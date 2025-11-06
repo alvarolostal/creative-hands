@@ -48,3 +48,4 @@ __pycache__/
 # Optional: lockfiles are usually committed. Uncomment if you do not want them
 # package-lock.json
 # yarn.lockserver.log
+`n# Ignorar build dev-dist`nclient/dev-dist/

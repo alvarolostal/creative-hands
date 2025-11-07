@@ -87,6 +87,7 @@ Los tests cubren autenticación, gestión de productos, categorías y chat usand
 - TailwindCSS + Framer Motion
 - Socket.io Client
 - Axios
+- Context API (Auth, Cart, Theme, Socket)
 
 **Backend**
 - Node.js + Express
@@ -94,6 +95,13 @@ Los tests cubren autenticación, gestión de productos, categorías y chat usand
 - Socket.io
 - JWT + bcrypt
 - Multer + Cloudinary (almacenamiento de imágenes en la nube)
+
+**Nuevas Funcionalidades E-commerce**
+- Sistema completo de carrito de compra
+- Gestión de pedidos (Orders)
+- Checkout con cálculo de envío e IVA
+- Perfil de usuario con direcciones
+- Panel de administración de pedidos
 
 ## 📁 Estructura
 
@@ -117,18 +125,23 @@ creative-hands/
 ## 🎯 Funcionalidades
 
 ### Usuarios
-✅ Registro y autenticación con JWT  
-✅ Navegación por categorías de productos  
-✅ Visualización detallada de productos  
-✅ Sistema de valoraciones  
-✅ Chat en tiempo real con administradores  
+✅ Registro y autenticación con JWT
+✅ Navegación por categorías de productos
+✅ Visualización detallada de productos
+✅ Sistema de valoraciones y reseñas
+✅ **Carrito de compra** - Gestión de productos con cantidades
+✅ **Proceso de checkout** - Formulario completo de compra
+✅ **Mis Pedidos** - Historial y seguimiento de pedidos
+✅ **Perfil de usuario** - Actualización de datos y contraseña
+✅ Chat en tiempo real con administradores
 ✅ Tema claro/oscuro automático
 
 ### Administradores
-✅ Panel de administración protegido  
-✅ CRUD completo de productos y categorías  
-✅ Subida de imágenes a Cloudinary con optimización automática  
-✅ Gestión de múltiples conversaciones simultáneas  
+✅ Panel de administración protegido
+✅ CRUD completo de productos y categorías
+✅ **Gestión de pedidos** - Visualización y actualización de estados
+✅ Subida de imágenes a Cloudinary con optimización automática
+✅ Gestión de múltiples conversaciones simultáneas
 ✅ Indicadores de estado (online/escribiendo)
 
 ## 💡 Decisiones de Desarrollo

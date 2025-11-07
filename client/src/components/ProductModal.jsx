@@ -1,8 +1,9 @@
 import { useEffect, useState, useRef } from "react";
 import { motion } from "framer-motion";
-import { X, ChevronLeft, ChevronRight, Star } from "lucide-react";
+import { X, ChevronLeft, ChevronRight, Star, ShoppingCart } from "lucide-react";
 import axios from "axios";
 import { useAuth } from "../context/AuthContext";
+import { useCart } from "../context/CartContext";
 import Reviews from "./Reviews";
 
 const backdropVariants = {
@@ -29,6 +30,8 @@ const ProductModal = ({ product, onClose }) => {
   const isFirstMount = useRef(true);
   const touchStartX = useRef(null);
   const touchEndX = useRef(null);
+  const [adding, setAdding] = useState(false);
+  const { addToCart } = useCart();
 
   useEffect(() => {
     const handleKey = (e) => {
@@ -65,7 +68,13 @@ const ProductModal = ({ product, onClose }) => {
 
   if (!product) return null;
 
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, isAdmin } = useAuth();
+
+  const handleAddToCart = async () => {
+    setAdding(true);
+    await addToCart(product._id, 1);
+    setAdding(false);
+  };
 
   // detailedProduct: fetched product with reviews
   const [detailedProduct, setDetailedProduct] = useState(product);
@@ -388,9 +397,16 @@ const ProductModal = ({ product, onClose }) => {
 
                 {/* CTA */}
                 <div className="mt-4 sm:mt-6 flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
-                  <button className="px-4 sm:px-5 py-3 bg-gradient-to-r from-primary-500 to-primary-600 text-white rounded-full font-semibold shadow-lg hover:shadow-xl text-base min-h-[44px] flex items-center justify-center">
-                    Añadir al carrito
-                  </button>
+                  {user && !isAdmin && (
+                    <button
+                      onClick={handleAddToCart}
+                      disabled={product.stock === 0 || adding}
+                      className="px-4 sm:px-5 py-3 bg-gradient-to-r from-primary-500 to-primary-600 text-white rounded-full font-semibold shadow-lg hover:shadow-xl text-base min-h-[44px] flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <ShoppingCart className="w-5 h-5" />
+                      {adding ? "Añadiendo..." : "Añadir al carrito"}
+                    </button>
+                  )}
                   <button
                     onClick={onClose}
                     className="px-4 py-3 border rounded-full text-gray-700 dark:text-gray-200 text-base min-h-[44px] flex items-center justify-center"

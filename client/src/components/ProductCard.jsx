@@ -1,5 +1,8 @@
 import { motion } from "framer-motion";
-import { Edit, Trash2, Package, Star } from "lucide-react";
+import { Edit, Trash2, Package, Star, ShoppingCart } from "lucide-react";
+import { useCart } from "../context/CartContext";
+import { useAuth } from "../context/AuthContext";
+import { useState } from "react";
 
 const ProductCard = ({
   product,
@@ -9,11 +12,21 @@ const ProductCard = ({
   onViewDetails,
   hideDetails,
 }) => {
+  const { addToCart } = useCart();
+  const { user } = useAuth();
+  const [adding, setAdding] = useState(false);
   const formatPrice = (price) => {
     return new Intl.NumberFormat("es-ES", {
       style: "currency",
       currency: "EUR",
     }).format(price);
+  };
+
+  const handleAddToCart = async (e) => {
+    e.stopPropagation();
+    setAdding(true);
+    await addToCart(product._id, 1);
+    setAdding(false);
   };
 
   return (
@@ -121,18 +134,32 @@ const ProductCard = ({
             )}
           </div>
 
-          {!hideDetails && (
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              // dejar la animación de escala a framer-motion; CSS solo anima colores
-              className="px-3 sm:px-4 py-2 bg-gradient-to-r from-primary-500 to-primary-600 text-white rounded-full text-xs sm:text-sm font-semibold shadow-lg hover:shadow-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap min-h-[40px] sm:min-h-[44px]"
-              disabled={product.stock === 0}
-              onClick={() => onViewDetails && onViewDetails(product)}
-            >
-              Ver detalles
-            </motion.button>
-          )}
+          <div className="flex gap-2">
+            {!hideDetails && (
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="px-3 sm:px-4 py-2 bg-gradient-to-r from-primary-500 to-primary-600 text-white rounded-full text-xs sm:text-sm font-semibold shadow-lg hover:shadow-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap min-h-[40px] sm:min-h-[44px]"
+                disabled={product.stock === 0}
+                onClick={() => onViewDetails && onViewDetails(product)}
+              >
+                Ver detalles
+              </motion.button>
+            )}
+
+            {user && !isAdmin && (
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="p-2 sm:p-3 bg-green-500 text-white rounded-full shadow-lg hover:shadow-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed min-h-[40px] min-w-[40px] sm:min-h-[44px] sm:min-w-[44px] flex items-center justify-center"
+                disabled={product.stock === 0 || adding}
+                onClick={handleAddToCart}
+                title="Añadir al carrito"
+              >
+                <ShoppingCart className="w-4 h-4 sm:w-5 sm:h-5" />
+              </motion.button>
+            )}
+          </div>
         </div>
       </div>
     </motion.div>

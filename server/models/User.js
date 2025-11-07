@@ -39,6 +39,24 @@ const userSchema = new mongoose.Schema(
       type: Date,
       default: Date.now,
     },
+    shippingAddresses: [
+      {
+        fullName: String,
+        address: String,
+        city: String,
+        postalCode: String,
+        province: String,
+        country: {
+          type: String,
+          default: "España",
+        },
+        phone: String,
+        isDefault: {
+          type: Boolean,
+          default: false,
+        },
+      },
+    ],
   },
   {
     timestamps: true,

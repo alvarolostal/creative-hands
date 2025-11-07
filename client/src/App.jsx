@@ -8,14 +8,19 @@ import {
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import { SocketProvider } from "./context/SocketContext";
 import { ThemeProvider } from "./context/ThemeContext";
+import { CartProvider } from "./context/CartContext";
 import Navbar from "./components/Navbar";
+import CartDrawer from "./components/CartDrawer";
 const ChatWidget = lazy(() => import("./components/ChatWidget"));
 import ErrorBoundary from "./components/ErrorBoundary";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Products from "./pages/Products";
+import Checkout from "./pages/Checkout";
 const Admin = lazy(() => import("./pages/Admin"));
+const MyOrders = lazy(() => import("./pages/MyOrders"));
+const Profile = lazy(() => import("./pages/Profile"));
 import { Loader } from "lucide-react";
 
 // Protected Route Component
@@ -60,6 +65,7 @@ function AppContent() {
   return (
     <div className="min-h-screen bg-light-500 dark:bg-dark-500 transition-colors duration-300">
       <Navbar />
+      <CartDrawer />
       <ErrorBoundary>
         <Routes>
           <Route path="/" element={<Home />} />
@@ -67,6 +73,34 @@ function AppContent() {
           <Route path="/register" element={<Register />} />
           <Route path="/products/category/:slug" element={<Products />} />
           <Route path="/products" element={<Products />} />
+          <Route
+            path="/checkout"
+            element={
+              <ProtectedRoute>
+                <Checkout />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/my-orders"
+            element={
+              <ProtectedRoute>
+                <Suspense fallback={<div />}>
+                  <MyOrders />
+                </Suspense>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <Suspense fallback={<div />}>
+                  <Profile />
+                </Suspense>
+              </ProtectedRoute>
+            }
+          />
           <Route
             path="/admin"
             element={
@@ -92,9 +126,11 @@ function App() {
     <Router>
       <ThemeProvider>
         <AuthProvider>
-          <SocketProvider>
-            <AppContent />
-          </SocketProvider>
+          <CartProvider>
+            <SocketProvider>
+              <AppContent />
+            </SocketProvider>
+          </CartProvider>
         </AuthProvider>
       </ThemeProvider>
     </Router>

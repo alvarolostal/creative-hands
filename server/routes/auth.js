@@ -155,6 +155,67 @@ router.get("/me", protect, async (req, res) => {
   }
 });
 
+// @route   PUT /api/auth/profile
+// @desc    Actualizar perfil de usuario
+// @access  Private
+router.put("/profile", protect, async (req, res) => {
+  try {
+    const { name, email, currentPassword, newPassword } = req.body;
+
+    const user = await User.findById(req.user.id).select("+password");
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "Usuario no encontrado",
+      });
+    }
+
+    // Si se intenta cambiar la contraseña
+    if (newPassword) {
+      if (!currentPassword) {
+        return res.status(400).json({
+          success: false,
+          message: "Debes proporcionar tu contraseña actual",
+        });
+      }
+
+      const isMatch = await user.comparePassword(currentPassword);
+      if (!isMatch) {
+        return res.status(401).json({
+          success: false,
+          message: "Contraseña actual incorrecta",
+        });
+      }
+
+      user.password = newPassword;
+    }
+
+    // Actualizar otros campos
+    if (name) user.name = name;
+    if (email) user.email = email;
+
+    await user.save();
+
+    res.json({
+      success: true,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        avatar: user.avatar,
+      },
+    });
+  } catch (error) {
+    console.error("Error al actualizar perfil:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error al actualizar el perfil",
+    });
+  }
+});
+
 // @route   POST /api/auth/logout
 // @desc    Cerrar sesión
 // @access  Private

@@ -18,6 +18,11 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Products from "./pages/Products";
 import Checkout from "./pages/Checkout";
+import About from "./pages/About";
+import Contact from "./pages/Contact";
+import Terms from "./pages/Terms";
+import Privacy from "./pages/Privacy";
+import Footer from "./components/Footer";
 const Admin = lazy(() => import("./pages/Admin"));
 const MyOrders = lazy(() => import("./pages/MyOrders"));
 const Profile = lazy(() => import("./pages/Profile"));
@@ -73,6 +78,10 @@ function AppContent() {
           <Route path="/register" element={<Register />} />
           <Route path="/products/category/:slug" element={<Products />} />
           <Route path="/products" element={<Products />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/terms" element={<Terms />} />
+          <Route path="/privacy" element={<Privacy />} />
           <Route
             path="/checkout"
             element={
@@ -117,6 +126,7 @@ function AppContent() {
       <Suspense fallback={null}>
         <ChatWidget />
       </Suspense>
+      <Footer />
     </div>
   );
 }

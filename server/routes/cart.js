@@ -2,17 +2,17 @@ const express = require("express");
 const router = express.Router();
 const Cart = require("../models/Cart");
 const Product = require("../models/Product");
-const auth = require("../middleware/auth");
+const { protect } = require("../middleware/auth");
 
 // Obtener el carrito del usuario
-router.get("/", auth, async (req, res) => {
+router.get("/", protect, async (req, res) => {
   try {
-    let cart = await Cart.findOne({ user: req.userId }).populate(
+    let cart = await Cart.findOne({ user: req.user.id }).populate(
       "items.product"
     );
 
     if (!cart) {
-      cart = new Cart({ user: req.userId, items: [] });
+      cart = new Cart({ user: req.user.id, items: [] });
       await cart.save();
     }
 
@@ -24,7 +24,7 @@ router.get("/", auth, async (req, res) => {
 });
 
 // Añadir producto al carrito
-router.post("/add", auth, async (req, res) => {
+router.post("/add", protect, async (req, res) => {
   try {
     const { productId, quantity = 1 } = req.body;
 
@@ -42,10 +42,10 @@ router.post("/add", auth, async (req, res) => {
       return res.status(400).json({ message: "Stock insuficiente" });
     }
 
-    let cart = await Cart.findOne({ user: req.userId });
+    let cart = await Cart.findOne({ user: req.user.id });
 
     if (!cart) {
-      cart = new Cart({ user: req.userId, items: [] });
+      cart = new Cart({ user: req.user.id, items: [] });
     }
 
     // Verificar si el producto ya está en el carrito
@@ -83,7 +83,7 @@ router.post("/add", auth, async (req, res) => {
 });
 
 // Actualizar cantidad de un producto en el carrito
-router.put("/update/:productId", auth, async (req, res) => {
+router.put("/update/:productId", protect, async (req, res) => {
   try {
     const { productId } = req.params;
     const { quantity } = req.body;
@@ -94,7 +94,7 @@ router.put("/update/:productId", auth, async (req, res) => {
         .json({ message: "La cantidad debe ser al menos 1" });
     }
 
-    const cart = await Cart.findOne({ user: req.userId });
+    const cart = await Cart.findOne({ user: req.user.id });
 
     if (!cart) {
       return res.status(404).json({ message: "Carrito no encontrado" });
@@ -129,11 +129,11 @@ router.put("/update/:productId", auth, async (req, res) => {
 });
 
 // Eliminar producto del carrito
-router.delete("/remove/:productId", auth, async (req, res) => {
+router.delete("/remove/:productId", protect, async (req, res) => {
   try {
     const { productId } = req.params;
 
-    const cart = await Cart.findOne({ user: req.userId });
+    const cart = await Cart.findOne({ user: req.user.id });
 
     if (!cart) {
       return res.status(404).json({ message: "Carrito no encontrado" });
@@ -155,9 +155,9 @@ router.delete("/remove/:productId", auth, async (req, res) => {
 });
 
 // Vaciar el carrito
-router.delete("/clear", auth, async (req, res) => {
+router.delete("/clear", protect, async (req, res) => {
   try {
-    const cart = await Cart.findOne({ user: req.userId });
+    const cart = await Cart.findOne({ user: req.user.id });
 
     if (!cart) {
       return res.status(404).json({ message: "Carrito no encontrado" });

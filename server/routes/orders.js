@@ -3,15 +3,15 @@ const router = express.Router();
 const Order = require("../models/Order");
 const Cart = require("../models/Cart");
 const Product = require("../models/Product");
-const auth = require("../middleware/auth");
+const { protect } = require("../middleware/auth");
 
 // Crear un nuevo pedido
-router.post("/", auth, async (req, res) => {
+router.post("/", protect, async (req, res) => {
   try {
     const { shippingAddress, paymentMethod } = req.body;
 
     // Obtener el carrito del usuario
-    const cart = await Cart.findOne({ user: req.userId }).populate(
+    const cart = await Cart.findOne({ user: req.user.id }).populate(
       "items.product"
     );
 
@@ -51,7 +51,7 @@ router.post("/", auth, async (req, res) => {
 
     // Crear el pedido
     const order = new Order({
-      user: req.userId,
+      user: req.user.id,
       items: orderItems,
       shippingAddress,
       paymentInfo: {
@@ -85,9 +85,9 @@ router.post("/", auth, async (req, res) => {
 });
 
 // Obtener pedidos del usuario
-router.get("/my-orders", auth, async (req, res) => {
+router.get("/my-orders", protect, async (req, res) => {
   try {
-    const orders = await Order.find({ user: req.userId })
+    const orders = await Order.find({ user: req.user.id })
       .populate("items.product", "name images")
       .sort({ createdAt: -1 });
 
@@ -99,7 +99,7 @@ router.get("/my-orders", auth, async (req, res) => {
 });
 
 // Obtener un pedido específico
-router.get("/:id", auth, async (req, res) => {
+router.get("/:id", protect, async (req, res) => {
   try {
     const order = await Order.findById(req.params.id).populate(
       "items.product",
@@ -111,7 +111,7 @@ router.get("/:id", auth, async (req, res) => {
     }
 
     // Verificar que el pedido pertenece al usuario o es admin
-    if (order.user.toString() !== req.userId && req.userRole !== "admin") {
+    if (order.user.toString() !== req.user.id && req.user.role !== "admin") {
       return res.status(403).json({ message: "Acceso denegado" });
     }
 
@@ -123,9 +123,9 @@ router.get("/:id", auth, async (req, res) => {
 });
 
 // Obtener todos los pedidos (solo admin)
-router.get("/", auth, async (req, res) => {
+router.get("/", protect, async (req, res) => {
   try {
-    if (req.userRole !== "admin") {
+    if (req.user.role !== "admin") {
       return res.status(403).json({ message: "Acceso denegado" });
     }
 
@@ -142,9 +142,9 @@ router.get("/", auth, async (req, res) => {
 });
 
 // Actualizar estado del pedido (solo admin)
-router.put("/:id/status", auth, async (req, res) => {
+router.put("/:id/status", protect, async (req, res) => {
   try {
-    if (req.userRole !== "admin") {
+    if (req.user.role !== "admin") {
       return res.status(403).json({ message: "Acceso denegado" });
     }
 

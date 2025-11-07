@@ -3,7 +3,7 @@ import { Heart, Target, Users, Award } from "lucide-react";
 
 const About = () => {
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-dark-500 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-dark-500 pt-24 pb-16 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}

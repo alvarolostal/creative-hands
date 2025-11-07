@@ -244,20 +244,93 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Footer (fino) */}
-      <footer className="mt-8 sm:mt-10 md:mt-12 mb-8 sm:mb-10 md:mb-12 px-4" role="contentinfo">
-        <div className="flex justify-center">
-          <div className="inline-flex flex-row items-center gap-2 sm:gap-3 px-4 sm:px-6 md:px-8 py-3 rounded-xl bg-white/8 dark:bg-gray-800/60 backdrop-blur-md text-sm md:text-base text-gray-700 dark:text-gray-100 shadow-md border border-white/6 dark:border-white/10">
-            <span className="font-medium">© 2025 Álvaro Lostal</span>
-            <span className="opacity-50">·</span>
-            <span aria-hidden="true" className="text-red-400">
-              ♥
-            </span>
-            <span className="opacity-50">·</span>
-            <span className="font-medium">Creative Hands</span>
+      {/* Why Choose Us Section */}
+      <section className="py-16 sm:py-20 md:py-24 bg-gradient-to-br from-light-500 via-primary-50 to-light-500 dark:from-dark-600 dark:via-dark-500 dark:to-dark-600">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="text-center mb-12 sm:mb-16"
+          >
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
+              ¿Por qué elegirnos?
+            </h2>
+            <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+              Cada pieza es una obra de arte única, creada con dedicación y pasión por artistas locales
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {[
+              {
+                icon: Heart,
+                title: "Hecho con amor",
+                description: "Cada producto es único y está hecho con dedicación y cariño por artistas apasionados"
+              },
+              {
+                icon: Sparkles,
+                title: "Calidad premium",
+                description: "Utilizamos solo los mejores materiales para garantizar la durabilidad de nuestras creaciones"
+              },
+              {
+                icon: Palette,
+                title: "Diseño único",
+                description: "Productos exclusivos que no encontrarás en ningún otro lugar, diseñados especialmente para ti"
+              }
+            ].map((feature, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+                className="glass p-8 rounded-2xl text-center hover:shadow-xl transition-shadow duration-300"
+              >
+                <div className="inline-flex items-center justify-center w-16 h-16 bg-primary-500 rounded-2xl mb-4">
+                  <feature.icon className="w-8 h-8 text-white" />
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">
+                  {feature.title}
+                </h3>
+                <p className="text-gray-600 dark:text-gray-300">
+                  {feature.description}
+                </p>
+              </motion.div>
+            ))}
           </div>
         </div>
-      </footer>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-16 sm:py-20 bg-white dark:bg-dark-500">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="glass p-8 sm:p-12 rounded-3xl"
+          >
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-4">
+              Únete a nuestra comunidad
+            </h2>
+            <p className="text-lg text-gray-600 dark:text-gray-300 mb-8">
+              Descubre productos únicos y apoya el talento artesanal local
+            </p>
+            <Link to="/register">
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="px-8 py-4 bg-primary-500 hover:bg-primary-600 text-white rounded-2xl font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-200"
+              >
+                Comenzar ahora
+              </motion.button>
+            </Link>
+          </motion.div>
+        </div>
+      </section>
     </div>
   );
 };

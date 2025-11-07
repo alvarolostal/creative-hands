@@ -22,6 +22,7 @@ import About from "./pages/About";
 import Contact from "./pages/Contact";
 import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
+import GoogleAuthSuccess from "./pages/GoogleAuthSuccess";
 import Footer from "./components/Footer";
 const Admin = lazy(() => import("./pages/Admin"));
 const MyOrders = lazy(() => import("./pages/MyOrders"));
@@ -76,6 +77,7 @@ function AppContent() {
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/auth/google/success" element={<GoogleAuthSuccess />} />
           <Route path="/products/category/:slug" element={<Products />} />
           <Route path="/products" element={<Products />} />
           <Route path="/about" element={<About />} />

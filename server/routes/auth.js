@@ -3,6 +3,7 @@ const router = express.Router();
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 const { protect } = require("../middleware/auth");
+const passport = require("../config/passport");
 
 // Generar JWT
 const generateToken = (id) => {
@@ -239,5 +240,48 @@ router.post("/logout", protect, async (req, res) => {
     });
   }
 });
+
+// @route   GET /api/auth/google
+// @desc    Iniciar autenticación con Google
+// @access  Public
+router.get(
+  "/google",
+  passport.authenticate("google", {
+    scope: ["profile", "email"],
+    session: false,
+  })
+);
+
+// @route   GET /api/auth/google/callback
+// @desc    Callback de Google OAuth
+// @access  Public
+router.get(
+  "/google/callback",
+  passport.authenticate("google", {
+    session: false,
+    failureRedirect: process.env.NODE_ENV === "production"
+      ? `${process.env.CLIENT_URL}/login?error=google_auth_failed`
+      : "http://localhost:5173/login?error=google_auth_failed",
+  }),
+  (req, res) => {
+    try {
+      // Generar token JWT
+      const token = generateToken(req.user._id);
+
+      // Redirigir al frontend con el token
+      const redirectUrl = process.env.NODE_ENV === "production"
+        ? `${process.env.CLIENT_URL}/auth/google/success?token=${token}`
+        : `http://localhost:5173/auth/google/success?token=${token}`;
+
+      res.redirect(redirectUrl);
+    } catch (error) {
+      console.error("Error en callback de Google:", error);
+      const errorUrl = process.env.NODE_ENV === "production"
+        ? `${process.env.CLIENT_URL}/login?error=auth_failed`
+        : "http://localhost:5173/login?error=auth_failed";
+      res.redirect(errorUrl);
+    }
+  }
+);
 
 module.exports = router;

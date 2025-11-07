@@ -5,10 +5,12 @@ const http = require("http");
 const socketIo = require("socket.io");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
+const session = require("express-session");
 const connectDB = require("./config/db");
 const User = require("./models/User");
 const Message = require("./models/Message");
 const jwt = require("jsonwebtoken");
+const passport = require("./config/passport");
 
 const app = express();
 const server = http.createServer(app);
@@ -60,6 +62,19 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+
+// Session para Passport (necesario para OAuth)
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET || "creative-hands-secret-key",
+    resave: false,
+    saveUninitialized: false,
+  })
+);
+
+// Inicializar Passport
+app.use(passport.initialize());
+app.use(passport.session());
 
 // Servir imágenes subidas desde /uploads
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));

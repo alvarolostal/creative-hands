@@ -18,17 +18,9 @@ const userSchema = new mongoose.Schema(
     },
     password: {
       type: String,
-      required: function() {
-        // Solo requerido si no hay googleId
-        return !this.googleId;
-      },
+      required: [true, "La contraseña es obligatoria"],
       minlength: 6,
       select: false,
-    },
-    googleId: {
-      type: String,
-      unique: true,
-      sparse: true, // Permite múltiples null values
     },
     role: {
       type: String,
@@ -73,8 +65,7 @@ const userSchema = new mongoose.Schema(
 
 // Encriptar contraseña antes de guardar
 userSchema.pre("save", async function (next) {
-  // Solo encriptar si hay password y ha sido modificado
-  if (!this.password || !this.isModified("password")) return next();
+  if (!this.isModified("password")) return next();
 
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);

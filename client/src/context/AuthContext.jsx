@@ -1,5 +1,5 @@
 import { createContext, useState, useContext, useEffect } from "react";
-import axios from "axios";
+import axios from "../utils/axios";
 
 const AuthContext = createContext();
 
@@ -19,13 +19,11 @@ export const AuthProvider = ({ children }) => {
   // entre pestañas diferentes (comportamiento deseado para sesiones independientes).
   const [token, setToken] = useState(sessionStorage.getItem("token"));
 
-  // Configurar axios con el token
+  // Guardar token en sessionStorage
   useEffect(() => {
     if (token) {
-      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
       sessionStorage.setItem("token", token);
     } else {
-      delete axios.defaults.headers.common["Authorization"];
       sessionStorage.removeItem("token");
     }
   }, [token]);
@@ -92,12 +90,7 @@ export const AuthProvider = ({ children }) => {
   const login = async (credentials) => {
     try {
       const { data } = await axios.post("/api/auth/login", credentials);
-      // Guardar token y establecer header de axios inmediatamente para evitar
-      // race conditions donde componentes montados hagan peticiones protegidas
-      // antes de que el useEffect tenga oportunidad de ejecutar.
-      axios.defaults.headers.common["Authorization"] = `Bearer ${data.token}`;
-      // Guardar en sessionStorage para que la autenticación sea independiente por pestaña
-      sessionStorage.setItem("token", data.token);
+      // Guardar token en estado y sessionStorage
       setToken(data.token);
 
       try {
@@ -106,8 +99,6 @@ export const AuthProvider = ({ children }) => {
         return { success: true };
       } catch (err) {
         // Si /me falla, limpiar estado y devolver error
-        delete axios.defaults.headers.common["Authorization"];
-        localStorage.removeItem("token");
         setToken(null);
         setUser(null);
         return {

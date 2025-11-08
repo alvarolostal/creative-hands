@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, Filter, Loader, Package } from "lucide-react";
-import axios from "axios";
+import axios from "../utils/axios";
 import ProductCard from "../components/ProductCard";
 import ProductModal from "../components/ProductModal";
 import { useAuth } from "../context/AuthContext";

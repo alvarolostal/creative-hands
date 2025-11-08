@@ -1,5 +1,6 @@
 import { createContext, useState, useContext, useEffect } from "react";
-import axios from "../utils/axios";
+import axios from "axios";
+import apiClient from "../utils/axios";
 
 const AuthContext = createContext();
 
@@ -10,6 +11,13 @@ export const useAuth = () => {
   }
   return context;
 };
+
+// Configurar axios base para autenticación (sin interceptor)
+const baseURL = import.meta.env.VITE_API_URL || "/api";
+const authAxios = axios.create({
+  baseURL,
+  withCredentials: true,
+});
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -30,7 +38,7 @@ export const AuthProvider = ({ children }) => {
 
   // Interceptor global para capturar 401 (token expirado / inválido)
   useEffect(() => {
-    const responseInterceptor = axios.interceptors.response.use(
+    const responseInterceptor = apiClient.interceptors.response.use(
       (response) => response,
       (error) => {
         const status = error?.response?.status;
@@ -50,7 +58,7 @@ export const AuthProvider = ({ children }) => {
     );
 
     return () => {
-      axios.interceptors.response.eject(responseInterceptor);
+      apiClient.interceptors.response.eject(responseInterceptor);
     };
   }, []);
 
@@ -59,7 +67,7 @@ export const AuthProvider = ({ children }) => {
     const checkAuth = async () => {
       if (token) {
         try {
-          const { data } = await axios.get("/api/auth/me");
+          const { data } = await apiClient.get("/api/auth/me");
           setUser(data.user);
         } catch (error) {
           console.error("Error al verificar autenticación:", error);
@@ -75,7 +83,7 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (userData) => {
     try {
-      const { data } = await axios.post("/api/auth/register", userData);
+      const { data } = await authAxios.post("/api/auth/register", userData);
       setToken(data.token);
       setUser(data.user);
       return { success: true };
@@ -89,12 +97,12 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (credentials) => {
     try {
-      const { data } = await axios.post("/api/auth/login", credentials);
+      const { data } = await authAxios.post("/api/auth/login", credentials);
       // Guardar token en estado y sessionStorage
       setToken(data.token);
 
       try {
-        const { data: me } = await axios.get("/api/auth/me");
+        const { data: me } = await apiClient.get("/api/auth/me");
         setUser(me.user);
         return { success: true };
       } catch (err) {
@@ -118,7 +126,7 @@ export const AuthProvider = ({ children }) => {
 
   const logout = async () => {
     try {
-      await axios.post("/api/auth/logout");
+      await apiClient.post("/api/auth/logout");
     } catch (error) {
       console.error("Error al cerrar sesión:", error);
     } finally {

@@ -16,7 +16,7 @@ import {
   XCircle,
   Clock,
 } from "lucide-react";
-import axios from "axios";
+import axios from "../utils/axios";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import ProductCard from "../components/ProductCard";

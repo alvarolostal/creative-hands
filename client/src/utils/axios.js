@@ -1,12 +1,7 @@
 import axios from "axios";
 
 // Configurar baseURL según el entorno
-// En desarrollo, usar el proxy de Vite (/api)
-// En producción, usar la URL completa del backend
-const baseURL =
-  import.meta.env.PROD
-    ? (import.meta.env.VITE_API_URL || "/api")
-    : "/api";
+const baseURL = import.meta.env.VITE_API_URL || "/api";
 
 // Crear instancia de axios con configuración base
 const api = axios.create({

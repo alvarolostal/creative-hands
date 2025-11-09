@@ -10,7 +10,7 @@
 **Portal de productos artesanales con autenticación JWT y chat en tiempo real**  
 _Trabajo práctico para Desarrollo Web I_
 
-[🌐 Ver Demo en Vivo](https://creative-hands-cjzg.onrender.com)
+[🌐 Ver Demo en Vivo](https://creative-hands-cjzg.onrender.com) | [📁 Ver Repositorio](https://github.com/lostal/creative-hands)
 
 </div>
 
@@ -20,64 +20,46 @@ _Trabajo práctico para Desarrollo Web I_
 
 Aplicación web full-stack para la venta de productos artesanales que permite a usuarios navegar por catálogos organizados por categorías, mientras que los administradores gestionan productos, categorías y se comunican con clientes mediante un sistema de chat en tiempo real.
 
-## 🚀 Ejecución y Pruebas
+## 🎯 Funcionalidades y Cumplimientos
+Resumen de lo implementado (mapa con los requisitos de la Práctica 1):
 
-### Opción 1: Probar la aplicación en producción
+- Autenticación con JWT: registro y login implementados; middleware valida tokens para rutas privadas y sockets.
+- Roles y permisos: usuarios (ver productos) y administradores (CRUD completo de productos).
+- Gestión de productos: listar, crear, ver detalle, editar y eliminar; subida de imágenes a Cloudinary.
+- Chat en tiempo real: integración con Socket.IO; solo usuarios autenticados pueden acceder; los mensajes incluyen nombre de usuario. Historial persistente disponible en la base de datos.
+- Persistencia: usuarios, productos y mensajes en MongoDB (modelos en `server/models`).
+- PWA: soporte básico (manifest + service worker) para instalación y offline.
+- Tests: suites automatizadas con Jest, Supertest y MongoDB Memory Server para probar autenticación, productos y chat.
 
-La aplicación está desplegada en **Render** con **MongoDB Atlas**:
+## 🚀 Ejecutar y probar (rápido)
 
-🔗 **[https://creative-hands-cjzg.onrender.com](https://creative-hands-cjzg.onrender.com/)**
+Hay una demo pública en Render: https://creative-hands-cjzg.onrender.com
 
-> ⚠️ **Nota**: El primer acceso puede tardar ~1 minuto (Render hiberna servicios gratuitos tras inactividad)
+Resumen mínimo para ejecutar localmente:
 
-### Opción 2: Ejecutar localmente
-
-#### Requisitos previos
-- Node.js 18+ y npm
-- MongoDB (local o Atlas)
-- Git
-
-#### Instalación
-
-```bash
-# Clonar repositorio
-git clone https://github.com/alvarolostal/creative-hands.git
-cd creative-hands
-
-# Instalar dependencias del servidor y cliente
+```powershell
+# Instalar dependencias (desde la raíz)
 npm install
-cd client && npm install && cd ..
 
-# Configurar variables de entorno
-cp .env.example .env
-# Editar .env con tus credenciales de MongoDB, JWT_SECRET y Cloudinary
-```
-
-#### Desarrollo
-
-```bash
-# Iniciar servidor y cliente simultáneamente
+# Desarrollo (server + client en modo dev)
 npm run dev
 
-# O por separado:
-npm run server  # Backend en http://localhost:5000
-npm run client  # Frontend en http://localhost:5173
-```
-
-#### Producción
-
-```bash
+# Para simular producción:
 npm run build
 npm start
 ```
 
-## 🧪 Testing
+Variables de entorno: copia `.env.example` a `.env` y configura al menos `MONGO_URI`, `JWT_SECRET` y las claves de Cloudinary si quieres subir imágenes.
 
-```bash
+## 🧪 Tests
+
+Ejecución rápida de la suite de tests:
+
+```powershell
 npm test
 ```
 
-Los tests cubren autenticación, gestión de productos, categorías y chat usando Jest, Supertest y MongoDB Memory Server.
+Las suites usan Jest, Supertest y MongoDB Memory Server para probar autenticación, productos y chat.
 
 ## 🛠️ Stack Tecnológico
 
@@ -114,22 +96,7 @@ creative-hands/
     └── tests/           # Tests unitarios
 ```
 
-## 🎯 Funcionalidades
-
-### Usuarios
-✅ Registro y autenticación con JWT  
-✅ Navegación por categorías de productos  
-✅ Visualización detallada de productos  
-✅ Sistema de valoraciones  
-✅ Chat en tiempo real con administradores  
-✅ Tema claro/oscuro automático
-
-### Administradores
-✅ Panel de administración protegido  
-✅ CRUD completo de productos y categorías  
-✅ Subida de imágenes a Cloudinary con optimización automática  
-✅ Gestión de múltiples conversaciones simultáneas  
-✅ Indicadores de estado (online/escribiendo)
+<!-- Sección de funcionalidades fusionada arriba -->
 
 ## 💡 Decisiones de Desarrollo
 

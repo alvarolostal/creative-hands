@@ -85,6 +85,8 @@ const Navbar = () => {
               Productos
             </Link>
 
+            {/* 'Sobre' eliminado por petición de diseño para mantener la navegación limpia */}
+
             {isAdmin && (
               <Link
                 to="/admin"
@@ -152,6 +154,15 @@ const Navbar = () => {
                               : "Usuario"}
                           </p>
                         </div>
+                        <Link
+                          to="/perfil"
+                          onClick={() => setUserMenuOpen(false)}
+                          className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors flex items-center space-x-2"
+                        >
+                          <User className="w-4 h-4" />
+                          <span>Perfil</span>
+                        </Link>
+
                         <button
                           onClick={handleLogout}
                           className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors flex items-center space-x-2"
@@ -215,6 +226,8 @@ const Navbar = () => {
                 Productos
               </Link>
 
+              {/* link a 'Sobre' removido del menú móvil */}
+
               {isAdmin && (
                 <Link
                   to="/admin"
@@ -250,6 +263,15 @@ const Navbar = () => {
                       {user.email}
                     </p>
                   </div>
+                  <Link
+                    to="/perfil"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="w-full text-left px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors flex items-center space-x-2 text-base font-medium min-h-[44px]"
+                  >
+                    <User className="w-5 h-5" />
+                    <span>Perfil</span>
+                  </Link>
+
                   <button
                     onClick={handleLogout}
                     className="w-full text-left px-4 py-3 text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors flex items-center space-x-2 text-base font-medium min-h-[44px]"

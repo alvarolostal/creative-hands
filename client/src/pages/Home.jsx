@@ -244,20 +244,7 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Footer (fino) */}
-      <footer className="mt-8 sm:mt-10 md:mt-12 mb-8 sm:mb-10 md:mb-12 px-4" role="contentinfo">
-        <div className="flex justify-center">
-          <div className="inline-flex flex-row items-center gap-2 sm:gap-3 px-4 sm:px-6 md:px-8 py-3 rounded-xl bg-white/8 dark:bg-gray-800/60 backdrop-blur-md text-sm md:text-base text-gray-700 dark:text-gray-100 shadow-md border border-white/6 dark:border-white/10">
-            <span className="font-medium">© 2025 Álvaro Lostal</span>
-            <span className="opacity-50">·</span>
-            <span aria-hidden="true" className="text-red-400">
-              ♥
-            </span>
-            <span className="opacity-50">·</span>
-            <span className="font-medium">Creative Hands</span>
-          </div>
-        </div>
-      </footer>
+      {/* Footer gestionado globalmente en App.jsx */}
     </div>
   );
 };

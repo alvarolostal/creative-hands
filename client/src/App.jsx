@@ -4,6 +4,7 @@ import {
   Routes,
   Route,
   Navigate,
+  useLocation,
 } from "react-router-dom";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import { SocketProvider } from "./context/SocketContext";
@@ -15,6 +16,11 @@ import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Products from "./pages/Products";
+import About from "./pages/About";
+import Perfil from "./pages/Perfil";
+import ShippingReturns from "./pages/ShippingReturns";
+import PrivacyTerms from "./pages/PrivacyTerms";
+import Footer from "./components/Footer";
 const Admin = lazy(() => import("./pages/Admin"));
 import { Loader } from "lucide-react";
 
@@ -43,6 +49,7 @@ const ProtectedRoute = ({ children, adminOnly = false }) => {
 
 function AppContent() {
   const { loading } = useAuth();
+  const location = useLocation();
 
   if (loading) {
     return (
@@ -63,6 +70,10 @@ function AppContent() {
       <ErrorBoundary>
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/envios" element={<ShippingReturns />} />
+          <Route path="/privacidad" element={<PrivacyTerms />} />
+          <Route path="/perfil" element={<ProtectedRoute>{<Perfil />}</ProtectedRoute>} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/products/category/:slug" element={<Products />} />
@@ -83,6 +94,8 @@ function AppContent() {
       <Suspense fallback={null}>
         <ChatWidget />
       </Suspense>
+      {/* Mostrar footer sólo en las páginas de contenido/publicas especificadas */}
+      {(location.pathname === '/' || location.pathname.startsWith('/products') || ['/about', '/envios', '/privacidad'].includes(location.pathname)) && <Footer />}
     </div>
   );
 }

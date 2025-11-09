@@ -11,6 +11,9 @@ client/node_modules/
 client/dist/
 client/build/
 
+# Dev service-worker output
+/dev-dist/
+
 # Logs
 logs/
 *.log

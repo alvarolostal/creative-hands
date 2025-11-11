@@ -13,7 +13,7 @@ const Footer = () => {
           {/* Brand - Left */}
           <div className="text-left col-span-1">
             <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300">Creative Hands</h4>
-            <p className="mt-2 text-xs text-gray-500 dark:text-gray-400 max-w-sm">Tienda de artesanía y productos hechos a mano. Calidad y cariño en cada pieza.</p>
+            <p className="mt-2 text-sm text-gray-500 dark:text-gray-400 max-w-sm">Tienda de artesanía y productos hechos a mano. Calidad y cariño en cada pieza.</p>
           </div>
 
           {/* Phrase: centered, full width on mobile (below Brand/Info), middle column on md+ */}
@@ -32,7 +32,7 @@ const Footer = () => {
           {/* Information - Right */}
           <div className="flex justify-end col-span-1 order-2 md:order-3">
             <div>
-              <h5 className="text-xs font-semibold text-gray-600 dark:text-gray-400 mb-2">Información</h5>
+              <h5 className="text-sm font-semibold text-gray-600 dark:text-gray-400 mb-2">Información</h5>
               <ul className="space-y-1 text-sm text-left">
                 <li>
                   <Link to="/about" className="text-gray-600 dark:text-gray-300 hover:text-primary-500">Quiénes somos</Link>

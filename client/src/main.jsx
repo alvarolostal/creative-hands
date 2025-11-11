@@ -5,15 +5,19 @@ import "./index.css";
 import { registerSW } from "virtual:pwa-register";
 
 // Registrar el service worker
-const updateSW = registerSW({
+let updateSW;
+registerSW({
   onNeedRefresh() {
     if (confirm("Nueva versión disponible. ¿Actualizar ahora?")) {
-      updateSW(true);
+      updateSW();
     }
   },
   onOfflineReady() {
     console.log("App lista para trabajar sin conexión");
   },
+  onRegistered(registration) {
+    updateSW = registration?.update;
+  }
 });
 
 ReactDOM.createRoot(document.getElementById("root")).render(

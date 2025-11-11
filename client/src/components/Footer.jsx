@@ -33,7 +33,7 @@ const Footer = () => {
           <div className="flex justify-end col-span-1 order-2 md:order-3">
             <div>
               <h5 className="text-xs font-semibold text-gray-600 dark:text-gray-400 mb-2">Información</h5>
-              <ul className="space-y-1 text-sm text-right">
+              <ul className="space-y-1 text-sm text-left">
                 <li>
                   <Link to="/about" className="text-gray-600 dark:text-gray-300 hover:text-primary-500">Quiénes somos</Link>
                 </li>

@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { Send, Loader, User, Circle } from "lucide-react";
 import { useSocket } from "../context/SocketContext";
 import { useAuth } from "../context/AuthContext";
-import axios from "axios";
+import api from "../utils/axios";
 
 const AdminChat = () => {
   const { socket, connected } = useSocket();
@@ -60,7 +60,7 @@ const AdminChat = () => {
 
   const fetchConversations = async () => {
     try {
-      const { data } = await axios.get("/api/chat/conversations");
+      const { data } = await api.get("/chat/conversations");
       setConversations(data.conversations);
       setLoading(false);
     } catch (error) {
@@ -72,8 +72,8 @@ const AdminChat = () => {
   const selectConversation = async (conversation) => {
     setSelectedConversation(conversation);
     try {
-      const { data } = await axios.get(
-        `/api/chat/messages/${conversation.user._id}`
+      const { data } = await api.get(
+        `/chat/messages/${conversation.user._id}`
       );
       setMessages(data.messages);
     } catch (error) {

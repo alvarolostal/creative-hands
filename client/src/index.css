@@ -1,27 +1,8 @@
 /* Fuentes Google: Poppins como fuente moderna y estética para el cuerpo */
 @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
 
-/* Copernicus New Condensed Trial - local fallback
-   Colocar el archivo de fuente en: public/fonts/CopernicusNewCondensedTrial.woff2
-   Si usas otro formato (woff, ttf), añade las fuentes correspondientes. */
-@font-face {
-  font-family: "Copernicus New Condensed Trial";
-  src: url("/fonts/CopernicusNewCondensedTrial.woff2") format("woff2");
-  font-weight: normal;
-  font-style: normal;
-  font-display: swap;
-}
-
-/* Map bold weight to the same file if no bold variant is available */
-@font-face {
-  font-family: "Copernicus New Condensed Trial";
-  src: url("/fonts/CopernicusNewCondensedTrial.woff2") format("woff2");
-  font-weight: 700;
-  font-style: normal;
-  font-display: swap;
-}
-
-/* Fuente para subtítulos: Copernicus Bold (archivo subido: CopernicusBold.woff2) */
+/* Copernicus Bold - fuente personalizada para subtítulos
+   Archivo: public/fonts/CopernicusBold.woff2 */
 @font-face {
   font-family: "Copernicus-Bold";
   src: url("/fonts/CopernicusBold.woff2") format("woff2");
@@ -60,7 +41,7 @@ body {
 @layer components {
   /* Clase utilitaria para el título de marca */
   .copernicus {
-    font-family: "Copernicus New Condensed Trial", "Inter", -apple-system,
+    font-family: "Copernicus-Bold", "Inter", -apple-system,
       BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     /* opcional: ajustar espaciado entre letras si se desea */
     letter-spacing: 0.02em;

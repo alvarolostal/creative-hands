@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { MessageCircle, X, Send, Loader } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { useSocket } from "../context/SocketContext";
-import axios from "axios";
+import api from "../utils/axios";
 
 const ChatWidget = () => {
   const { user, isAdmin } = useAuth();
@@ -32,11 +32,11 @@ const ChatWidget = () => {
       const fetchData = async () => {
         try {
           setLoading(true);
-          const { data: adminData } = await axios.get("/api/chat/admin");
+          const { data: adminData } = await api.get("/chat/admin");
           setAdminInfo(adminData.admin);
 
-          const { data: messagesData } = await axios.get(
-            `/api/chat/messages/${adminData.admin._id}`
+          const { data: messagesData } = await api.get(
+            `/chat/messages/${adminData.admin._id}`
           );
           setMessages(messagesData.messages);
         } catch (error) {

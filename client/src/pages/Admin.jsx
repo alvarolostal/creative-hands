@@ -10,12 +10,14 @@ import {
   Upload,
   GripVertical,
   Star,
+  ShoppingCart,
 } from "lucide-react";
 import axios from "axios";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import ProductCard from "../components/ProductCard";
 import AdminChat from "../components/AdminChat";
+import AdminOrders from "../components/AdminOrders";
 
 const Admin = () => {
   const { isAdmin } = useAuth();
@@ -526,6 +528,17 @@ const Admin = () => {
             <MessageSquare className="w-5 h-5" />
             <span>Conversaciones</span>
           </button>
+          <button
+            onClick={() => setActiveTab("orders")}
+            className={`flex items-center justify-center sm:justify-start space-x-2 px-4 sm:px-6 py-3 rounded-xl font-semibold transition-colors duration-200 min-h-[48px] text-base ${
+              activeTab === "orders"
+                ? "bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-lg"
+                : "glass text-gray-700 dark:text-gray-300 hover:shadow-md"
+            }`}
+          >
+            <ShoppingCart className="w-5 h-5" />
+            <span>Pedidos</span>
+          </button>
         </motion.div>
 
         {/* Content */}
@@ -590,6 +603,17 @@ const Admin = () => {
               exit={{ opacity: 0, x: 20 }}
             >
               <AdminChat />
+            </motion.div>
+          )}
+
+          {activeTab === "orders" && (
+            <motion.div
+              key="orders"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+            >
+              <AdminOrders />
             </motion.div>
           )}
         </AnimatePresence>

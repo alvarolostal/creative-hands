@@ -20,12 +20,16 @@ import About from "./pages/About";
 import Perfil from "./pages/Perfil";
 import ShippingReturns from "./pages/ShippingReturns";
 import PrivacyTerms from "./pages/PrivacyTerms";
+import Cart from "./pages/Cart";
+import Checkout from "./pages/Checkout";
+import MyOrders from "./pages/MyOrders";
+import OrderConfirmation from "./pages/OrderConfirmation";
 import Footer from "./components/Footer";
 const Admin = lazy(() => import("./pages/Admin"));
 import { Loader } from "lucide-react";
 
 // Protected Route Component
-const ProtectedRoute = ({ children, adminOnly = false }) => {
+const ProtectedRoute = ({ children, adminOnly = false, excludeAdmin = false }) => {
   const { user, loading, isAdmin } = useAuth();
 
   if (loading) {
@@ -42,6 +46,10 @@ const ProtectedRoute = ({ children, adminOnly = false }) => {
 
   if (adminOnly && !isAdmin) {
     return <Navigate to="/products" replace />;
+  }
+
+  if (excludeAdmin && isAdmin) {
+    return <Navigate to="/admin" replace />;
   }
 
   return children;
@@ -73,6 +81,10 @@ function AppContent() {
           <Route path="/about" element={<About />} />
           <Route path="/envios" element={<ShippingReturns />} />
           <Route path="/privacidad" element={<PrivacyTerms />} />
+          <Route path="/cart" element={<Cart />} />
+          <Route path="/checkout" element={<ProtectedRoute excludeAdmin>{<Checkout />}</ProtectedRoute>} />
+          <Route path="/order-confirmation" element={<ProtectedRoute excludeAdmin>{<OrderConfirmation />}</ProtectedRoute>} />
+          <Route path="/my-orders" element={<ProtectedRoute excludeAdmin>{<MyOrders />}</ProtectedRoute>} />
           <Route path="/perfil" element={<ProtectedRoute>{<Perfil />}</ProtectedRoute>} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
@@ -95,7 +107,7 @@ function AppContent() {
         <ChatWidget />
       </Suspense>
       {/* Mostrar footer sólo en las páginas de contenido/publicas especificadas */}
-      {(location.pathname === '/' || location.pathname.startsWith('/products') || ['/about', '/envios', '/privacidad'].includes(location.pathname)) && <Footer />}
+      {(location.pathname === '/' || location.pathname.startsWith('/products') || ['/about', '/envios', '/privacidad', '/cart'].includes(location.pathname)) && <Footer />}
     </div>
   );
 }

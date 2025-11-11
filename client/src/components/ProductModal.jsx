@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { X, ChevronLeft, ChevronRight, Star } from "lucide-react";
 import axios from "axios";
 import { useAuth } from "../context/AuthContext";
+import { useCart } from "../context/CartContext";
 import Reviews from "./Reviews";
 
 const backdropVariants = {
@@ -29,6 +30,10 @@ const ProductModal = ({ product, onClose }) => {
   const isFirstMount = useRef(true);
   const touchStartX = useRef(null);
   const touchEndX = useRef(null);
+  const [quantity, setQuantity] = useState(1);
+  const [addedToCart, setAddedToCart] = useState(false);
+
+  const { addToCart } = useCart();
 
   useEffect(() => {
     const handleKey = (e) => {
@@ -388,8 +393,43 @@ const ProductModal = ({ product, onClose }) => {
 
                 {/* CTA */}
                 <div className="mt-4 sm:mt-6 flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
-                  <button className="px-4 sm:px-5 py-3 bg-gradient-to-r from-primary-500 to-primary-600 text-white rounded-full font-semibold shadow-lg hover:shadow-xl text-base min-h-[44px] flex items-center justify-center">
-                    Añadir al carrito
+                  <div className="flex items-center gap-2 bg-gray-100 dark:bg-gray-800 rounded-full px-3 py-2">
+                    <button
+                      onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                      className="px-2 py-1 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
+                      disabled={quantity <= 1}
+                    >
+                      -
+                    </button>
+                    <span className="px-3 font-semibold text-gray-900 dark:text-white min-w-[2rem] text-center">
+                      {quantity}
+                    </span>
+                    <button
+                      onClick={() =>
+                        setQuantity(Math.min(product.stock, quantity + 1))
+                      }
+                      className="px-2 py-1 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
+                      disabled={quantity >= product.stock}
+                    >
+                      +
+                    </button>
+                  </div>
+                  <button
+                    onClick={() => {
+                      addToCart(product, quantity);
+                      setAddedToCart(true);
+                      setTimeout(() => setAddedToCart(false), 2000);
+                    }}
+                    disabled={product.stock === 0}
+                    className={`px-4 sm:px-5 py-3 text-white rounded-full font-semibold shadow-lg hover:shadow-xl text-base min-h-[44px] flex items-center justify-center transition-all ${
+                      product.stock === 0
+                        ? "bg-gray-400 cursor-not-allowed"
+                        : addedToCart
+                        ? "bg-green-600 hover:bg-green-700"
+                        : "bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700"
+                    }`}
+                  >
+                    {addedToCart ? "✓ Añadido" : "Añadir al carrito"}
                   </button>
                   <button
                     onClick={onClose}

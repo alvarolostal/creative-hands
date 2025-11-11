@@ -54,14 +54,14 @@ const Perfil = () => {
         <div className="glass p-6 rounded-2xl shadow-lg">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h2 className="text-2xl font-semibold">Mi perfil</h2>
-              <p className="text-sm text-gray-600">Actualiza tu nombre o cambia tu contraseña desde aquí.</p>
+              <h2 className="text-2xl font-semibold dark:text-white">Mi perfil</h2>
+              <p className="text-sm text-gray-600 dark:text-gray-300">Actualiza tu nombre o cambia tu contraseña desde aquí.</p>
             </div>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700">Nombre</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Nombre</label>
               <input
                 value={name}
                 onChange={(e) => setName(e.target.value)}
@@ -70,7 +70,7 @@ const Perfil = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700">Contraseña actual (necesaria si vas a cambiar)</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Contraseña actual (necesaria si vas a cambiar)</label>
               <input
                 type="password"
                 value={currentPassword}
@@ -81,7 +81,7 @@ const Perfil = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700">Nueva contraseña</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Nueva contraseña</label>
               <input
                 type="password"
                 value={newPassword}

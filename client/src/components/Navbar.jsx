@@ -51,7 +51,7 @@ const Navbar = () => {
       }`}
     >
       <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-14 sm:h-16">
+        <div className="flex justify-between items-center h-18 sm:h-20">
           {/* Logo */}
           <Link
             to="/"
@@ -70,7 +70,7 @@ const Navbar = () => {
             }}
             className="flex items-center space-x-2 group"
           >
-            <span className="text-lg sm:text-xl md:text-xl font-bold copernicus copernicus-110 uppercase text-primary-500 transition-colors brand-title">
+            <span className="text-3xl lg:text-2xl font-bold copernicus copernicus-110 uppercase text-primary-500 transition-colors brand-title">
               creative hands
             </span>
           </Link>
@@ -223,16 +223,15 @@ const Navbar = () => {
             )}
           </div>
 
-          {/* Mobile Menu Button */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-2.5 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
+            className="md:hidden p-3.5 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors min-w-[52px] min-h-[52px] flex items-center justify-center"
             aria-label={mobileMenuOpen ? "Cerrar menú" : "Abrir menú"}
           >
             {mobileMenuOpen ? (
-              <X className="w-6 h-6 text-gray-700 dark:text-gray-300" />
+              <X className="w-8 h-8 text-gray-700 dark:text-gray-300" />
             ) : (
-              <Menu className="w-6 h-6 text-gray-700 dark:text-gray-300" />
+              <Menu className="w-8 h-8 text-gray-700 dark:text-gray-300" />
             )}
           </button>
         </div>

@@ -10,6 +10,7 @@ import { AuthProvider, useAuth } from "./context/AuthContext";
 import { SocketProvider } from "./context/SocketContext";
 import { ThemeProvider } from "./context/ThemeContext";
 import Navbar from "./components/Navbar";
+import CartDrawer from "./components/CartDrawer";
 const ChatWidget = lazy(() => import("./components/ChatWidget"));
 import ErrorBoundary from "./components/ErrorBoundary";
 import Home from "./pages/Home";
@@ -74,7 +75,8 @@ function AppContent() {
 
   return (
     <div className="min-h-screen bg-light-500 dark:bg-dark-500 transition-colors duration-300">
-      <Navbar />
+    <Navbar />
+    <CartDrawer />
       <ErrorBoundary>
         <Routes>
           <Route path="/" element={<Home />} />

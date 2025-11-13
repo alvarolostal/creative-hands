@@ -12,6 +12,7 @@ export const useCart = () => {
 
 export const CartProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState([]);
+  const [isCartOpen, setIsCartOpen] = useState(false);
 
   // Cargar carrito desde localStorage al montar
   useEffect(() => {
@@ -82,6 +83,10 @@ export const CartProvider = ({ children }) => {
     setCartItems([]);
   };
 
+  const openCart = () => setIsCartOpen(true);
+  const closeCart = () => setIsCartOpen(false);
+  const toggleCart = () => setIsCartOpen((s) => !s);
+
   // Calcular número total de items
   const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
@@ -97,6 +102,10 @@ export const CartProvider = ({ children }) => {
     removeFromCart,
     updateQuantity,
     clearCart,
+    isCartOpen,
+    openCart,
+    closeCart,
+    toggleCart,
     totalItems,
     totalPrice,
   };

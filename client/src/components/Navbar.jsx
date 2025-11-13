@@ -18,7 +18,7 @@ import {
 
 const Navbar = () => {
   const { user, logout, isAdmin } = useAuth();
-  const { totalItems } = useCart();
+  const { totalItems, openCart } = useCart();
   const { theme, toggleTheme } = useTheme();
   const location = useLocation();
   const [scrolled, setScrolled] = useState(false);
@@ -106,9 +106,10 @@ const Navbar = () => {
 
             {/* Carrito - solo usuarios autenticados que NO sean admin */}
             {user && !isAdmin && (
-              <Link
-                to="/cart"
+              <button
+                onClick={openCart}
                 className="relative text-sm font-medium transition-colors text-gray-700 dark:text-gray-300 hover:text-primary-500 flex items-center space-x-1"
+                aria-label="Abrir carrito"
               >
                 <ShoppingBag className="w-5 h-5" />
                 {totalItems > 0 && (
@@ -116,7 +117,7 @@ const Navbar = () => {
                     {totalItems}
                   </span>
                 )}
-              </Link>
+              </button>
             )}
 
             {/* Theme Toggle */}
@@ -313,9 +314,11 @@ const Navbar = () => {
                   )}
 
                   {user && !isAdmin && (
-                    <Link
-                      to="/cart"
-                      onClick={() => setMobileMenuOpen(false)}
+                    <button
+                      onClick={() => {
+                        openCart();
+                        setMobileMenuOpen(false);
+                      }}
                       className="w-full text-left px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors flex items-center space-x-2 text-base font-medium min-h-[44px] relative"
                     >
                       <ShoppingBag className="w-5 h-5" />
@@ -325,7 +328,7 @@ const Navbar = () => {
                           {totalItems}
                         </span>
                       )}
-                    </Link>
+                    </button>
                   )}
 
                   <button

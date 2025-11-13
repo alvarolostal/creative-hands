@@ -141,6 +141,31 @@ body {
   }
 }
 
+/* Asegurar colores de texto legibles en modo oscuro para utilidades heredadas
+   Algunas clases pueden haberse definido sólo para modo claro; aquí añadimos
+   un pequeño override para que esos textos también sean legibles en .dark. */
+@layer components {
+  .dark .text-gray-900 { color: #ffffff !important; }
+  .dark .text-gray-800 { color: #f8fafc !important; }
+  .dark .text-gray-700 { color: #d1d5db !important; }
+  .dark .text-gray-600 { color: #9ca3af !important; }
+  .dark .text-gray-500 { color: #6b7280 !important; }
+}
+
+/* Variable global de color de texto para elementos sin utilidades específicas */
+:root {
+  --text-default: #111827; /* gray-900 */
+}
+.dark :root,
+.dark body,
+.dark .dark-text-fallback {
+  --text-default: #ffffff;
+}
+
+body {
+  color: var(--text-default);
+}
+
 .smooth-transition {
   transition: color 0.25s ease, background-color 0.25s ease,
     box-shadow 0.25s ease, transform 0.25s ease;

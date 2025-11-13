@@ -8,7 +8,7 @@ import { motion } from "framer-motion";
 
 const Checkout = () => {
   const navigate = useNavigate();
-  const { cartItems, totalPrice, clearCart } = useCart();
+  const { cartItems, totalPrice, clearCart, openCart } = useCart();
   const { user, isAdmin } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -98,7 +98,7 @@ const Checkout = () => {
             Añade productos antes de proceder al checkout
           </p>
           <button
-            onClick={() => navigate("/cart")}
+            onClick={() => openCart()}
             className="inline-block px-6 py-3 bg-gradient-to-r from-primary-500 to-primary-600 text-white rounded-full font-semibold hover:shadow-lg transition-all"
           >
             Volver al carrito
@@ -114,7 +114,7 @@ const Checkout = () => {
         {/* Header */}
         <div className="mb-8">
           <button
-            onClick={() => navigate("/cart")}
+            onClick={() => openCart()}
             className="flex items-center space-x-2 text-primary-500 hover:text-primary-600 font-medium mb-4"
           >
             <ArrowLeft className="w-4 h-4" />

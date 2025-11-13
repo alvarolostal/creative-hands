@@ -51,7 +51,7 @@ const Navbar = () => {
       }`}
     >
       <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-18 sm:h-20">
+        <div className="flex justify-between items-center h-16 sm:h-20">
           {/* Logo */}
           <Link
             to="/"
@@ -70,7 +70,7 @@ const Navbar = () => {
             }}
             className="flex items-center space-x-2 group"
           >
-            <span className="text-3xl lg:text-2xl font-bold copernicus copernicus-110 uppercase text-primary-500 transition-colors brand-title">
+            <span className="text-2xl lg:text-2xl font-bold copernicus copernicus-110 uppercase text-primary-500 transition-colors brand-title">
               creative hands
             </span>
           </Link>

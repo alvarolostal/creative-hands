@@ -10,6 +10,7 @@ import {
   User,
   LogOut,
   ShoppingBag,
+  Package,
   Menu,
   X,
   LayoutDashboard,
@@ -103,18 +104,20 @@ const Navbar = () => {
               </Link>
             )}
 
-            {/* Carrito */}
-            <Link
-              to="/cart"
-              className="relative text-sm font-medium transition-colors text-gray-700 dark:text-gray-300 hover:text-primary-500 flex items-center space-x-1"
-            >
-              <ShoppingBag className="w-5 h-5" />
-              {totalItems > 0 && (
-                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
-                  {totalItems}
-                </span>
-              )}
-            </Link>
+            {/* Carrito - solo usuarios autenticados que NO sean admin */}
+            {user && !isAdmin && (
+              <Link
+                to="/cart"
+                className="relative text-sm font-medium transition-colors text-gray-700 dark:text-gray-300 hover:text-primary-500 flex items-center space-x-1"
+              >
+                <ShoppingBag className="w-5 h-5" />
+                {totalItems > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                    {totalItems}
+                  </span>
+                )}
+              </Link>
+            )}
 
             {/* Theme Toggle */}
             <motion.button
@@ -184,7 +187,7 @@ const Navbar = () => {
                             onClick={() => setUserMenuOpen(false)}
                             className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors flex items-center space-x-2"
                           >
-                            <ShoppingBag className="w-4 h-4" />
+                            <Package className="w-4 h-4" />
                             <span>Mis Pedidos</span>
                           </Link>
                         )}
@@ -304,24 +307,26 @@ const Navbar = () => {
                       onClick={() => setMobileMenuOpen(false)}
                       className="w-full text-left px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors flex items-center space-x-2 text-base font-medium min-h-[44px]"
                     >
-                      <ShoppingBag className="w-5 h-5" />
+                      <Package className="w-5 h-5" />
                       <span>Mis Pedidos</span>
                     </Link>
                   )}
 
-                  <Link
-                    to="/cart"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="w-full text-left px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors flex items-center space-x-2 text-base font-medium min-h-[44px] relative"
-                  >
-                    <ShoppingBag className="w-5 h-5" />
-                    <span>Carrito</span>
-                    {totalItems > 0 && (
-                      <span className="ml-auto bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
-                        {totalItems}
-                      </span>
-                    )}
-                  </Link>
+                  {user && !isAdmin && (
+                    <Link
+                      to="/cart"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="w-full text-left px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors flex items-center space-x-2 text-base font-medium min-h-[44px] relative"
+                    >
+                      <ShoppingBag className="w-5 h-5" />
+                      <span>Carrito</span>
+                      {totalItems > 0 && (
+                        <span className="ml-auto bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                          {totalItems}
+                        </span>
+                      )}
+                    </Link>
+                  )}
 
                   <button
                     onClick={handleLogout}

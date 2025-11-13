@@ -32,6 +32,7 @@ const ProductModal = ({ product, onClose }) => {
   const touchEndX = useRef(null);
   const [quantity, setQuantity] = useState(1);
   const [addedToCart, setAddedToCart] = useState(false);
+  const [ctaMessage, setCtaMessage] = useState("");
 
   const { addToCart } = useCart();
 
@@ -414,23 +415,44 @@ const ProductModal = ({ product, onClose }) => {
                       +
                     </button>
                   </div>
-                  <button
-                    onClick={() => {
-                      addToCart(product, quantity);
-                      setAddedToCart(true);
-                      setTimeout(() => setAddedToCart(false), 2000);
-                    }}
-                    disabled={product.stock === 0}
-                    className={`px-4 sm:px-5 py-3 text-white rounded-full font-semibold shadow-lg hover:shadow-xl text-base min-h-[44px] flex items-center justify-center transition-all ${
-                      product.stock === 0
-                        ? "bg-gray-400 cursor-not-allowed"
-                        : addedToCart
-                        ? "bg-green-600 hover:bg-green-700"
-                        : "bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700"
-                    }`}
-                  >
-                    {addedToCart ? "✓ Añadido" : "Añadir al carrito"}
-                  </button>
+                  <div className="flex flex-col items-stretch gap-2 w-full">
+                    {ctaMessage && (
+                      <div className="text-sm text-center text-yellow-700 dark:text-yellow-300 bg-yellow-50 dark:bg-yellow-900/30 px-3 py-2 rounded-md">
+                        {ctaMessage}
+                      </div>
+                    )}
+                    <button
+                      onClick={() => {
+                        // bloquear para admins y no autenticados, mostrar mensaje apropiado
+                        if (!isAuthenticated) {
+                          setCtaMessage("Regístrate para agregar al carrito.");
+                          setTimeout(() => setCtaMessage(""), 3000);
+                          return;
+                        }
+                        // Authenticated but admin
+                        if (user?.role === "admin") {
+                          setCtaMessage("Eres admin, no puedes añadir productos al carrito.");
+                          setTimeout(() => setCtaMessage(""), 3000);
+                          return;
+                        }
+
+                        // Usuario cliente: proceder
+                        addToCart(product, quantity);
+                        setAddedToCart(true);
+                        setTimeout(() => setAddedToCart(false), 2000);
+                      }}
+                      disabled={product.stock === 0}
+                      className={`w-full px-4 sm:px-5 py-3 text-white rounded-full font-semibold shadow-lg hover:shadow-xl text-base min-h-[44px] flex items-center justify-center transition-all ${
+                        product.stock === 0
+                          ? "bg-gray-400 cursor-not-allowed"
+                          : addedToCart
+                          ? "bg-green-600 hover:bg-green-700"
+                          : "bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700"
+                      }`}
+                    >
+                      {addedToCart ? "✓ Añadido" : "Añadir al carrito"}
+                    </button>
+                  </div>
                   <button
                     onClick={onClose}
                     className="px-4 py-3 border rounded-full text-gray-700 dark:text-gray-200 text-base min-h-[44px] flex items-center justify-center"

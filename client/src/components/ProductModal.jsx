@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { motion } from "framer-motion";
-import { X, ChevronLeft, ChevronRight, Star } from "lucide-react";
+import { X, ChevronLeft, ChevronRight, Star, ShoppingCart } from "lucide-react";
 import axios from "axios";
 import { useAuth } from "../context/AuthContext";
 import { useCart } from "../context/CartContext";
@@ -393,16 +393,17 @@ const ProductModal = ({ product, onClose }) => {
                 )}
 
                 {/* CTA */}
-                <div className="mt-4 sm:mt-6 flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
-                  <div className="flex items-center gap-2 bg-gray-100 dark:bg-gray-800 rounded-full px-3 py-2">
+                <div className="mt-4 sm:mt-6 flex flex-row flex-nowrap items-center gap-3">
+                  <div className="flex items-center gap-2 bg-gray-100 dark:bg-gray-800 rounded-full px-2 py-2 w-28 sm:w-40 flex-none justify-center">
                     <button
                       onClick={() => setQuantity(Math.max(1, quantity - 1))}
                       className="px-2 py-1 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
                       disabled={quantity <= 1}
+                      aria-label="Disminuir cantidad"
                     >
                       -
                     </button>
-                    <span className="px-3 font-semibold text-gray-900 dark:text-white min-w-[2rem] text-center">
+                    <span className="px-2 font-semibold text-gray-900 dark:text-white w-8 text-center">
                       {quantity}
                     </span>
                     <button
@@ -411,38 +412,32 @@ const ProductModal = ({ product, onClose }) => {
                       }
                       className="px-2 py-1 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
                       disabled={quantity >= product.stock}
+                      aria-label="Aumentar cantidad"
                     >
                       +
                     </button>
                   </div>
-                  <div className="flex flex-col items-stretch gap-2 w-full">
-                    {ctaMessage && (
-                      <div className="text-sm text-center text-yellow-700 dark:text-yellow-300 bg-yellow-50 dark:bg-yellow-900/30 px-3 py-2 rounded-md">
-                        {ctaMessage}
-                      </div>
-                    )}
+
+                  <div className="flex-1 flex items-center gap-3 sm:gap-4 w-full min-w-0">
                     <button
                       onClick={() => {
-                        // bloquear para admins y no autenticados, mostrar mensaje apropiado
                         if (!isAuthenticated) {
                           setCtaMessage("Regístrate para agregar al carrito.");
                           setTimeout(() => setCtaMessage(""), 3000);
                           return;
                         }
-                        // Authenticated but admin
                         if (user?.role === "admin") {
                           setCtaMessage("Eres admin, no puedes añadir productos al carrito.");
                           setTimeout(() => setCtaMessage(""), 3000);
                           return;
                         }
 
-                        // Usuario cliente: proceder
                         addToCart(product, quantity);
                         setAddedToCart(true);
                         setTimeout(() => setAddedToCart(false), 2000);
                       }}
                       disabled={product.stock === 0}
-                      className={`w-full px-4 sm:px-5 py-3 text-white rounded-full font-semibold shadow-lg hover:shadow-xl text-base min-h-[44px] flex items-center justify-center transition-all ${
+                      className={`flex-1 flex items-center justify-center gap-2 px-4 sm:px-5 py-3 text-white rounded-full font-semibold shadow-lg hover:shadow-xl text-base min-h-[44px] transition-all whitespace-nowrap min-w-[120px] ${
                         product.stock === 0
                           ? "bg-gray-400 cursor-not-allowed"
                           : addedToCart
@@ -450,15 +445,18 @@ const ProductModal = ({ product, onClose }) => {
                           : "bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700"
                       }`}
                     >
-                      {addedToCart ? "✓ Añadido" : "Añadir al carrito"}
+                      <ShoppingCart className="w-4 h-4" />
+                      <span>{addedToCart ? "Añadido" : "Añadir"}</span>
                     </button>
+
+                    {/* El botón 'Cerrar' inferior eliminado: ya existe el botón de cierre en la cabecera */}
                   </div>
-                  <button
-                    onClick={onClose}
-                    className="px-4 py-3 border rounded-full text-gray-700 dark:text-gray-200 text-base min-h-[44px] flex items-center justify-center"
-                  >
-                    Cerrar
-                  </button>
+                  {/* Mensaje CTA colocado debajo para evitar que rompa la línea en móviles */}
+                  {ctaMessage && (
+                    <div className="w-full text-sm mt-2 text-center text-yellow-700 dark:text-yellow-300 bg-yellow-50 dark:bg-yellow-900/30 px-3 py-2 rounded-md">
+                      {ctaMessage}
+                    </div>
+                  )}
                 </div>
                 <div className="mt-4 sm:mt-6 text-xs text-gray-400">
                   ID del producto: {product._id}

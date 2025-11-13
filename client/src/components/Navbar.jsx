@@ -68,7 +68,7 @@ const Navbar = () => {
                 );
               }
             }}
-            className="flex items-center space-x-2 group"
+            className="flex items-center space-x-2 group ml-3 lg:ml-0"
           >
             <span className="text-2xl lg:text-2xl font-bold copernicus copernicus-110 uppercase text-primary-500 transition-colors brand-title">
               creative hands
